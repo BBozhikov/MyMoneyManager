@@ -48,7 +48,7 @@ export default function LoginScreen() {
             <Text style={styles.link}>Нямаш акаунт? Регистрирай се</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ marginTop:50}} activeOpacity={0.7} onPress={() => router.push('/(tabs)/explore')}>
+        <TouchableOpacity style={{ marginTop:50}} activeOpacity={0.7} onPress={() => router.push('/(tabs)/main')}>
             <Text style={styles.link2}>Искаш без акаунт? Използвай локално приложението</Text>
         </TouchableOpacity>
     </View></>
