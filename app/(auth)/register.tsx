@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RegisterScreen() {
   const [name, setName] = useState('');
@@ -14,7 +15,7 @@ export default function RegisterScreen() {
 
   return (
     <><Stack.Screen options={{ headerShown: false }} />
-
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }}>
     <View style={styles.container}>
       <Image source={PlaceholderImage} style={styles.image} />
 
@@ -69,30 +70,15 @@ export default function RegisterScreen() {
         )}
       </Pressable>
 
-    </View></>
+    </View>
+    </SafeAreaView></>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#000',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 32,
-    textAlign: 'center',
-    color: 'white',
-  },
-  image: {
-    alignSelf: 'center',
-    marginBottom: 20,
-    height: 78,
-    width: 102,
-  },
+  container: {flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#2b4d47',},
+  title: {fontSize: 28,fontWeight: 'bold',marginBottom: 32,textAlign: 'center',color: 'white',},
+  image: {alignSelf: 'center',marginBottom: 20,height: 78,width: 102,},
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
