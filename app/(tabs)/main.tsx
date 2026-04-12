@@ -14,7 +14,7 @@ export default function MainScreen() {
   const router = useRouter();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#3b6861' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#3b6861' }} edges={['top', 'bottom']}>
     <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
       <View style={styles.card}>
         <PieChart

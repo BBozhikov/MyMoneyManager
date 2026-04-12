@@ -1,12 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import {
-    ActivityIndicator,
-    Alert,
-    StyleSheet, Text, TextInput, TouchableOpacity,
-    View,
-} from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Step = 'email' | 'success';
 
@@ -39,14 +34,8 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <><StatusBar style="light" backgroundColor="#2b4d47" translucent={false} />
-    <Stack.Screen options={{
-        headerShown: true,
-        title: 'Забравена парола',
-        headerStyle: { backgroundColor: '#2b4d47' },
-        headerTintColor: 'white',
-        headerTitleStyle: { fontWeight: 'bold' },
-      }} />
+    <><Stack.Screen options={{ headerShown: false, animation: 'slide_from_left'}} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }} edges={['top', 'bottom']}>
     <View style={styles.container}>
       {step === 'email' ? (
         <>
@@ -78,7 +67,7 @@ export default function ForgotPasswordScreen() {
             }
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.7} onPress={() => router.back()}>
+          <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/(auth)/login')}>
             <Text style={styles.link}>Обратно към вход</Text>
           </TouchableOpacity>
         </>
@@ -95,7 +84,7 @@ export default function ForgotPasswordScreen() {
           <TouchableOpacity
             style={styles.button}
             activeOpacity={0.7}
-            onPress={() => router.replace('/(auth)/login')}
+            onPress={() => router.push('/(auth)/login')}
           >
             <Text style={styles.buttonText}>Обратно към вход</Text>
           </TouchableOpacity>
@@ -106,6 +95,7 @@ export default function ForgotPasswordScreen() {
         </>
       )}
     </View>
+    </SafeAreaView>
     </>
   );
 }

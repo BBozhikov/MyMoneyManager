@@ -14,8 +14,8 @@ export default function RegisterScreen() {
   const PlaceholderImage = require('@/assets/images/banknote.png');
 
   return (
-    <><Stack.Screen options={{ headerShown: false }} />
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }}>
+    <><Stack.Screen options={{ headerShown: false, animation: 'slide_from_left'}} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }} edges={['top', 'bottom']}>
     <View style={styles.container}>
       <Image source={PlaceholderImage} style={styles.image} />
 

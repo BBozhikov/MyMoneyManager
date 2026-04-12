@@ -43,11 +43,11 @@ export default function LoginScreen() {
 
   return (
     <><Stack.Screen options={{ headerShown: false }} />
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }} edges={['top', 'bottom']}>
     <View style={styles.container}>
       <Image source={PlaceholderImage} style={styles.image} />
       <Text style={styles.title}>Добре дошъл отново в My Money Manager</Text>
-
+      
       <TextInput
         style={styles.input}
         placeholder="Имейл"

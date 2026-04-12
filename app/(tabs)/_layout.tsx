@@ -16,6 +16,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: { backgroundColor: '#3b6861' },
+        sceneStyle: { backgroundColor: '#3b6861' },
       }}>
       <Tabs.Screen
         name="index"
@@ -40,8 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="reports"
         options={{
-          title: 'Анализ',
-          tabBarIcon: ({ color }) => <AntDesign name="area-chart" size={28} color={color} />,
+          href: null,
         }}/>
 
       <Tabs.Screen

@@ -1,6 +1,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SystemBars } from 'react-native-edge-to-edge';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -14,14 +15,20 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
+    <><SystemBars style={{ statusBar: 'light', navigationBar: 'light' }} />
     <SafeAreaProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
+        <Stack screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: '#3b6861' }, // ← това е ключовото
+          animation: 'slide_from_right',
+        }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         </Stack>
         <StatusBar style="auto" />
       </ThemeProvider>
     </SafeAreaProvider>
+    </>
   );
 }
