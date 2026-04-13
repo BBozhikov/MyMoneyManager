@@ -1,20 +1,9 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Stack } from 'expo-router';
 import React, { useState } from 'react';
-import {
-    Modal,
-    Platform,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ─── Константи ────────────────────────────────────────────────────
 const CATEGORIES = ['Храна', 'Транспорт', 'Сметки', 'Развлечения', 'Здраве', 'Жилище', 'Заплата', 'Инвестиции', 'Друго'];
 const ACCOUNTS   = ['Кеш', 'ДСК', 'Revolut'];
 
@@ -224,20 +213,12 @@ const styles = StyleSheet.create({
   content: { padding: 16, gap: 12, paddingBottom: 48 },
 
   // Type toggle
-  typeToggle: {
-    flexDirection: 'row', backgroundColor: SURFACE,
-    borderRadius: 14, padding: 4, gap: 4,
-    borderWidth: 1, borderColor: BORDER,
-  },
+  typeToggle: {flexDirection: 'row', backgroundColor: SURFACE,borderRadius: 14, padding: 4, gap: 4,borderWidth: 1, borderColor: BORDER,},
   typeBtn:     { flex: 1, paddingVertical: 11, alignItems: 'center' },
   typeBtnText: { color: 'rgba(255,255,255,0.4)', fontSize: 15, fontWeight: '700' },
 
   // Card
-  card: {
-    backgroundColor: SURFACE, borderRadius: 14,
-    paddingHorizontal: 16, paddingVertical: 14,
-    borderWidth: 1, borderColor: BORDER, gap: 8,
-  },
+  card: {backgroundColor: SURFACE, borderRadius: 14,paddingHorizontal: 16, paddingVertical: 14,borderWidth: 1, borderColor: BORDER, gap: 8,},
   label: { color: 'rgba(255,255,255,0.5)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.8 },
 
   // Amount
@@ -252,34 +233,21 @@ const styles = StyleSheet.create({
   chevron:         { color: 'rgba(255,255,255,0.3)', fontSize: 22, lineHeight: 26 },
 
   // Note
-  noteInput: {
-    color: 'white', fontSize: 15, paddingVertical: 0,
-    minHeight: 64, textAlignVertical: 'top',
-  },
+  noteInput: {color: 'white', fontSize: 15, paddingVertical: 0,minHeight: 64, textAlignVertical: 'top',},
 
   // Camera
-  cameraBtn: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: 10, backgroundColor: SURFACE, borderRadius: 14,
-    paddingVertical: 14, borderWidth: 1, borderColor: BORDER,
-    borderStyle: 'dashed',
-  },
+  cameraBtn: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center',gap: 10, backgroundColor: SURFACE, 
+    borderRadius: 14,paddingVertical: 14, borderWidth: 1, borderColor: BORDER,borderStyle: 'dashed',},
   cameraIcon:    { fontSize: 20 },
   cameraBtnText: { color: 'rgba(255,255,255,0.6)', fontSize: 15, fontWeight: '600' },
 
   // Submit
-  submitBtn: {
-    borderRadius: 14, paddingVertical: 16,
-    alignItems: 'center', marginTop: 4,
-  },
+  submitBtn: {borderRadius: 14, paddingVertical: 16,alignItems: 'center', marginTop: 4,},
   submitBtnText: { color: 'white', fontSize: 16, fontWeight: '700' },
 
   // Modal
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
-  sheet: {
-    backgroundColor: '#2a5248', borderTopLeftRadius: 20,
-    borderTopRightRadius: 20, padding: 20, paddingBottom: 40, gap: 4,
-  },
+  sheet: {backgroundColor: '#2a5248', borderTopLeftRadius: 20,borderTopRightRadius: 20, padding: 20, paddingBottom: 40, gap: 4,},
   sheetTitle:           { color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 },
   sheetOption:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 12, borderRadius: 10 },
   sheetOptionActive:    { backgroundColor: 'rgba(255,255,255,0.08)' },

@@ -79,29 +79,8 @@ const styles = StyleSheet.create({
   container: {flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#2b4d47',},
   title: {fontSize: 28,fontWeight: 'bold',marginBottom: 32,textAlign: 'center',color: 'white',},
   image: {alignSelf: 'center',marginBottom: 20,height: 78,width: 102,},
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 16,
-    fontSize: 16,
-    color: 'white',
-  },
-  button: {
-    borderRadius: 8,
-    padding: 14,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  link: {
-    color: '#007AFF',
-    textAlign: 'center',
-    fontSize: 14,
-  },
+  input: {borderWidth: 1,borderColor: '#ccc',borderRadius: 8,padding: 12,marginBottom: 16,fontSize: 16,color: 'white',},
+  button: {borderRadius: 8,padding: 14,alignItems: 'center',marginBottom: 16,},
+  buttonText: {color: '#fff',fontSize: 16,fontWeight: '600',},
+  link: {color: '#007AFF',textAlign: 'center',fontSize: 14,},
 });

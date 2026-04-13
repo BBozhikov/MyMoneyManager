@@ -124,134 +124,32 @@ const WHITE_MUTED = 'rgba(255,255,255,0.6)';
 const WHITE_FAINT = 'rgba(255,255,255,0.12)';
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: BG,
-  },
-  scroll: {
-    flex: 1,
-    backgroundColor: BG,
-    marginTop: 20,
-  },
-  content: {
-    padding: 24,
-    alignItems: 'center',
-    gap: 16,
-  },
+  safe: {flex: 1,backgroundColor: BG,},
+  scroll: {flex: 1,backgroundColor: BG,marginTop: 20,},
+  content: {padding: 24,alignItems: 'center',gap: 16,},
 
   // Avatar
-  avatarCard: {
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-  },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 6,
-  },
-  avatarText: {
-    color: WHITE,
-    fontSize: 26,
-    fontWeight: '700',
-    letterSpacing: -0.5,
-  },
-  userName: {
-    color: WHITE,
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-  },
-  userEmail: {
-    color: WHITE_MUTED,
-    fontSize: 14,
-  },
+  avatarCard: {alignItems: 'center',gap: 6,paddingVertical: 8,},
+  avatar: {width: 72,height: 72,borderRadius: 36,backgroundColor: 'rgba(0,0,0,0.25)',alignItems: 'center',justifyContent: 'center',marginBottom: 6,},
+  avatarText: {color: WHITE,fontSize: 26,fontWeight: '700',letterSpacing: -0.5,},
+  userName: {color: WHITE,fontSize: 20,fontWeight: '700',letterSpacing: -0.3,},
+  userEmail: {color: WHITE_MUTED,fontSize: 14,},
 
   // Info card
-  card: {
-    backgroundColor: CARD,
-    borderRadius: 20,
-    width: '100%',
-    overflow: 'hidden',
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-  },
-  infoLabel: {
-    color: WHITE_MUTED,
-    fontSize: 15,
-  },
-  infoValue: {
-    color: WHITE,
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: WHITE_FAINT,
-    marginHorizontal: 16,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-  },
-  actionText: {
-    fontSize: 18,
-    width: 28,
-    textAlign: 'center',
-  },
-  actionLabel: {
-    flex: 1,
-    color: WHITE,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  chevron: {
-    color: WHITE_MUTED,
-    fontSize: 22,
-    fontWeight: '300',
-    lineHeight: 24,
-  },
+  card: {backgroundColor: CARD,borderRadius: 20,width: '100%',overflow: 'hidden'},
+  infoRow: {flexDirection: 'row',justifyContent: 'space-between',alignItems: 'center',paddingVertical: 16,paddingHorizontal: 20,},
+  infoLabel: {color: WHITE_MUTED,fontSize: 15,},
+  infoValue: {color: WHITE,fontSize: 15,fontWeight: '500',},
+  divider: {height: 1,backgroundColor: WHITE_FAINT,marginHorizontal: 16,},
+  actionRow: {flexDirection: 'row',alignItems: 'center',gap: 12,paddingVertical: 18,paddingHorizontal: 20,},
+  actionText: {fontSize: 18,width: 28,textAlign: 'center',},
+  actionLabel: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '600',},
+  chevron: {color: WHITE_MUTED,fontSize: 22,fontWeight: '300',lineHeight: 24,},
 
   // Bottom buttons
-  bottomRow: {
-    flexDirection: 'row',
-    width: '100%',
-    gap: 12,
-  },
-  signOutButton: {
-    flex: 1,
-    backgroundColor: CARD,
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  signOutText: {
-    color: WHITE_MUTED,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  deleteButton: {
-    flex: 1,
-    backgroundColor: 'rgba(255,59,48,0.18)',
-    borderRadius: 16,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  deleteText: {
-    color: '#FF3B30',
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  bottomRow: {flexDirection: 'row',width: '100%',gap: 12,},
+  signOutButton: {flex: 1,backgroundColor: CARD,borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
+  signOutText: {color: WHITE_MUTED,fontSize: 15,fontWeight: '600',},
+  deleteButton: {flex: 1,backgroundColor: 'rgba(255,59,48,0.18)',borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
+  deleteText: {color: '#FF3B30',fontSize: 15,fontWeight: '600',},
 });

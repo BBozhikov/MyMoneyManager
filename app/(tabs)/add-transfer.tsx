@@ -1,15 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-    Alert,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // ─── Mock data — replace with your real accounts ──────────────────────────────
@@ -318,7 +309,6 @@ export default function NewTransferScreen() {
   );
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const BG    = '#3b6861';
 const HEADER = '#3b6861';
 const CARD  = 'rgba(255,255,255,0.07)';
@@ -326,18 +316,10 @@ const WHITE = '#ffffff';
 const MUTED = 'rgba(255,255,255,0.4)';
 const ACCENT = '#3ecf8e';
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: HEADER,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
+  header: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',backgroundColor: HEADER,paddingHorizontal: 16,paddingVertical: 14,},
   backBtn: { width: 40 },
   backArrow: { color: WHITE, fontSize: 22 },
   headerTitle: { color: WHITE, fontSize: 18, fontWeight: '700' },
@@ -346,81 +328,19 @@ const styles = StyleSheet.create({
   content: { padding: 24, paddingBottom: 120, gap: 24 },
 
   // Amount
-  amountSection: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    gap: 10,
-    marginTop: 8,
-  },
-  amountInput: {
-    color: WHITE,
-    fontSize: 52,
-    fontWeight: '300',
-    letterSpacing: -1.5,
-    padding: 0,
-    minWidth: 80,
-    textAlign: 'center',
-  },
-  amountCurrency: {
-    color: ACCENT,
-    fontSize: 28,
-    fontWeight: '600',
-    paddingBottom: 6,
-  },
-  amountUnderline: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    marginHorizontal: 40,
-    marginTop: -14,
-  },
+  amountSection: {flexDirection: 'row',alignItems: 'flex-end',justifyContent: 'center',gap: 10,marginTop: 8,},
+  amountInput: {color: WHITE,fontSize: 52,fontWeight: '300',letterSpacing: -1.5,padding: 0,minWidth: 80,textAlign: 'center',},
+  amountCurrency: {color: ACCENT,fontSize: 28,fontWeight: '600',paddingBottom: 6,},
+  amountUnderline: {height: 1,backgroundColor: 'rgba(255,255,255,0.15)',marginHorizontal: 40,marginTop: -14,},
 
   // Transfer row
-  transferRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  accountCard: {
-    flex: 1,
-    backgroundColor: CARD,
-    borderRadius: 20,
-    padding: 16,
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.08)',
-    minHeight: 130,
-    justifyContent: 'center',
-  },
-  cardDirectionLabel: {
-    color: MUTED,
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    position: 'absolute',
-    top: 12,
-    left: 14,
-  },
-  cardIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
+  transferRow: {flexDirection: 'row',alignItems: 'center',gap: 8,},
+  accountCard: {flex: 1,backgroundColor: CARD,borderRadius: 20,padding: 16,alignItems: 'center',gap: 8,borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.08)',minHeight: 130,justifyContent: 'center',},
+  cardDirectionLabel: {color: MUTED,fontSize: 12,fontWeight: '600',textTransform: 'uppercase',letterSpacing: 0.8,position: 'absolute',top: 12,left: 14,},
+  cardIcon: {width: 48,height: 48,borderRadius: 24,alignItems: 'center',justifyContent: 'center',marginTop: 8,},
   cardEmoji: { fontSize: 24 },
-  cardIconEmpty: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
+  cardIconEmpty: {width: 48,height: 48,borderRadius: 24,backgroundColor: 'rgba(255,255,255,0.08)',alignItems: 'center',justifyContent: 'center',marginTop: 8,},
   cardEmptyPlus: { color: MUTED, fontSize: 22, fontWeight: '300' },
   cardName: { color: WHITE, fontSize: 14, fontWeight: '600', textAlign: 'center' },
   cardNameEmpty: { color: MUTED, fontSize: 14 },
@@ -431,82 +351,28 @@ const styles = StyleSheet.create({
   arrowIcon: { color: ACCENT, fontSize: 22 },
 
   // Details card
-  detailsCard: {
-    backgroundColor: CARD,
-    borderRadius: 20,
-    overflow: 'hidden',
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 14,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-  },
+  detailsCard: {backgroundColor: CARD,borderRadius: 20,overflow: 'hidden',},
+  detailRow: {flexDirection: 'row',alignItems: 'flex-start',gap: 14,paddingVertical: 16,paddingHorizontal: 18,},
   detailIcon: { fontSize: 20, marginTop: 1 },
   detailContent: { flex: 1, gap: 4 },
   detailLabel: { color: MUTED, fontSize: 12, fontWeight: '500' },
   detailValue: { color: WHITE, fontSize: 15, fontWeight: '500' },
-  commentInput: {
-    color: WHITE,
-    fontSize: 15,
-    padding: 0,
-    lineHeight: 22,
-  },
+  commentInput: {color: WHITE,fontSize: 15,padding: 0,lineHeight: 22,},
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: 16 },
   chevron: { color: MUTED, fontSize: 22, fontWeight: '300', alignSelf: 'center' },
 
   // Footer
-  footer: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    padding: 20,
-    paddingBottom: 36,
-    backgroundColor: BG,
-  },
-  submitBtn: {
-    backgroundColor: ACCENT,
-    borderRadius: 999,
-    paddingVertical: 17,
-    alignItems: 'center',
-  },
+  footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 36,backgroundColor: BG,},
+  submitBtn: {backgroundColor: ACCENT,borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: '#0d1a10', fontSize: 17, fontWeight: '700' },
 
   // Modal
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalSheet: {
-    backgroundColor: '#1a2e22',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
-    maxHeight: '70%',
-  },
-  modalHandle: {
-    width: 36, height: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 999,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
+  modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
+  modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '70%',},
+  modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},
   modalTitle: { color: WHITE, fontSize: 18, fontWeight: '700', marginBottom: 16 },
-  accountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: 14,
-  },
-  accountIcon: {
-    width: 46, height: 46,
-    borderRadius: 23,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  accountRow: {flexDirection: 'row',alignItems: 'center',gap: 14,paddingVertical: 14,},
+  accountIcon: {width: 46, height: 46,borderRadius: 23,alignItems: 'center',justifyContent: 'center',},
   accountIconEmoji: { fontSize: 22 },
   accountInfo: { flex: 1 },
   accountName: { color: WHITE, fontSize: 16, fontWeight: '600' },
@@ -514,11 +380,6 @@ const styles = StyleSheet.create({
   checkmark: { fontSize: 20, fontWeight: '700' },
   modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
 
-  dateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-  },
+  dateRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 14,},
   dateRowText: { color: WHITE, fontSize: 15 },
 });

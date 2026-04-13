@@ -1,3 +1,4 @@
+//Анализ - може и да не се използва и да се изтрие ако не стигне времето. Най-вероятно ще се изтрие.
 import { Image } from 'expo-image';
 import { Platform, StyleSheet } from 'react-native';
 

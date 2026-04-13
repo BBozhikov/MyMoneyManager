@@ -112,146 +112,34 @@ export default function MainScreen() {
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    flex: 1,
-    backgroundColor: '#3b6861',
-    width: '100%',
-    marginTop: 1,
-    marginBottom: 0,
-  },
-  content: {
-    padding: 12,
-    alignItems: 'center',
-    gap: 16,
-  },
+  scroll: {flex: 1,backgroundColor: '#3b6861',width: '100%',marginTop: 1,marginBottom: 0,},
+  content: {padding: 12,alignItems: 'center',gap: 16,},
 
   // Toggle
-  toggleContainer: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.25)',
-    borderRadius: 14,
-    padding: 4,
-    width: '100%',
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  toggleActive: {
-    backgroundColor: '#34C759',
-  },
-  toggleActiveExpense: {
-    backgroundColor: '#FF3B30',
-  },
-  toggleText: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  toggleTextActive: {
-    color: 'white',
-  },
+  toggleContainer: {flexDirection: 'row',backgroundColor: 'rgba(0,0,0,0.25)',borderRadius: 14,padding: 4,width: '100%',},
+  toggleButton: {flex: 1,paddingVertical: 10,alignItems: 'center',borderRadius: 10,},
+  toggleActive: {backgroundColor: '#34C759',},
+  toggleActiveExpense: {backgroundColor: '#FF3B30',},
+  toggleText: {color: 'rgba(255,255,255,0.55)',fontSize: 15,fontWeight: '600',},
+  toggleTextActive: {color: 'white',},
 
   // Карти
-  card: {
-    backgroundColor: 'rgba(0,0,0,0.18)',
-    borderRadius: 20,
-    padding: 20,
-    width: '100%',
-    alignItems: 'center',
-  },
-  actionsCard: {
-    backgroundColor: 'rgba(0,0,0,0.18)',
-    borderRadius: 20,
-    width: '100%',
-    overflow: 'hidden',
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-  },
-  primaryButtonIcon: {
-    color: '#34C759',
-    fontSize: 22,
-    fontWeight: '300',
-    width: 28,
-    textAlign: 'center',
-  },
-  primaryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    marginHorizontal: 16,
-  },
-  secondaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-  },
-  secondaryButtonIcon: {
-    color: '#007AFF',
-    fontSize: 18,
-    width: 28,
-    textAlign: 'center',
-  },
-  secondaryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  card: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,padding: 20,width: '100%',alignItems: 'center',},
+  actionsCard: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,width: '100%',overflow: 'hidden',},
+  primaryButton: {flexDirection: 'row',alignItems: 'center',gap: 12,paddingVertical: 18,paddingHorizontal: 20,},
+  primaryButtonIcon: {color: '#34C759',fontSize: 22,fontWeight: '300',width: 28,textAlign: 'center',},
+  primaryButtonText: {color: 'white',fontSize: 16,fontWeight: '600',},
+  divider: {height: 1,backgroundColor: 'rgba(255,255,255,0.12)',marginHorizontal: 16,},
+  secondaryButton: {flexDirection: 'row',alignItems: 'center',gap: 12,paddingVertical: 18,paddingHorizontal: 20,},
+  secondaryButtonIcon: {color: '#007AFF',fontSize: 18,width: 28,textAlign: 'center',},
+  secondaryButtonText: {color: 'white',fontSize: 16,fontWeight: '600',},
 
   // Легенда
-  legendCard: {
-    backgroundColor: 'rgba(0,0,0,0.18)',
-    borderRadius: 20,
-    padding: 20,
-    width: '100%',
-    gap: 12,
-  },
-  legendTitle: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 4,
-  },
-  legendRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  legendText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '500',
-    flex: 1,
-  },
-  legendValue: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  legendPercent: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: 13,
-    width: 38,
-    textAlign: 'right',
-  },
+  legendCard: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,padding: 20,width: '100%',gap: 12,},
+  legendTitle: {color: 'rgba(255,255,255,0.7)',fontSize: 13,fontWeight: '600',textTransform: 'uppercase',letterSpacing: 1,marginBottom: 4,},
+  legendRow: {flexDirection: 'row',alignItems: 'center',gap: 12,},
+  legendDot: {width: 12,height: 12,borderRadius: 6,},
+  legendText: {color: 'white',fontSize: 15,fontWeight: '500',flex: 1,},
+  legendValue: {color: 'white',fontSize: 15,fontWeight: '600',},
+  legendPercent: {color: 'rgba(255,255,255,0.55)',fontSize: 13,width: 38,textAlign: 'right',},
 });

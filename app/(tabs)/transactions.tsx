@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const BG     = '#3b6861';
 const CARD   = '#1e2d22';
 const WHITE  = '#ffffff';
@@ -381,31 +380,19 @@ export default function TransactionsScreen() {
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
   // Header
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: BG, paddingHorizontal: 16, paddingVertical: 14,
-  },
+  header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',backgroundColor: BG, paddingHorizontal: 16, paddingVertical: 14,},
   backBtn:           { width: 40 },
   backArrow:         { color: WHITE, fontSize: 22 },
   headerTitle:       { color: WHITE, fontSize: 18, fontWeight: '700' },
-  accountPickerBtn:  {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.2)',
-    alignItems: 'center', justifyContent: 'center',
-  },
+  accountPickerBtn:  {width: 40, height: 40, borderRadius: 20,backgroundColor: 'rgba(0,0,0,0.2)',alignItems: 'center', justifyContent: 'center',},
   accountPickerEmoji: { fontSize: 20 },
 
   // Content card
-  contentCard: {
-    flex: 1, backgroundColor: CARD,
-    borderRadius: 24, margin: 12, marginTop: 4,
-    overflow: 'hidden', paddingBottom: 80,
-  },
+  contentCard: {flex: 1, backgroundColor: CARD,borderRadius: 24, margin: 12, marginTop: 4,overflow: 'hidden', paddingBottom: 80,},
 
   // Period tabs
   tabsScroll:   { flexGrow: 0 },
@@ -413,50 +400,30 @@ const styles = StyleSheet.create({
   tabBtn:       { paddingHorizontal: 12, paddingVertical: 8, alignItems: 'center', position: 'relative' },
   tabText:      { color: MUTED, fontSize: 15, fontWeight: '500' },
   tabTextActive:{ color: ACCENT, fontWeight: '600' },
-  tabUnderline: {
-    position: 'absolute', bottom: 0, left: 12, right: 12,
-    height: 2, backgroundColor: ACCENT, borderRadius: 999,
-  },
+  tabUnderline: {position: 'absolute', bottom: 0, left: 12, right: 12,height: 2, backgroundColor: ACCENT, borderRadius: 999,},
 
   // Filter row
-  filterRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: 16, paddingVertical: 10, gap: 8,
-  },
-  comboBox: {
-    flex: 1, flexDirection: 'row', alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 10, paddingHorizontal: 10, paddingVertical: 9,
-    gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-  },
+  filterRow: {flexDirection: 'row', alignItems: 'center',paddingHorizontal: 16, paddingVertical: 10, gap: 8,},
+  comboBox: {flex: 1, flexDirection: 'row', alignItems: 'center',backgroundColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 10, paddingHorizontal: 10, paddingVertical: 9,gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',},
   comboEmoji:   { fontSize: 15 },
   comboText:    { flex: 1, color: WHITE, fontSize: 13, fontWeight: '500' },
   comboChevron: { color: MUTED, fontSize: 14 },
 
-  typeToggle: {
-    flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 10, padding: 3, gap: 2,
+  typeToggle: {flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.07)',borderRadius: 10, padding: 3, gap: 2,
     borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
   },
   typeBtn:         { paddingHorizontal: 10, paddingVertical: 7, alignItems: 'center' },
   typeBtnText:     { color: MUTED, fontSize: 14, fontWeight: '700' },
   typeBtnTextActive: { color: WHITE },
 
-  sortBtn: {
-    width: 40, height: 40, backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 10, alignItems: 'center', justifyContent: 'center',
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-  },
+  sortBtn: {width: 40, height: 40, backgroundColor: 'rgba(255,255,255,0.07)',borderRadius: 10, alignItems: 'center', 
+    justifyContent: 'center',borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',},
   sortIcon: { color: WHITE, fontSize: 18 },
 
   // Search
-  searchRow: {
-    flexDirection: 'row', alignItems: 'center',
-    marginHorizontal: 16, marginBottom: 8,
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    borderRadius: 10, paddingHorizontal: 12,
-    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 8,
-  },
+  searchRow: {flexDirection: 'row', alignItems: 'center',marginHorizontal: 16, marginBottom: 8,backgroundColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 10, paddingHorizontal: 12,borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 8,},
   searchIcon:  { fontSize: 13 },
   searchInput: { flex: 1, color: WHITE, fontSize: 14, paddingVertical: 11 },
   clearIcon:   { color: MUTED, fontSize: 15, padding: 4 },
@@ -470,15 +437,8 @@ const styles = StyleSheet.create({
   dateHeader: { color: MUTED, fontSize: 13, fontWeight: '500', paddingVertical: 6 },
 
   // Tx row
-  txRow: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    paddingVertical: 12, paddingHorizontal: 4,
-  },
-  txIconWrap: {
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(255,255,255,0.07)',
-    alignItems: 'center', justifyContent: 'center',
-  },
+  txRow: {flexDirection: 'row', alignItems: 'center', gap: 12,paddingVertical: 12, paddingHorizontal: 4,},
+  txIconWrap: {width: 40, height: 40, borderRadius: 20,backgroundColor: 'rgba(255,255,255,0.07)',alignItems: 'center', justifyContent: 'center',},
   txInfo:   { flex: 1 },
   txName:   { color: WHITE, fontSize: 15, fontWeight: '600' },
   txMeta:   { color: MUTED, fontSize: 12, marginTop: 2 },
@@ -490,28 +450,15 @@ const styles = StyleSheet.create({
   emptyText:  { color: MUTED, fontSize: 16 },
 
   // FAB
-  fab: {
-    position: 'absolute', bottom: 28, alignSelf: 'center',
-    width: 60, height: 60, borderRadius: 30,
-    backgroundColor: FAB, alignItems: 'center', justifyContent: 'center',
-    shadowColor: FAB, shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4, shadowRadius: 10, elevation: 8,
+  fab: {position: 'absolute', bottom: 28, alignSelf: 'center',width: 60, height: 60, borderRadius: 30,backgroundColor: FAB, alignItems: 'center', 
+    justifyContent: 'center',shadowColor: FAB, shadowOffset: { width: 0, height: 4 },shadowOpacity: 0.4, shadowRadius: 10, elevation: 8,
   },
   fabIcon: { color: WHITE, fontSize: 28, fontWeight: '300', lineHeight: 32 },
 
   // Modal
-  modalBackdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end',
-  },
-  modalSheet: {
-    backgroundColor: '#1a2e22',
-    borderTopLeftRadius: 24, borderTopRightRadius: 24,
-    paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40,
-  },
-  modalHandle: {
-    width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 999, alignSelf: 'center', marginBottom: 20,
-  },
+  modalBackdrop: {flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end',},
+  modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24, borderTopRightRadius: 24,paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40,},
+  modalHandle: {width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999, alignSelf: 'center', marginBottom: 20,},
   modalTitle:   { color: WHITE, fontSize: 18, fontWeight: '700', marginBottom: 16 },
   accountRow:   { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14 },
   accountIcon:  { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

@@ -1,16 +1,16 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-    Alert,
-    FlatList,
-    Modal,
-    ScrollView,
-    StyleSheet,
-    Switch,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -238,7 +238,6 @@ export default function NewAccountScreen() {
   );
 }
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 const BG      = '#3b6861';
 const HEADER  = '#3b6861';
 const CARD    = 'rgba(255,255,255,0.07)';
@@ -247,19 +246,11 @@ const WHITE   = '#ffffff';
 const MUTED   = 'rgba(255,255,255,0.45)';
 const ACCENT  = '#3ecf8e';
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
   // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: HEADER,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    justifyContent: 'space-between',
-  },
+  header: {flexDirection: 'row',alignItems: 'center',backgroundColor: HEADER,paddingHorizontal: 16,paddingVertical: 14,justifyContent: 'space-between',},
   backBtn: { width: 40, alignItems: 'flex-start' },
   backArrow: { color: WHITE, fontSize: 22 },
   headerTitle: { color: WHITE, fontSize: 18, fontWeight: '700' },
@@ -269,142 +260,48 @@ const styles = StyleSheet.create({
   content: { padding: 24, paddingBottom: 120, gap: 28 },
 
   // Amount
-  amountRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    gap: 12,
-    marginTop: 8,
-  },
-  amountInput: {
-    color: WHITE,
-    fontSize: 44,
-    fontWeight: '300',
-    letterSpacing: -1,
-    textAlign: 'center',
-    minWidth: 80,
-    padding: 0,
-  },
-  currencyLabel: {
-    color: ACCENT,
-    fontSize: 28,
-    fontWeight: '600',
-    paddingBottom: 4,
-  },
-  amountUnderline: {
-    height: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    marginHorizontal: 40,
-    marginTop: -16,
-  },
+  amountRow: {flexDirection: 'row',alignItems: 'flex-end',justifyContent: 'center',gap: 12,marginTop: 8,},
+  amountInput: {color: WHITE,fontSize: 44,fontWeight: '300',letterSpacing: -1,textAlign: 'center',minWidth: 80,padding: 0,},
+  currencyLabel: {color: ACCENT,fontSize: 28,fontWeight: '600',paddingBottom: 4,},
+  amountUnderline: {height: 1,backgroundColor: 'rgba(255,255,255,0.2)',marginHorizontal: 40,marginTop: -16,},
 
   // Section
   section: { gap: 14 },
   sectionLabel: { color: MUTED, fontSize: 15 },
 
   // Name input
-  nameInput: {
-    color: WHITE,
-    fontSize: 16,
-    paddingBottom: 8,
-    padding: 0,
-  },
+  nameInput: {color: WHITE,fontSize: 16,paddingBottom: 8,padding: 0,},
   nameUnderline: { height: 1.5, backgroundColor: ACCENT },
 
   // Icons grid
-  iconsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  iconBtn: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  iconsGrid: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
+  iconBtn: {width: 64,height: 64,borderRadius: 32,alignItems: 'center',justifyContent: 'center',},
   iconEmoji: { fontSize: 26 },
 
   // Colors row
-  colorsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  colorBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  colorBtnSelected: {
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.6)',
-  },
+  colorsRow: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
+  colorBtn: {width: 44,height: 44,borderRadius: 22,alignItems: 'center',justifyContent: 'center',},
+  colorBtnSelected: {borderWidth: 3,borderColor: 'rgba(255,255,255,0.6)',},
   colorCheck: { color: WHITE, fontSize: 18, fontWeight: '700' },
 
   // Currency value
-  currencyValue: {
-    color: ACCENT,
-    fontSize: 22,
-    fontWeight: '600',
-  },
+  currencyValue: {color: ACCENT,fontSize: 22,fontWeight: '600',},
 
   // Toggle
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-  },
+  toggleRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 4,},
   toggleLabel: { color: WHITE, fontSize: 16, flex: 1 },
 
   // Footer
-  footer: {
-    position: 'absolute',
-    bottom: 0, left: 0, right: 0,
-    padding: 20,
-    paddingBottom: 32,
-    backgroundColor: BG,
-  },
-  submitBtn: {
-    borderRadius: 999,
-    paddingVertical: 17,
-    alignItems: 'center',
-  },
+  footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 32,backgroundColor: BG,},
+  submitBtn: {borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
 
   // Currency modal
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalSheet: {
-    backgroundColor: '#1a2e22',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 40,
-    maxHeight: '60%',
-  },
-  modalHandle: {
-    width: 36, height: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 999,
-    alignSelf: 'center',
-    marginBottom: 20,
-  },
+  modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
+  modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '60%',},
+  modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},
   modalTitle: { color: WHITE, fontSize: 18, fontWeight: '700', marginBottom: 16 },
-  currencyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 14,
-  },
+  currencyRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 14,},
   currencyRowText: { color: WHITE, fontSize: 16 },
   currencyCheck: { fontSize: 18, fontWeight: '700' },
   modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
