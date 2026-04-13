@@ -209,7 +209,7 @@ export default function TransactionsScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => router.replace('/(tabs)/main')} style={styles.backBtn} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Транзакции</Text>
