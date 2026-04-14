@@ -1,8 +1,8 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// Mock user — replace with your auth context / store
 const USER = {
   name: 'Иван Петров',
   email: 'ivan.petrov@example.com',
@@ -23,7 +23,9 @@ export default function ProfileScreen() {
         text: 'Изход',
         style: 'destructive',
         onPress: () => {
-          // TODO: signOut() then redirect
+          
+
+
           router.replace('/(auth)/login');
         },
       },
@@ -40,7 +42,9 @@ export default function ProfileScreen() {
           text: 'Изтрий',
           style: 'destructive',
           onPress: () => {
-            // TODO: deleteAccount() then redirect
+            
+
+
             router.replace('/(auth)/login');
           },
         },
@@ -52,7 +56,6 @@ export default function ProfileScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
 
-        {/* Avatar */}
         <View style={styles.avatarCard}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{USER.initials}</Text>
@@ -61,10 +64,8 @@ export default function ProfileScreen() {
           <Text style={styles.userEmail}>{USER.email}</Text>
         </View>
 
-        {/* Info + actions card */}
         <View style={styles.card}>
 
-          {/* Name row */}
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Име</Text>
             <Text style={styles.infoValue}>{USER.name}</Text>
@@ -72,7 +73,6 @@ export default function ProfileScreen() {
 
           <View style={styles.divider} />
 
-          {/* Email row */}
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Имейл</Text>
             <Text style={styles.infoValue}>{USER.email}</Text>
@@ -80,20 +80,18 @@ export default function ProfileScreen() {
 
           <View style={styles.divider} />
 
-          {/* Change password */}
           <TouchableOpacity
             style={styles.actionRow}
             activeOpacity={0.75}
             onPress={handleChangePassword}
           >
-            <Text style={styles.actionText}>🔑</Text>
+            <Text style={styles.actionText}><AntDesign name="key" size={24} color="white" /></Text>
             <Text style={styles.actionLabel}>Смяна на парола</Text>
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
         </View>
 
-        {/* Bottom buttons */}
         <View style={styles.bottomRow}>
           <TouchableOpacity
             style={styles.signOutButton}
@@ -128,14 +126,12 @@ const styles = StyleSheet.create({
   scroll: {flex: 1,backgroundColor: BG,marginTop: 20,},
   content: {padding: 24,alignItems: 'center',gap: 16,},
 
-  // Avatar
   avatarCard: {alignItems: 'center',gap: 6,paddingVertical: 8,},
   avatar: {width: 72,height: 72,borderRadius: 36,backgroundColor: 'rgba(0,0,0,0.25)',alignItems: 'center',justifyContent: 'center',marginBottom: 6,},
   avatarText: {color: WHITE,fontSize: 26,fontWeight: '700',letterSpacing: -0.5,},
   userName: {color: WHITE,fontSize: 20,fontWeight: '700',letterSpacing: -0.3,},
   userEmail: {color: WHITE_MUTED,fontSize: 14,},
 
-  // Info card
   card: {backgroundColor: CARD,borderRadius: 20,width: '100%',overflow: 'hidden'},
   infoRow: {flexDirection: 'row',justifyContent: 'space-between',alignItems: 'center',paddingVertical: 16,paddingHorizontal: 20,},
   infoLabel: {color: WHITE_MUTED,fontSize: 15,},
@@ -146,7 +142,6 @@ const styles = StyleSheet.create({
   actionLabel: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '600',},
   chevron: {color: WHITE_MUTED,fontSize: 22,fontWeight: '300',lineHeight: 24,},
 
-  // Bottom buttons
   bottomRow: {flexDirection: 'row',width: '100%',gap: 12,},
   signOutButton: {flex: 1,backgroundColor: CARD,borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
   signOutText: {color: WHITE_MUTED,fontSize: 15,fontWeight: '600',},

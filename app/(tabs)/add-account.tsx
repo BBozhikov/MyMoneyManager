@@ -1,64 +1,54 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  Alert,
-  FlatList,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, FlatList, Modal, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-
 const ICONS = [
-  { id: 'cash',       emoji: '💵' },
-  { id: 'bank',       emoji: '🏦' },
-  { id: 'pound',      emoji: '💷' },
-  { id: 'card',       emoji: '💳' },
-  { id: 'wallet',     emoji: '👛' },
-  { id: 'savings',    emoji: '🐖' },
-  { id: 'paypal',     emoji: '🅿️' },
-  { id: 'safe',       emoji: '🔐' },
-  { id: 'bitcoin',    emoji: '₿' },
-  { id: 'ethereum',   emoji: '⟠' },
-  { id: 'dollar',     emoji: '💲' },
-  { id: 'euro',       emoji: '€' },
-  { id: 'yen',        emoji: '¥' },
-  { id: 'chart',      emoji: '📊' },
-  { id: 'bag',        emoji: '💰' },
-  { id: 'percent',    emoji: '％' },
-  { id: 'invest',     emoji: '📈' },
-  { id: 'diamond',    emoji: '💎' },
-  { id: 'gold',       emoji: '🥇' },
-  { id: 'coins',      emoji: '🪙' },
+  { id: 'cash',       emoji: <FontAwesome name="money" size={24} color="white" /> },
+  { id: 'bank',       emoji: <AntDesign name="bank" size={24} color="white" /> },
+  { id: 'pound',      emoji: <AntDesign name="pound-circle" size={24} color="white" /> },
+  { id: 'card',       emoji: <FontAwesome name="credit-card" size={24} color="white" /> },
+  { id: 'wallet',     emoji: <FontAwesome5 name="wallet" size={24} color="white" /> },
+  { id: 'savings',    emoji: <FontAwesome5 name="piggy-bank" size={24} color="white" />  },
+  { id: 'paypal',     emoji: <FontAwesome name="paypal" size={24} color="white" /> },
+  { id: 'safe',       emoji: <MaterialCommunityIcons name="safe" size={24} color="white" /> },
+  { id: 'bitcoin',    emoji: <FontAwesome name="bitcoin" size={24} color="white" /> },
+  { id: 'ethereum',   emoji: <FontAwesome5 name="ethereum" size={24} color="white" /> },
+  { id: 'dollar',     emoji: <FontAwesome name="dollar" size={24} color="white" /> },
+  { id: 'euro',       emoji: <FontAwesome name="euro" size={24} color="white" /> },
+  { id: 'yen',        emoji: <FontAwesome name="yen" size={24} color="white" /> },
+  { id: 'stocks',     emoji: <AntDesign name="stock" size={24} color="white" /> },
+  { id: 'bag',        emoji: <FontAwesome6 name="sack-dollar" size={24} color="white" /> },
+  { id: 'percent',    emoji: <FontAwesome5 name="percent" size={24} color="white" /> },
+  { id: 'finance',    emoji: <MaterialCommunityIcons name="finance" size={24} color= "white" /> },
+  { id: 'diamond',    emoji: <FontAwesome name="diamond" size={24} color="white" /> },
+  { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={24} color="white" /> },
+  { id: 'coins',      emoji: <FontAwesome5 name="coins" size={24} color="white" /> },
 ];
 
 const COLORS = [
-  '#f5a623', // amber
-  '#00d4ff', // cyan
-  '#e91e8c', // pink
-  '#ff7043', // orange
-  '#4a7c6f', // teal-dark
-  '#34c759', // green
-  '#ff3b30', // red
-  '#5856d6', // purple
-  '#ffcc00', // yellow
-  '#007aff', // blue
+  '#f5a623', 
+  '#00d4ff',
+  '#e91e8c', 
+  '#ff7043',
+  '#4a7c6f',
+  '#34c759',
+  '#ff3b30',
+  '#5856d6',
+  '#ffcc00',
+  '#007aff',
 ];
 
 const CURRENCIES = [
-  'BGN', 'EUR', 'USD', 'GBP', 'CHF',
+  'EUR', 'USD', 'GBP', 'CHF',
   'JPY', 'CAD', 'AUD', 'CNY', 'RUB',
   'TRY', 'NOK', 'SEK', 'DKK', 'PLN',
 ];
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 export default function NewAccountScreen() {
   const router = useRouter();
@@ -67,7 +57,7 @@ export default function NewAccountScreen() {
   const [name, setName]               = useState('');
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-  const [currency, setCurrency]       = useState('BGN');
+  const [currency, setCurrency]       = useState('EUR');
   const [excludeBalance, setExcludeBalance] = useState(false);
   const [currencyModal, setCurrencyModal] = useState(false);
 
@@ -75,9 +65,11 @@ export default function NewAccountScreen() {
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    // TODO: save account to your store/db
+   
+
+
     Alert.alert('Успех', `Сметката "${name}" беше създадена!`, [
-      { text: 'OK', onPress: () => router.back() },
+      { text: 'OK', onPress: () => router.replace("/(tabs)/explore") },
     ]);
   };
 
@@ -86,9 +78,8 @@ export default function NewAccountScreen() {
   return (
     <SafeAreaView style={styles.safe}>
 
-      {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => router.replace("/(tabs)/explore")} style={styles.backBtn} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Добавяне на сметка</Text>
@@ -97,7 +88,6 @@ export default function NewAccountScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-        {/* AMOUNT + CURRENCY */}
         <View style={styles.amountRow}>
           <TextInput
             style={styles.amountInput}
@@ -114,21 +104,19 @@ export default function NewAccountScreen() {
         </View>
         <View style={styles.amountUnderline} />
 
-        {/* NAME */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Име на сметката</Text>
           <TextInput
             style={styles.nameInput}
             value={name}
             onChangeText={setName}
-            placeholder="Въведете име на сметката"
+            //placeholder=""
             placeholderTextColor={MUTED}
             selectionColor={ACCENT}
           />
           <View style={styles.nameUnderline} />
         </View>
 
-        {/* ICON PICKER */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Икони</Text>
           <View style={styles.iconsGrid}>
@@ -152,7 +140,6 @@ export default function NewAccountScreen() {
           </View>
         </View>
 
-        {/* COLOR PICKER */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Цвят</Text>
           <View style={styles.colorsRow}>
@@ -176,7 +163,6 @@ export default function NewAccountScreen() {
           </View>
         </View>
 
-        {/* CURRENCY (tap opens modal) */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Изберете валута</Text>
           <TouchableOpacity onPress={() => setCurrencyModal(true)} activeOpacity={0.75}>
@@ -184,7 +170,6 @@ export default function NewAccountScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* EXCLUDE FROM BALANCE */}
         <View style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>Не включвай в общия баланс</Text>
           <Switch
@@ -197,7 +182,6 @@ export default function NewAccountScreen() {
 
       </ScrollView>
 
-      {/* SUBMIT BUTTON */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.submitBtn, { backgroundColor: selectedColor, opacity: canSubmit ? 1 : 0.45 }]}
@@ -209,7 +193,6 @@ export default function NewAccountScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* CURRENCY MODAL */}
       <Modal visible={currencyModal} transparent animationType="slide" onRequestClose={() => setCurrencyModal(false)}>
         <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setCurrencyModal(false)}>
           <View style={styles.modalSheet}>
@@ -249,54 +232,45 @@ const ACCENT  = '#3ecf8e';
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
-  // Header
+
   header: {flexDirection: 'row',alignItems: 'center',backgroundColor: HEADER,paddingHorizontal: 16,paddingVertical: 14,justifyContent: 'space-between',},
   backBtn: { width: 40, alignItems: 'flex-start' },
   backArrow: { color: WHITE, fontSize: 22 },
   headerTitle: { color: WHITE, fontSize: 18, fontWeight: '700' },
 
-  // Scroll
   scroll: { flex: 1 },
   content: { padding: 24, paddingBottom: 120, gap: 28 },
 
-  // Amount
   amountRow: {flexDirection: 'row',alignItems: 'flex-end',justifyContent: 'center',gap: 12,marginTop: 8,},
   amountInput: {color: WHITE,fontSize: 44,fontWeight: '300',letterSpacing: -1,textAlign: 'center',minWidth: 80,padding: 0,},
   currencyLabel: {color: ACCENT,fontSize: 28,fontWeight: '600',paddingBottom: 4,},
   amountUnderline: {height: 1,backgroundColor: 'rgba(255,255,255,0.2)',marginHorizontal: 40,marginTop: -16,},
 
-  // Section
   section: { gap: 14 },
   sectionLabel: { color: MUTED, fontSize: 15 },
 
-  // Name input
   nameInput: {color: WHITE,fontSize: 16,paddingBottom: 8,padding: 0,},
   nameUnderline: { height: 1.5, backgroundColor: ACCENT },
 
-  // Icons grid
   iconsGrid: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
   iconBtn: {width: 64,height: 64,borderRadius: 32,alignItems: 'center',justifyContent: 'center',},
   iconEmoji: { fontSize: 26 },
 
-  // Colors row
   colorsRow: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
   colorBtn: {width: 44,height: 44,borderRadius: 22,alignItems: 'center',justifyContent: 'center',},
   colorBtnSelected: {borderWidth: 3,borderColor: 'rgba(255,255,255,0.6)',},
   colorCheck: { color: WHITE, fontSize: 18, fontWeight: '700' },
 
-  // Currency value
   currencyValue: {color: ACCENT,fontSize: 22,fontWeight: '600',},
 
-  // Toggle
   toggleRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 4,},
   toggleLabel: { color: WHITE, fontSize: 16, flex: 1 },
 
-  // Footer
   footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 32,backgroundColor: BG,},
   submitBtn: {borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
 
-  // Currency modal
+
   modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
   modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '60%',},
   modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},

@@ -1,13 +1,15 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// ─── Mock data — replace with your real accounts ──────────────────────────────
 const ACCOUNTS = [
-  { id: '1', name: 'Основен',        balance: 202.58,  emoji: '💵', color: '#f5a623' },
-  { id: '2', name: 'Банкова сметка', balance: 1031.00, emoji: '🏦', color: '#007aff' },
-  { id: '3', name: 'Спестявания',    balance: 540.00,  emoji: '🐖', color: '#34c759' },
+  { id: '1', name: 'Основен',        balance: 202.58,  emoji: <FontAwesome name="money" size={24} color="white" />, color: '#f5a623' },
+  { id: '2', name: 'Банкова сметка', balance: 1031.00, emoji: <AntDesign name="bank" size={24} color="white" />, color: '#007aff' },
+  { id: '3', name: 'Спестявания',    balance: 540.00,  emoji: <FontAwesome5 name="piggy-bank" size={24} color="white" />, color: '#34c759' },
 ];
 
 function formatAmount(n: number) {
@@ -18,7 +20,6 @@ function formatDate(d: Date) {
   return d.toLocaleDateString('bg-BG', { day: '2-digit', month: 'long', year: 'numeric' });
 }
 
-// ─── Account picker modal ─────────────────────────────────────────────────────
 function AccountPickerModal({
   visible,
   selected,
@@ -51,7 +52,7 @@ function AccountPickerModal({
                 </View>
                 <View style={styles.accountInfo}>
                   <Text style={styles.accountName}>{account.name}</Text>
-                  <Text style={styles.accountBalance}>{formatAmount(account.balance)} лв</Text>
+                  <Text style={styles.accountBalance}>{formatAmount(account.balance)} €</Text>
                 </View>
                 {selected === account.id && (
                   <Text style={[styles.checkmark, { color: ACCENT }]}>✓</Text>
@@ -66,7 +67,6 @@ function AccountPickerModal({
   );
 }
 
-// ─── Date picker modal (simple day picker) ────────────────────────────────────
 function DatePickerModal({
   visible,
   selected,
@@ -79,7 +79,8 @@ function DatePickerModal({
   onClose: () => void;
 }) {
   const today = new Date();
-  // Build last 30 days + next 7 days
+  
+
   const days: Date[] = [];
   for (let i = -30; i <= 7; i++) {
     const d = new Date(today);
@@ -120,7 +121,6 @@ function DatePickerModal({
   );
 }
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function NewTransferScreen() {
   const router = useRouter();
 
@@ -144,16 +144,15 @@ export default function NewTransferScreen() {
     Alert.alert(
       'Успех',
       `Преведени ${amount} лв от "${fromAccount?.name}" към "${toAccount?.name}".`,
-      [{ text: 'OK', onPress: () => router.back() }]
+      [{ text: 'OK', onPress: () => router.replace("/(tabs)/explore") }]
     );
   };
 
   return (
     <SafeAreaView style={styles.safe}>
 
-      {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
+        <TouchableOpacity onPress={() => router.replace("/(tabs)/explore")} style={styles.backBtn} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Нов превод</Text>
@@ -162,7 +161,6 @@ export default function NewTransferScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-        {/* AMOUNT */}
         <View style={styles.amountSection}>
           <TextInput
             style={styles.amountInput}
@@ -173,13 +171,11 @@ export default function NewTransferScreen() {
             keyboardType="decimal-pad"
             selectionColor={ACCENT}
           />
-          <Text style={styles.amountCurrency}>лв</Text>
+          <Text style={styles.amountCurrency}>€</Text>
         </View>
         <View style={styles.amountUnderline} />
 
-        {/* FROM → TO */}
         <View style={styles.transferRow}>
-          {/* FROM */}
           <TouchableOpacity
             style={[styles.accountCard, fromAccount && { borderColor: fromAccount.color + '55' }]}
             onPress={() => setFromModal(true)}
@@ -197,19 +193,17 @@ export default function NewTransferScreen() {
             ) : (
               <>
                 <View style={styles.cardIconEmpty}>
-                  <Text style={styles.cardEmptyPlus}>＋</Text>
+                  <Text style={styles.cardEmptyPlus}>+</Text>
                 </View>
                 <Text style={styles.cardNameEmpty}>Изберете</Text>
               </>
             )}
           </TouchableOpacity>
 
-          {/* Arrow */}
           <View style={styles.arrowContainer}>
-            <Text style={styles.arrowIcon}>→</Text>
+            <Text style={styles.arrowIcon}><AntDesign name="arrow-right" size={24} color="light green" /></Text>
           </View>
 
-          {/* TO */}
           <TouchableOpacity
             style={[styles.accountCard, toAccount && { borderColor: toAccount.color + '55' }]}
             onPress={() => setToModal(true)}
@@ -227,7 +221,7 @@ export default function NewTransferScreen() {
             ) : (
               <>
                 <View style={styles.cardIconEmpty}>
-                  <Text style={styles.cardEmptyPlus}>＋</Text>
+                  <Text style={styles.cardEmptyPlus}>+</Text>
                 </View>
                 <Text style={styles.cardNameEmpty}>Изберете</Text>
               </>
@@ -235,12 +229,10 @@ export default function NewTransferScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* DETAILS CARD */}
         <View style={styles.detailsCard}>
 
-          {/* Date */}
           <TouchableOpacity style={styles.detailRow} onPress={() => setDateModal(true)} activeOpacity={0.75}>
-            <Text style={styles.detailIcon}>📅</Text>
+            <Text style={styles.detailIcon}><AntDesign name="calendar" size={24} color="white" /></Text>
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>Дата</Text>
               <Text style={styles.detailValue}>{formatDate(date)}</Text>
@@ -250,9 +242,8 @@ export default function NewTransferScreen() {
 
           <View style={styles.divider} />
 
-          {/* Comment */}
           <View style={styles.detailRow}>
-            <Text style={styles.detailIcon}>💬</Text>
+            <Text style={styles.detailIcon}><AntDesign name="comment" size={24} color="white" /></Text>
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>Коментар</Text>
               <TextInput
@@ -271,7 +262,6 @@ export default function NewTransferScreen() {
 
       </ScrollView>
 
-      {/* SUBMIT */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[styles.submitBtn, { opacity: canSubmit ? 1 : 0.4 }]}
@@ -283,7 +273,6 @@ export default function NewTransferScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* MODALS */}
       <AccountPickerModal
         visible={fromModal}
         selected={fromId}
@@ -327,13 +316,11 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   content: { padding: 24, paddingBottom: 120, gap: 24 },
 
-  // Amount
   amountSection: {flexDirection: 'row',alignItems: 'flex-end',justifyContent: 'center',gap: 10,marginTop: 8,},
   amountInput: {color: WHITE,fontSize: 52,fontWeight: '300',letterSpacing: -1.5,padding: 0,minWidth: 80,textAlign: 'center',},
   amountCurrency: {color: ACCENT,fontSize: 28,fontWeight: '600',paddingBottom: 6,},
   amountUnderline: {height: 1,backgroundColor: 'rgba(255,255,255,0.15)',marginHorizontal: 40,marginTop: -14,},
 
-  // Transfer row
   transferRow: {flexDirection: 'row',alignItems: 'center',gap: 8,},
   accountCard: {flex: 1,backgroundColor: CARD,borderRadius: 20,padding: 16,alignItems: 'center',gap: 8,borderWidth: 1.5,
     borderColor: 'rgba(255,255,255,0.08)',minHeight: 130,justifyContent: 'center',},
@@ -346,11 +333,9 @@ const styles = StyleSheet.create({
   cardNameEmpty: { color: MUTED, fontSize: 14 },
   cardBalance: { color: MUTED, fontSize: 12, textAlign: 'center' },
 
-  // Arrow
   arrowContainer: { alignItems: 'center', justifyContent: 'center', width: 28 },
   arrowIcon: { color: ACCENT, fontSize: 22 },
 
-  // Details card
   detailsCard: {backgroundColor: CARD,borderRadius: 20,overflow: 'hidden',},
   detailRow: {flexDirection: 'row',alignItems: 'flex-start',gap: 14,paddingVertical: 16,paddingHorizontal: 18,},
   detailIcon: { fontSize: 20, marginTop: 1 },
@@ -361,12 +346,10 @@ const styles = StyleSheet.create({
   divider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginHorizontal: 16 },
   chevron: { color: MUTED, fontSize: 22, fontWeight: '300', alignSelf: 'center' },
 
-  // Footer
   footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 36,backgroundColor: BG,},
   submitBtn: {backgroundColor: ACCENT,borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: '#0d1a10', fontSize: 17, fontWeight: '700' },
 
-  // Modal
   modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
   modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '70%',},
   modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},

@@ -1,14 +1,12 @@
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const BG     = '#3b6861';
@@ -18,27 +16,26 @@ const MUTED  = 'rgba(255,255,255,0.45)';
 const ACCENT = '#3ecf8e';
 const FAB    = '#f5a623';
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
 type TxType = 'all' | 'expense' | 'income';
 type SortKey = 'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc';
 
-const ACCOUNTS = [
-  { id: 'all', name: 'Всички сметки', emoji: '📋' },
-  { id: '1',   name: 'Кеш',          emoji: '💵' },
-  { id: '2',   name: 'ДСК',          emoji: '🏦' },
-  { id: '3',   name: 'Revolut',      emoji: '💳' },
+const ACCOUNTS: {id: string; name: string; emoji: any}[]= [
+  { id: 'all', name: 'Всички сметки', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> },
+  { id: '1',   name: 'Кеш',          emoji: <FontAwesome name="money" size={24} color="white" /> },
+  { id: '2',   name: 'ДСК',          emoji: <AntDesign name="bank" size={24} color="white" /> },
+  { id: '3',   name: 'Revolut',      emoji: <FontAwesome name="credit-card" size={24} color="white" /> },
 ];
 
-const CATEGORIES = [
-  { id: 'all',          name: 'Всички категории', emoji: '📋' },
-  { id: 'food',         name: 'Храна',            emoji: '🍔' },
-  { id: 'transport',    name: 'Транспорт',        emoji: '🚗' },
-  { id: 'bills',        name: 'Сметки',           emoji: '📄' },
-  { id: 'fun',          name: 'Развлечения',      emoji: '🎮' },
-  { id: 'health',       name: 'Здраве',           emoji: '💊' },
-  { id: 'home',         name: 'Жилище',           emoji: '🏠' },
-  { id: 'salary',       name: 'Заплата',          emoji: '💰' },
-  { id: 'freelance',    name: 'Freelance',        emoji: '💻' },
+const CATEGORIES: {id: string; name: string; emoji: any}[] = [
+  { id: 'all',          name: 'Всички категории', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> },
+  { id: 'food',         name: 'Храна',            emoji: <FontAwesome5 name="hamburger" size={24} color="white" /> },
+  { id: 'transport',    name: 'Транспорт',        emoji: <AntDesign name="car" size={24} color="white" /> },
+  { id: 'bills',        name: 'Сметки',           emoji: <AntDesign name="audit" size={24} color="white" /> },
+  { id: 'fun',          name: 'Развлечения',      emoji: <Ionicons name="game-controller-sharp" size={24} color="white" /> },
+  { id: 'health',       name: 'Здраве',           emoji: <FontAwesome5 name="pills" size={24} color="white" /> },
+  { id: 'home',         name: 'Жилище',           emoji: <FontAwesome5 name="house-user" size={24} color="white" /> },
+  { id: 'salary',       name: 'Заплата',          emoji: <FontAwesome6 name="sack-dollar" size={24} color="white" /> },
+  { id: 'freelance',    name: 'Freelance',        emoji: <AntDesign name="laptop" size={24} color="white" /> },
 ];
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
@@ -63,10 +60,9 @@ const TRANSACTIONS = [
   { id: '10', accountId: '3', categoryId: 'transport', type: 'expense', description: 'Гориво',            amount: -65.00,  date: new Date(2025, 2, 25) },
 ];
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 function formatAmount(n: number) {
   const sign = n >= 0 ? '+ ' : '- ';
-  return sign + Math.abs(n).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' лв';
+  return sign + Math.abs(n).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
 function formatDateHeader(d: Date) {
@@ -85,7 +81,7 @@ function groupByDate(txs: typeof TRANSACTIONS) {
     .map(([key, items]) => ({ date: new Date(key), items }));
 }
 
-// ─── Picker Modal (reusable) ──────────────────────────────────────────────────
+
 function PickerModal({
   visible,
   title,
@@ -131,7 +127,6 @@ function PickerModal({
   );
 }
 
-// ─── Sort Modal ───────────────────────────────────────────────────────────────
 function SortModal({
   visible,
   selected,
@@ -170,7 +165,6 @@ function SortModal({
   );
 }
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
 export default function TransactionsScreen() {
   const router = useRouter();
 
@@ -187,14 +181,12 @@ export default function TransactionsScreen() {
   const activeAccount  = ACCOUNTS.find(a => a.id === selectedAccount)!;
   const activeCategory = CATEGORIES.find(c => c.id === selectedCat)!;
 
-  // Filter
   let filtered = TRANSACTIONS
     .filter(t => selectedAccount === 'all' || t.accountId === selectedAccount)
     .filter(t => selectedCat     === 'all' || t.categoryId === selectedCat)
     .filter(t => txType          === 'all' || (txType === 'expense' ? t.amount < 0 : t.amount > 0))
     .filter(t => search.trim() === '' || t.description.toLowerCase().includes(search.toLowerCase()));
 
-  // Sort
   filtered = [...filtered].sort((a, b) => {
     if (sort === 'date_desc')   return b.date.getTime() - a.date.getTime();
     if (sort === 'date_asc')    return a.date.getTime() - b.date.getTime();
@@ -207,13 +199,11 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/main')} style={styles.backBtn} activeOpacity={0.7}>
           <Text style={styles.backArrow}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Транзакции</Text>
-        {/* Account combobox */}
         <TouchableOpacity
           style={styles.accountPickerBtn}
           onPress={() => setAccountModal(true)}
@@ -223,9 +213,7 @@ export default function TransactionsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* CONTENT CARD */}
       <View style={styles.contentCard}>
-        {/* PERIOD TABS */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -245,9 +233,7 @@ export default function TransactionsScreen() {
           ))}
         </ScrollView>
 
-        {/* FILTER ROW: Категория + Тип + Сортиране */}
         <View style={styles.filterRow}>
-          {/* Category combobox */}
           <TouchableOpacity
             style={styles.comboBox}
             onPress={() => setCatModal(true)}
@@ -260,7 +246,6 @@ export default function TransactionsScreen() {
             <Text style={styles.comboChevron}>⌄</Text>
           </TouchableOpacity>
 
-          {/* Type toggle */}
           <View style={styles.typeToggle}>
             {(['all', 'expense', 'income'] as TxType[]).map(t => (
               <TouchableOpacity
@@ -283,19 +268,17 @@ export default function TransactionsScreen() {
             ))}
           </View>
 
-          {/* Sort */}
           <TouchableOpacity
             style={styles.sortBtn}
             onPress={() => setSortModal(true)}
             activeOpacity={0.75}
           >
-            <Text style={styles.sortIcon}>⇅</Text>
+            <Text style={styles.sortIcon}><FontAwesome name="sort" size={24} color="white" /></Text>
           </TouchableOpacity>
         </View>
 
-        {/* SEARCH */}
         <View style={styles.searchRow}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Text style={styles.searchIcon}><Entypo name="magnifying-glass" size={24} color="white" /></Text>
           <TextInput
             style={styles.searchInput}
             placeholder="Търси транзакция…"
@@ -310,7 +293,6 @@ export default function TransactionsScreen() {
           )}
         </View>
 
-        {/* TRANSACTIONS LIST */}
         <ScrollView
           style={styles.listScroll}
           contentContainerStyle={styles.listContent}
@@ -348,12 +330,10 @@ export default function TransactionsScreen() {
         </ScrollView>
       </View>
 
-      {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={() => router.push('/(tabs)/add-transaction')} activeOpacity={0.85}>
-        <Text style={styles.fabIcon}>＋</Text>
+        <Text style={styles.fabIcon}>+</Text>
       </TouchableOpacity>
 
-      {/* MODALS */}
       <PickerModal
         visible={accountModal}
         title="Изберете сметка"
@@ -383,7 +363,6 @@ export default function TransactionsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
-  // Header
   header: {flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',backgroundColor: BG, paddingHorizontal: 16, paddingVertical: 14,},
   backBtn:           { width: 40 },
   backArrow:         { color: WHITE, fontSize: 22 },
@@ -391,10 +370,8 @@ const styles = StyleSheet.create({
   accountPickerBtn:  {width: 40, height: 40, borderRadius: 20,backgroundColor: 'rgba(0,0,0,0.2)',alignItems: 'center', justifyContent: 'center',},
   accountPickerEmoji: { fontSize: 20 },
 
-  // Content card
   contentCard: {flex: 1, backgroundColor: CARD,borderRadius: 24, margin: 12, marginTop: 4,overflow: 'hidden', paddingBottom: 80,},
 
-  // Period tabs
   tabsScroll:   { flexGrow: 0 },
   tabsContent:  { flexDirection: 'row', paddingHorizontal: 16, paddingTop: 16, gap: 4 },
   tabBtn:       { paddingHorizontal: 12, paddingVertical: 8, alignItems: 'center', position: 'relative' },
@@ -402,7 +379,6 @@ const styles = StyleSheet.create({
   tabTextActive:{ color: ACCENT, fontWeight: '600' },
   tabUnderline: {position: 'absolute', bottom: 0, left: 12, right: 12,height: 2, backgroundColor: ACCENT, borderRadius: 999,},
 
-  // Filter row
   filterRow: {flexDirection: 'row', alignItems: 'center',paddingHorizontal: 16, paddingVertical: 10, gap: 8,},
   comboBox: {flex: 1, flexDirection: 'row', alignItems: 'center',backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: 10, paddingHorizontal: 10, paddingVertical: 9,gap: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',},
@@ -421,22 +397,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',},
   sortIcon: { color: WHITE, fontSize: 18 },
 
-  // Search
   searchRow: {flexDirection: 'row', alignItems: 'center',marginHorizontal: 16, marginBottom: 8,backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: 10, paddingHorizontal: 12,borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 8,},
   searchIcon:  { fontSize: 13 },
   searchInput: { flex: 1, color: WHITE, fontSize: 14, paddingVertical: 11 },
   clearIcon:   { color: MUTED, fontSize: 15, padding: 4 },
 
-  // List
   listScroll:  { flex: 1 },
   listContent: { paddingHorizontal: 16, paddingTop: 4, paddingBottom: 24, gap: 20 },
 
-  // Group
   group:      { gap: 4 },
   dateHeader: { color: MUTED, fontSize: 13, fontWeight: '500', paddingVertical: 6 },
 
-  // Tx row
   txRow: {flexDirection: 'row', alignItems: 'center', gap: 12,paddingVertical: 12, paddingHorizontal: 4,},
   txIconWrap: {width: 40, height: 40, borderRadius: 20,backgroundColor: 'rgba(255,255,255,0.07)',alignItems: 'center', justifyContent: 'center',},
   txInfo:   { flex: 1 },
@@ -444,18 +416,15 @@ const styles = StyleSheet.create({
   txMeta:   { color: MUTED, fontSize: 12, marginTop: 2 },
   txAmount: { fontSize: 15, fontWeight: '600' },
 
-  // Empty
   emptyState: { alignItems: 'center', paddingTop: 60, gap: 12 },
   emptyIcon:  { fontSize: 40 },
   emptyText:  { color: MUTED, fontSize: 16 },
 
-  // FAB
   fab: {position: 'absolute', bottom: 28, alignSelf: 'center',width: 60, height: 60, borderRadius: 30,backgroundColor: FAB, alignItems: 'center', 
     justifyContent: 'center',shadowColor: FAB, shadowOffset: { width: 0, height: 4 },shadowOpacity: 0.4, shadowRadius: 10, elevation: 8,
   },
   fabIcon: { color: WHITE, fontSize: 28, fontWeight: '300', lineHeight: 32 },
 
-  // Modal
   modalBackdrop: {flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end',},
   modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24, borderTopRightRadius: 24,paddingHorizontal: 24, paddingTop: 16, paddingBottom: 40,},
   modalHandle: {width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999, alignSelf: 'center', marginBottom: 20,},

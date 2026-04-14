@@ -23,7 +23,9 @@ export default function ForgotPasswordScreen() {
     }
     setLoading(true);
     try {
-      // TODO: await sendPasswordResetEmail(auth, email);
+      
+
+      
       await new Promise((resolve) => setTimeout(resolve, 1500));
       setStep('success');
     } catch {

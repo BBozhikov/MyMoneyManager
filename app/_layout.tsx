@@ -18,7 +18,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      return true; // true = събитието е обработено, не прави нищо
+      return true;
     });
     return () => subscription.remove();
   }, []);
@@ -29,7 +29,7 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#3b6861' }, // ← това е ключовото
+          contentStyle: { backgroundColor: '#3b6861' },
           animation: 'slide_from_right',
           gestureEnabled: false,
         }}>

@@ -37,7 +37,8 @@ export default function LoginScreen() {
         await AsyncStorage.setItem('rememberMe', 'false');
       }
     } catch (_) {}
-    // TODO: Логика за автентикация
+    
+    
     console.log(email, password);
   };
 
