@@ -1,8 +1,11 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, } from 'react-native';
@@ -30,6 +33,7 @@ const ICONS = [
   { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={24} color="white" /> },
   { id: 'coins',      emoji: <FontAwesome5 name="coins" size={24} color="white" /> },
 ];
+
 
 const COLORS = [
   '#f5a623', 
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
   section: { gap: 14 },
   sectionLabel: { color: MUTED, fontSize: 15 },
 
-  nameInput: {color: WHITE,fontSize: 16,paddingBottom: 8,padding: 0,},
+  nameInput: {color: WHITE,fontSize: 16,paddingBottom: 2,padding: 0,},
   nameUnderline: { height: 1.5, backgroundColor: ACCENT },
 
   iconsGrid: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},

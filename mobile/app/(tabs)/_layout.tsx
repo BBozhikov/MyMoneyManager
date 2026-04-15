@@ -1,5 +1,6 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
@@ -44,7 +45,13 @@ export default function TabLayout() {
         options={{
           href: null,
         }}/>
-
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Категории',
+          tabBarIcon: ({ color }) => <MaterialIcons name="category" size={24} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="profile"
         options={{
@@ -80,6 +87,12 @@ export default function TabLayout() {
         options={{
           href: null,
         }}/>
+      <Tabs.Screen
+        name="add-category"
+        options={{
+          href:null,
+        }}
+      />
     </Tabs>
   );
 }
