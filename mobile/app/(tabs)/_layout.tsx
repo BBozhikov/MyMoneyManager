@@ -6,6 +6,7 @@ import React from 'react';
 import { HapticTab } from '@/components/haptic-tab';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -44,7 +45,13 @@ export default function TabLayout() {
         options={{
           href: null,
         }}/>
-
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Категории',
+          tabBarIcon: ({ color }) => <MaterialIcons name="category" size={28} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="profile"
         options={{
@@ -80,6 +87,12 @@ export default function TabLayout() {
         options={{
           href: null,
         }}/>
+      <Tabs.Screen
+        name="add-category"
+        options={{
+          href:null,
+        }}
+        />
     </Tabs>
   );
 }

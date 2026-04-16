@@ -29,19 +29,19 @@ export default function MainScreen() {
 
         <View style={styles.toggleContainer}>
           <TouchableOpacity
-            style={[styles.toggleButton, activeType === 'приход' && styles.toggleActive]}
-            onPress={() => setActiveType('приход')}
-          >
-            <Text style={[styles.toggleText, activeType === 'приход' && styles.toggleTextActive]}>
-              Приход
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[styles.toggleButton, activeType === 'разход' && styles.toggleActiveExpense]}
             onPress={() => setActiveType('разход')}
           >
             <Text style={[styles.toggleText, activeType === 'разход' && styles.toggleTextActive]}>
               Разход
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, activeType === 'приход' && styles.toggleActive]}
+            onPress={() => setActiveType('приход')}
+          >
+            <Text style={[styles.toggleText, activeType === 'приход' && styles.toggleTextActive]}>
+              Приход
             </Text>
           </TouchableOpacity>
         </View>
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   toggleText: {color: 'rgba(255,255,255,0.55)',fontSize: 15,fontWeight: '600',},
   toggleTextActive: {color: 'white',},
 
-  card: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,padding: 20,width: '100%',alignItems: 'center',},
+  card: {backgroundColor: '#0000002e',borderRadius: 20,padding: 20,width: '100%',alignItems: 'center',},
   actionsCard: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,width: '100%',overflow: 'hidden',},
   primaryButton: {flexDirection: 'row',alignItems: 'center',gap: 12,paddingVertical: 18,paddingHorizontal: 20,},
   primaryButtonIcon: {color: '#34C759',fontSize: 22,fontWeight: '300',width: 28,textAlign: 'center',},

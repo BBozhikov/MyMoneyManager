@@ -88,7 +88,7 @@ export default function AccountsScreen() {
 }
 
 const BG        = '#3b6861';
-const CARD      = 'rgba(255,255,255,0.07)';
+const CARD      = '#0000002e';
 const WHITE     = '#ffffff';
 const MUTED     = 'rgba(255,255,255,0.55)';
 const DIVIDER   = 'rgba(255,255,255,0.08)';
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
   divider: {height: 1,backgroundColor: DIVIDER,marginHorizontal: 16,},
 
   fab: {position: 'absolute',bottom: 32,alignSelf: 'center',width: 60,height: 60,borderRadius: 30,backgroundColor: FAB_COLOR,
-    alignItems: 'center',justifyContent: 'center',shadowColor: FAB_COLOR,shadowOffset: { width: 0, height: 4 },shadowOpacity: 0.4,shadowRadius: 10,elevation: 8,},
+    alignItems: 'center',justifyContent: 'center',shadowColor: FAB_COLOR,shadowOffset: { width: 0, height: 4 },shadowOpacity: 0.4,shadowRadius: 10,elevation: 8
+  ,borderColor:'black',borderWidth:1},
   fabIcon: {color: WHITE,fontSize: 28,fontWeight: '300',lineHeight: 32,},
 });
