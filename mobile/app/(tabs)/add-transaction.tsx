@@ -1,6 +1,6 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import React, { useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -138,7 +138,7 @@ export default function AddTransactionScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.cameraBtn} activeOpacity={0.75} onPress={() => console.log('camera')}>
+        <TouchableOpacity style={styles.cameraBtn} activeOpacity={0.75} onPress={() => router.replace("/(tabs)/camera")}>
           <Text style={styles.cameraIcon}><AntDesign name="camera" size={24} color="white" /></Text>
           <Text style={styles.cameraBtnText}>Снимай касова бележка</Text>
         </TouchableOpacity>

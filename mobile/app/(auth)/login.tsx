@@ -2,44 +2,62 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://192.168.0.6:8080';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const PlaceholderImage = require('@/assets/images/banknote.png');
 
-  useEffect(() => {
-    const loadSaved = async () => {
-      try {
-        const savedEmail = await AsyncStorage.getItem('rememberedEmail');
-        const savedRemember = await AsyncStorage.getItem('rememberMe');
-        if (savedRemember === 'true' && savedEmail) {
-          setEmail(savedEmail);
-          setRememberMe(true);
-        }
-      } catch (_) {}
-    };
-    loadSaved();
-  }, []);
-
   const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('Грешка', 'Моля, попълни имейл и парола');
+      return;
+    }
+
     try {
+      setLoading(true);
+
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
+        email: email.trim(),
+        password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = response.data;
+
+      console.log('Login response:', data);
+      console.log('JWT token:', data.token);
+      console.log('Remember me: ', rememberMe);
+  
+      router.push('/(tabs)/main');
+
       if (rememberMe) {
-        await AsyncStorage.setItem('rememberedEmail', email);
-        await AsyncStorage.setItem('rememberMe', 'true');
-      } else {
-        await AsyncStorage.removeItem('rememberedEmail');
-        await AsyncStorage.setItem('rememberMe', 'false');
+        await AsyncStorage.setItem('token', data.token);
       }
-    } catch (_) {}
-    
-    
-    console.log(email, password);
+    } catch (error: any) {
+      console.log('Login error:', error?.response?.data || error.message);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Неуспешно логване';
+
+      Alert.alert('Грешка', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,10 +112,6 @@ export default function LoginScreen() {
 
       <TouchableOpacity activeOpacity={0.7} onPress={() => router.push('/(auth)/register')}>
         <Text style={styles.link}>Нямаш акаунт? Регистрирай се</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={{ marginTop: 50 }} activeOpacity={0.7} onPress={() => router.push('/(tabs)/main')}>
-        <Text style={styles.link2}>Искаш без акаунт? Използвай локално приложението</Text>
       </TouchableOpacity>
     </View>
     </SafeAreaView></>
