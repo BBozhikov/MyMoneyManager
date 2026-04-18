@@ -2,15 +2,34 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const USER = {
-  name: 'Иван Петров',
-  email: 'ivan.petrov@example.com',
-  initials: 'ИП',
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const handleGetUserData = async () => {
+    try {
+      setLoading(true);
+
+      const storedFullName = await AsyncStorage.getItem('fullName');
+      const storedEmail = await AsyncStorage.getItem('email');
+      setFullName(storedFullName || '');
+      setEmail(storedEmail || '');
+    } catch (error: any) {
+      console.log('Loading user info error:', error?.response?.data || error.message);
+        const message =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          'Неуспешно зареждане на данни за потребителя';
+  
+        Alert.alert('Грешка', message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChangePassword = () => {
     router.push('/(auth)/forgot-password');
@@ -51,6 +70,10 @@ export default function ProfileScreen() {
       ]
     );
   };
+``
+  useEffect(() => {
+    handleGetUserData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -58,24 +81,24 @@ export default function ProfileScreen() {
 
         <View style={styles.avatarCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{USER.initials}</Text>
+            <Text style={styles.avatarText}>{fullName?.split(' ').map(n => n[0]).join('')}</Text>
           </View>
-          <Text style={styles.userName}>{USER.name}</Text>
-          <Text style={styles.userEmail}>{USER.email}</Text>
+          <Text style={styles.userName}>{fullName}</Text>
+          <Text style={styles.userEmail}>{email}</Text>
         </View>
 
         <View style={styles.card}>
 
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Име</Text>
-            <Text style={styles.infoValue}>{USER.name}</Text>
+            <Text style={styles.infoValue} numberOfLines={1} ellipsizeMode="tail" >{fullName}</Text>
           </View>
 
           <View style={styles.divider} />
 
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Имейл</Text>
-            <Text style={styles.infoValue}>{USER.email}</Text>
+            <Text style={styles.infoValue} numberOfLines={1} ellipsizeMode="tail" >{email}</Text>
           </View>
 
           <View style={styles.divider} />
@@ -135,7 +158,7 @@ const styles = StyleSheet.create({
   card: {backgroundColor: CARD,borderRadius: 20,width: '100%',overflow: 'hidden'},
   infoRow: {flexDirection: 'row',justifyContent: 'space-between',alignItems: 'center',paddingVertical: 16,paddingHorizontal: 20,},
   infoLabel: {color: WHITE_MUTED,fontSize: 15,},
-  infoValue: {color: WHITE,fontSize: 15,fontWeight: '500',},
+  infoValue: {color: WHITE,fontSize: 15,fontWeight: '500', maxWidth: '80%', textAlign: 'right'},
   divider: {height: 1,backgroundColor: WHITE_FAINT,marginHorizontal: 16,},
   actionRow: {flexDirection: 'row',alignItems: 'center',gap: 12,paddingVertical: 18,paddingHorizontal: 20,},
   actionText: {fontSize: 18,width: 28,textAlign: 'center',},

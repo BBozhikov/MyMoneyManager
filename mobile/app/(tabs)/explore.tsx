@@ -1,5 +1,6 @@
 // !!!! IMPORTRANT - explore = accounts
 import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome6 from '@expo/vector-icons/build/FontAwesome6';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -10,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const ACCOUNTS = [
   { id: '1', name: 'Основен', balance: 202.58, emoji: <FontAwesome name="money" size={24} color="white" /> },
   { id: '2', name: 'Банкова сметка', balance: 1031.00, emoji: <AntDesign name="bank" size={24} color="white" /> },
-  { id: '3', name: 'Спестявания', balance: 540.00, emoji: <FontAwesome5 name="piggy-bank" size={24} color="white" /> },
+  { id: '3', name: 'Спестявания', balance: 540.00, emoji: <FontAwesome6 name="piggy-bank" size={24} color="white" /> },
 ];
 
 function formatAmount(amount: number) {

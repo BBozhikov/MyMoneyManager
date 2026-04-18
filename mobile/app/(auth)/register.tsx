@@ -1,17 +1,68 @@
 import { Image } from 'expo-image';
 import { Stack, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://192.168.0.6:8080';
 
 export default function RegisterScreen() {
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const PlaceholderImage = require('@/assets/images/banknote.png');
+
+  const handleRegister = async () => {
+    if (!email.trim() || !password.trim() || !fullName.trim() || !confirmPassword.trim()) {
+      Alert.alert('Грешка', 'Моля, попълни всички полета');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Грешка', 'Паролите не съвпадат');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = response.data;
+
+      console.log('Register response:', data);
+      Alert.alert(
+        'Успех', 
+        `Регистрацията е успешна за ${email}. Трябвя да си потвърдиш имейла преди да влезеш.`,
+        [{ text: 'Разбрах!', onPress: () => router.push('/(auth)/login') }]
+      );
+
+    } catch (error: any) {
+      console.log('Register error:', error?.response?.data || error.message);
+
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        'Неуспешно логване';
+
+      Alert.alert('Грешка', message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <><Stack.Screen options={{ headerShown: false, animation: 'slide_from_left'}} />
@@ -23,10 +74,10 @@ export default function RegisterScreen() {
 
       <TextInput
         style={styles.input}
-        placeholder="Име"
+        placeholder="Пълно име"
         placeholderTextColor="white"
-        value={name}
-        onChangeText={setName}/>
+        value={fullName}
+        onChangeText={setFullName}/>
 
       <TextInput
         style={styles.input}
@@ -58,7 +109,7 @@ export default function RegisterScreen() {
           styles.button,
           { backgroundColor: pressed ? '#005ecb' : '#007AFF' }
         ]}
-        onPress={() => console.log(name, email, password)}>
+        onPress={handleRegister}>
         <Text style={styles.buttonText}>Регистрирай се</Text>
       </Pressable>
 

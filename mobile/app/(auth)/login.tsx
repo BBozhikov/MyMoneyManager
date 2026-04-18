@@ -41,11 +41,14 @@ export default function LoginScreen() {
       console.log('JWT token:', data.token);
       console.log('Remember me: ', rememberMe);
   
-      router.push('/(tabs)/main');
-
       if (rememberMe) {
         await AsyncStorage.setItem('token', data.token);
       }
+      await AsyncStorage.setItem('fullName', data.fullName);
+      await AsyncStorage.setItem('email', data.email);
+
+      router.push('/(tabs)/main');
+
     } catch (error: any) {
       console.log('Login error:', error?.response?.data || error.message);
 
