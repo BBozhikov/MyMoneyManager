@@ -6,10 +6,10 @@ import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const data = [
-  { value: 500, color: '#007AFF', text: 'Храна', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  { value: 300, color: '#34C759', text: 'Транспорт', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  { value: 200, color: '#FF9500', text: 'Развлечения', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  { value: 150, color: '#FF3B30', text: 'Сметки', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
+  //{ value: 500, color: '#007AFF', text: 'Храна', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
+  //{ value: 300, color: '#34C759', text: 'Транспорт', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
+  //{ value: 200, color: '#FF9500', text: 'Развлечения', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
+  //{ value: 150, color: '#FF3B30', text: 'Сметки', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
 
   { value: 2000, color: '#5AC8FA', text: 'Заплата', type: 'приход', strokeWidth: 2, strokeColor: '#3b6861' },
   { value: 400, color: '#BF5AF2', text: 'Freelance', type: 'приход', strokeWidth: 2, strokeColor: '#3b6861' },

@@ -96,6 +96,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="camera"
         options={{
+          tabBarStyle: { display: 'none' },
           href:null,
         }}
         />

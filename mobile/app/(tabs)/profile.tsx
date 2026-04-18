@@ -83,8 +83,6 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{fullName?.split(' ').map(n => n[0]).join('')}</Text>
           </View>
-          <Text style={styles.userName}>{fullName}</Text>
-          <Text style={styles.userEmail}>{email}</Text>
         </View>
 
         <View style={styles.card}>
