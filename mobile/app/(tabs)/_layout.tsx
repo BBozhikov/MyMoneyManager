@@ -87,12 +87,7 @@ export default function TabLayout() {
         options={{
           href: null,
         }}/>
-      <Tabs.Screen
-        name="add-category"
-        options={{
-          href:null,
-        }}
-        />
+      <Tabs.Screen name="add-category" options={{ href:null,}}/>
       <Tabs.Screen
         name="camera"
         options={{
