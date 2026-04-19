@@ -56,6 +56,7 @@ export default function TabLayout() {
       <Tabs.Screen name="transfer-history" options={{ href: null,}}/>
       <Tabs.Screen name="add-category" options={{ href:null,}}/>
       <Tabs.Screen name="edit-category" options={{ href:null,}}/>
+      <Tabs.Screen name="edit-account" options={{ href:null,}}/>
       <Tabs.Screen
         name="camera"
         options={{

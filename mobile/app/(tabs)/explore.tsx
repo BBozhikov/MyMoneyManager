@@ -8,10 +8,56 @@ import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+const iconSize = 24;
+const ICONS = [
+  { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
+  { id: 'bank',       emoji: <AntDesign name="bank" size={iconSize} color="white" /> },
+  { id: 'pound',      emoji: <AntDesign name="pound-circle" size={iconSize} color="white" /> },
+  { id: 'card',       emoji: <FontAwesome name="credit-card" size={iconSize} color="white" /> },
+  { id: 'wallet',     emoji: <FontAwesome5 name="wallet" size={iconSize} color="white" /> },
+  { id: 'savings',    emoji: <FontAwesome5 name="piggy-bank" size={iconSize} color="white" />  },
+  { id: 'paypal',     emoji: <FontAwesome name="paypal" size={iconSize} color="white" /> },
+  { id: 'safe',       emoji: <MaterialCommunityIcons name="safe" size={iconSize} color="white" /> },
+  { id: 'bitcoin',    emoji: <FontAwesome name="bitcoin" size={iconSize} color="white" /> },
+  { id: 'ethereum',   emoji: <FontAwesome5 name="ethereum" size={iconSize} color="white" /> },
+  { id: 'dollar',     emoji: <FontAwesome name="dollar" size={iconSize} color="white" /> },
+  { id: 'euro',       emoji: <FontAwesome name="euro" size={iconSize} color="white" /> },
+  { id: 'yen',        emoji: <FontAwesome name="yen" size={iconSize} color="white" /> },
+  { id: 'stocks',     emoji: <AntDesign name="stock" size={iconSize} color="white" /> },
+  { id: 'bag',        emoji: <FontAwesome6 name="sack-dollar" size={iconSize} color="white" /> },
+  { id: 'percent',    emoji: <FontAwesome5 name="percent" size={iconSize} color="white" /> },
+  { id: 'finance',    emoji: <MaterialCommunityIcons name="finance" size={iconSize} color= "white" /> },
+  { id: 'diamond',    emoji: <FontAwesome name="diamond" size={iconSize} color="white" /> },
+  { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={iconSize} color="white" /> },
+  { id: 'coins',      emoji: <FontAwesome5 name="coins" size={iconSize} color="white" /> },
+];
+const ICON_MAP = Object.fromEntries(ICONS.map(i => [i.id, i.emoji]));
+
+const COLORS = [
+  {id: 'amber', color: '#f5a623'}, // amber
+  {id: 'cyan', color: '#00d4ff'}, // cyan
+  {id: 'pink', color: '#e91e8c'}, // pink
+  {id: 'orange', color: '#ff7043'}, // orange
+  {id: 'dark_green', color: '#4a7c6f'}, // dark_green
+  {id: 'light_green', color: '#34c759'}, // light_green
+  {id: 'red', color: '#ff3b30'}, // red
+  {id: 'purple', color: '#5856d6'}, // purple
+  {id: 'yellow', color: '#ffcc00'}, // yellow
+  {id: 'blue', color: '#007aff'}, // blue
+];
+const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
+
+interface Account {
+  id: string;
+  name: string;
+  iconId: string;
+  colorId: string;
+  amount: number;
+}
 const ACCOUNTS = [
-  { id: '1', name: 'Основен', balance: 202.58, emoji: <FontAwesome name="money" size={24} color="white" /> },
-  { id: '2', name: 'Банкова сметка', balance: 1031.00, emoji: <AntDesign name="bank" size={24} color="white" /> },
-  { id: '3', name: 'Спестявания', balance: 540.00, emoji: <FontAwesome6 name="piggy-bank" size={24} color="white" /> },
+  { id: '1', name: 'Основен', amount: 202.58, iconId: 'cash', colorId: 'amber' },
+  { id: '2', name: 'Банкова сметка', amount: 1031.00, iconId: 'bank', colorId: 'cyan' },
+  { id: '3', name: 'Спестявания', amount: 540.00, iconId: 'savings', colorId: 'light_green' },
 ];
 
 function formatAmount(amount: number) {
@@ -21,7 +67,7 @@ function formatAmount(amount: number) {
 export default function AccountsScreen() {
   const router = useRouter();
 
-  const total = ACCOUNTS.reduce((sum, a) => sum + a.balance, 0);
+  const total = ACCOUNTS.reduce((sum, a) => sum + a.amount, 0);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -62,13 +108,14 @@ export default function AccountsScreen() {
               <TouchableOpacity
                 style={styles.accountRow}
                 activeOpacity={0.7}
-                //onPress={() => router.push()}
-              >
-                <View style={styles.accountIcon}>
-                  <Text style={styles.accountIconText}>{account.emoji}</Text>
+                onPress={() => router.replace({ pathname: `/(tabs)/edit-account`, 
+                params: { id: account.id, amount: account.amount, name: account.name, colorId : account.colorId, iconId: account.iconId,} })}>
+
+                <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.colorId] }]}>
+                  <Text style={styles.accountIconText}>{ICON_MAP[account.iconId]}</Text>
                 </View>
                 <Text style={styles.accountName}>{account.name}</Text>
-                <Text style={styles.accountBalance}>{formatAmount(account.balance)}</Text>
+                <Text style={styles.accountBalance}>{formatAmount(account.amount)}</Text>
               </TouchableOpacity>
               {index < ACCOUNTS.length - 1 && <View style={styles.divider} />}
             </View>
