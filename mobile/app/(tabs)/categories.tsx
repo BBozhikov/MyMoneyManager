@@ -1,4 +1,8 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/build/Feather';
+import FontAwesome from '@expo/vector-icons/build/FontAwesome';
+import FontAwesome6 from '@expo/vector-icons/build/FontAwesome6';
+import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -14,44 +18,88 @@ type CategoryType = 'разход' | 'приход';
 interface Category {
   id: string;
   name: string;
-  icon: React.ReactNode;
-  color: string;
+  iconId: string;
+  colorId: string;
   type: CategoryType;
 }
 const iconSize = 46;
+const ICONS = [
+    { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={iconSize} color="white" /> },
+    { id: 'plane',      emoji: <FontAwesome name="plane" size={iconSize} color="white" /> },
+    { id: 'tag',        emoji: <AntDesign name="tag" size={iconSize} color="white" /> },
+    { id: 'pet',        emoji: <MaterialIcons name="pets" size={iconSize} color="white" /> },
+    { id: 'monitor',    emoji: <Feather name="monitor" size={iconSize} color="white" /> },
+    { id: 'pot',        emoji: <MaterialCommunityIcons name="pot-mix" size={iconSize} color="white" />  },
+    { id: 'shopping_cart',     emoji: <AntDesign name="shopping-cart" size={iconSize} color="white" /> },
+    { id: 'brush',      emoji: <FontAwesome5 name="brush" size={iconSize} color="white" /> },
+    { id: 'washing_machine',    emoji: <MaterialCommunityIcons name="washing-machine" size={iconSize} color="white" /> },
+    { id: 'tent',   emoji: <FontAwesome6 name="tent" size={iconSize} color="white" /> },
+    { id: 'controller',     emoji: <Ionicons name="game-controller-sharp" size={iconSize} color="white" /> },
+    { id: 'car',       emoji: <AntDesign name="car" size={iconSize} color="white" /> },
+    { id: 'first_aid',        emoji: <FontAwesome5 name="first-aid" size={iconSize} color="white" /> },
+    { id: 'book',     emoji: <Feather name="book-open" size={iconSize} color="white" /> },
+    { id: 'tshirt',        emoji: <FontAwesome5 name="tshirt" size={iconSize} color="white" /> },
+    { id: 'shoe',    emoji: <MaterialCommunityIcons name="shoe-sneaker" size={iconSize} color="white" /> },
+    { id: 'food', emoji: <MaterialCommunityIcons name="food-variant" size={iconSize} color="white" />},
+    { id: 'restaurant', emoji: <Ionicons name="restaurant" size={iconSize} color="white" />},
+    { id: 'cafe', emoji: <Ionicons name="cafe" size={iconSize} color="white" />},
+    { id: 'house', emoji: <FontAwesome6 name="house-chimney" size={iconSize} color="white" />},
+    { id: 'therapy', emoji: <MaterialIcons name="local-pharmacy" size={iconSize} color="white" />},
+    { id: 'education', emoji: <FontAwesome name="graduation-cap" size={iconSize} color="white" />},
+    { id: 'gift', emoji: <Feather name="gift" size={iconSize} color="white" />},
+    { id: 'cleaning', emoji: <FontAwesome5 name="pump-soap" size={iconSize} color="white" />},
+    { id: 'family', emoji: <MaterialIcons name="family-restroom" size={iconSize} color="white" />},
+    { id: 'sports', emoji: <MaterialIcons name="sports-football" size={iconSize} color="white" />},
+    { id: 'transport', emoji: <MaterialIcons name="emoji-transportation" size={iconSize} color="white" />},
+    { id: 'salary', emoji: <MaterialCommunityIcons name="account-cash" size={iconSize} color="white" />},
+    { id: 'loan', emoji: <MaterialIcons name="account-balance" size={iconSize} color="white" />},
+    { id: 'trade', emoji: <FontAwesome name="handshake-o" size={iconSize} color="white" />},
+    { id: 'others', emoji: <AntDesign name="question" size={iconSize} color="white" />},
+  ];
+const ICON_MAP = Object.fromEntries(ICONS.map(i => [i.id, i.emoji]));
+const COLORS = [
+  {id: 'amber', color: '#f5a623'}, // amber
+  {id: 'cyan', color: '#00d4ff'}, // cyan
+  {id: 'pink', color: '#e91e8c'}, // pink
+  {id: 'orange', color: '#ff7043'}, // orange
+  {id: 'dark_green', color: '#4a7c6f'}, // dark_green
+  {id: 'light_green', color: '#34c759'}, // light_green
+  {id: 'red', color: '#ff3b30'}, // red
+  {id: 'purple', color: '#5856d6'}, // purple
+  {id: 'yellow', color: '#ffcc00'}, // yellow
+  {id: 'blue', color: '#007aff'}, // blue
+];
+const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
+
 const categories: Category[] = [
   // Разходи
-  { id: '1', name: 'Здраве', icon: <MaterialIcons name="favorite" size={iconSize} color="#fff" />, color: '#E53935', type: 'разход' },
-  { id: '2', name: 'Свободно', icon: <MaterialIcons name="account-balance-wallet" size={iconSize} color="#fff" />, color: '#43A047', type: 'разход' },
-  { id: '3', name: 'Къща', icon: <MaterialIcons name="home" size={iconSize} color="#fff" />, color: '#1E88E5', type: 'разход' },
-  { id: '4', name: 'Кафене', icon: <MaterialIcons name="restaurant" size={iconSize} color="#fff" />, color: '#F9A825', type: 'разход' },
-  { id: '5', name: 'Образование', icon: <MaterialIcons name="school" size={iconSize} color="#fff" />, color: '#D81B60', type: 'разход' },
-  { id: '6', name: 'Подаръци', icon: <MaterialIcons name="card-giftcard" size={iconSize} color="#fff" />, color: '#8E99A4', type: 'разход' },
-  { id: '7', name: 'Хранителни', icon: <MaterialIcons name="shopping-basket" size={iconSize} color="#fff" />, color: '#64B5F6', type: 'разход' },
-  { id: '8', name: 'Семейство', icon: <MaterialIcons name="people" size={iconSize} color="#fff" />, color: '#E53935', type: 'разход' },
-  { id: '9', name: 'Тренировки', icon: <MaterialIcons name="fitness-center" size={iconSize} color="#fff" />, color: '#66BB6A', type: 'разход' },
-  { id: '10', name: 'Транспорт', icon: <MaterialIcons name="directions-bus" size={iconSize} color="#fff" />, color: '#1E88E5', type: 'разход' },
-  { id: '11', name: 'Други', icon: <MaterialIcons name="help" size={iconSize} color="#fff" />, color: '#E53935', type: 'разход' },
-  { id: '12', name: 'Пазаруване', icon: <MaterialIcons name="shopping-cart" size={iconSize} color="#fff" />, color: '#E53935', type: 'разход' },
-  { id: '13', name: 'Споделено', icon: <MaterialIcons name="directions-car" size={iconSize} color="#fff" />, color: '#8E99A4', type: 'разход' },
-  { id: '14', name: 'Пране', icon: <MaterialIcons name="local-laundry-service" size={iconSize} color="#fff" />, color: '#EC407A', type: 'разход' },
-  { id: '15', name: 'Стол', icon: <MaterialIcons name="soup-kitchen" size={iconSize} color="#fff" />, color: '#FF7043', type: 'разход' },
-  { id: '16', name: 'Петлето', icon: <FontAwesome5 name="drumstick-bite" size={iconSize} color="#fff" />, color: '#F9A825', type: 'разход' },
-  { id: '17', name: 'Steam', icon: <FontAwesome5 name="steam" size={iconSize} color="#fff" />, color: '#546E7A', type: 'разход' },
-  { id: '18', name: 'Бръснар', icon: <MaterialIcons name="content-cut" size={iconSize} color="#fff" />, color: '#FF7043', type: 'разход' },
-  { id: '19', name: 'Гироланд', icon: <Ionicons name="fast-food" size={iconSize} color="#fff" />, color: '#EC407A', type: 'разход' },
-  { id: '20', name: 'Козметика', icon: <MaterialIcons name="face" size={iconSize} color="#fff" />, color: '#00ACC1', type: 'разход' },
-  { id: '21', name: 'Протеин', icon: <MaterialIcons name="local-cafe" size={iconSize} color="#fff" />, color: '#F9A825', type: 'разход' },
+  { id: '1', name: 'Здраве', iconId: 'first_aid', colorId: 'red', type: 'разход' },
+  { id: '2', name: 'Свободно', iconId: 'sports', colorId: 'light_green', type: 'разход' },
+  { id: '3', name: 'Къща', iconId: 'house', colorId: 'blue', type: 'разход' },
+  { id: '4', name: 'Кафене', iconId: 'cafe', colorId: 'yellow', type: 'разход' },
+  { id: '5', name: 'Образование', iconId: 'education', colorId: 'pink', type: 'разход' },
+  { id: '6', name: 'Подаръци', iconId: 'gift', colorId: 'amber', type: 'разход' },
+  { id: '7', name: 'Хранителни', iconId: 'shopping_cart', colorId: 'cyan', type: 'разход' },
+  { id: '8', name: 'Семейство', iconId: 'family', colorId: 'red', type: 'разход' },
+  { id: '9', name: 'Тренировки', iconId: 'sports', colorId: 'light_green', type: 'разход' },
+  { id: '10', name: 'Транспорт', iconId: 'transport', colorId: 'blue', type: 'разход' },
+  { id: '11', name: 'Други', iconId: 'others', colorId: 'red', type: 'разход' },
+  { id: '12', name: 'Пазаруване', iconId: 'shopping_cart', colorId: 'red', type: 'разход' },
+  { id: '13', name: 'Споделено', iconId: 'car', colorId: 'amber', type: 'разход' },
+  { id: '14', name: 'Пране', iconId: 'washing_machine', colorId: 'pink', type: 'разход' },
+  { id: '15', name: 'Стол', iconId: 'restaurant', colorId: 'orange', type: 'разход' },
+  { id: '16', name: 'Петлето', iconId: 'food', colorId: 'cyan', type: 'разход' },
+  { id: '17', name: 'Steam', iconId: 'gift', colorId: 'amber', type: 'разход' },
+  { id: '18', name: 'Бръснар', iconId: 'tag', colorId: 'orange', type: 'разход' },
+  { id: '19', name: 'Гироланд', iconId: 'cafe', colorId: 'pink', type: 'разход' },
 
   // Приходи
-  { id: '22', name: 'Заплата', icon: <MaterialIcons name="work" size={iconSize} color="#fff" />, color: '#43A047', type: 'приход' },
-  { id: '23', name: 'Freelance', icon: <MaterialIcons name="laptop" size={iconSize} color="#fff" />, color: '#1E88E5', type: 'приход' },
-  { id: '24', name: 'Дивиденти', icon: <MaterialIcons name="trending-up" size={iconSize} color="#fff" />, color: '#F9A825', type: 'приход' },
-  { id: '25', name: 'Наем', icon: <MaterialIcons name="home" size={iconSize} color="#fff" />, color: '#8E24AA', type: 'приход' },
-  { id: '26', name: 'Бонус', icon: <MaterialIcons name="star" size={iconSize} color="#fff" />, color: '#E53935', type: 'приход' },
-  { id: '27', name: 'Подарък', icon: <MaterialIcons name="card-giftcard" size={iconSize} color="#fff" />, color: '#EC407A', type: 'приход' },
-  { id: '28', name: 'Лихви', icon: <MaterialIcons name="account-balance" size={iconSize} color="#fff" />, color: '#00ACC1', type: 'приход' },
-  { id: '29', name: 'Други', icon: <MaterialIcons name="help" size={iconSize} color="#fff" />, color: '#546E7A', type: 'приход' },
+  { id: '21', name: 'Заплата', iconId: 'salary', colorId: 'light_green', type: 'приход' },
+  { id: '23', name: 'Freelance', iconId: 'trade', colorId: 'blue', type: 'приход' },
+  { id: '25', name: 'Наем', iconId: 'house', colorId: 'purple', type: 'приход' },
+  { id: '27', name: 'Подарък', iconId: 'gift', colorId: 'pink', type: 'приход' },
+  { id: '28', name: 'Лихви', iconId: 'loan', colorId: 'cyan', type: 'приход' },
+  { id: '29', name: 'Други', iconId: 'others', colorId: 'amber', type: 'приход' },
 ];
 
 const FAB_COLOR = '#f5a623'; 
@@ -86,9 +134,12 @@ export default function CategoriesScreen() {
           </TouchableOpacity>
         </View>
         {filtered.map((cat) => (
-          <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.75}>
-            <View style={[styles.circle, { backgroundColor: cat.color }]}>
-              {cat.icon}
+          <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.75} 
+          onPress={() => router.replace({ pathname: `/(tabs)/edit-category`, 
+          params: { id: cat.id, name: cat.name, colorId : cat.colorId, iconId: cat.iconId, type: cat.type } })}>
+            
+            <View style={[styles.circle, { backgroundColor: COLOR_MAP[cat.colorId] }]}>
+              {ICON_MAP[cat.iconId]}
             </View>
             <Text style={styles.categoryName} numberOfLines={2}>
               {cat.name}
