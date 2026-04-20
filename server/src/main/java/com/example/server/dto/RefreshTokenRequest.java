@@ -1,18 +1,15 @@
 package com.example.server.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
+public class RefreshTokenRequest {
 
-    private String accessToken;
+    @NotBlank
     private String refreshToken;
-    private String email;
-    private String fullName;
 }

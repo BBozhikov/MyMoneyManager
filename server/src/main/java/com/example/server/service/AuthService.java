@@ -4,9 +4,11 @@ import com.example.server.dto.AuthResponse;
 import com.example.server.dto.LoginRequest;
 import com.example.server.dto.MessageResponse;
 import com.example.server.dto.RegisterRequest;
+import com.example.server.entity.RefreshToken;
 import com.example.server.entity.User;
 import com.example.server.entity.VerificationToken;
 import com.example.server.enums.Currency;
+import com.example.server.exception.InvalidRefreshTokenException;
 import com.example.server.repository.UserRepository;
 import com.example.server.repository.VerificationTokenRepository;
 import com.example.server.security.JwtService;
@@ -29,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final RefreshTokenService refreshTokenService;
 
     @Value("${app.verification-token-expiry-hours}")
     private int verificationTokenExpiryHours;
@@ -91,11 +94,40 @@ public class AuthService {
             throw new DisabledException("Account is not verified. Please check your email.");
         }
 
-        String token = jwtService.generateToken(user);
+        String accessToken = jwtService.generateToken(user);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
         return AuthResponse.builder()
-                .token(token)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
                 .email(user.getEmail())
                 .fullName(user.getFullName())
                 .build();
+    }
+
+    public AuthResponse refreshToken(String refreshTokenString) {
+        RefreshToken oldRefreshToken = refreshTokenService.verifyRefreshToken(refreshTokenString);
+        User user = oldRefreshToken.getUser();
+
+        RefreshToken newRefreshToken = refreshTokenService.rotateRefreshToken(oldRefreshToken);
+        String accessToken = jwtService.generateToken(user);
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(newRefreshToken.getToken())
+                .email(user.getEmail())
+                .fullName(user.getFullName())
+                .build();
+    }
+
+    public MessageResponse logout(String refreshTokenString, UUID userId) {
+        RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(refreshTokenString);
+
+        if (!refreshToken.getUser().getId().equals(userId)) {
+            throw new InvalidRefreshTokenException("Refresh token does not belong to this user");
+        }
+
+        refreshTokenService.revokeRefreshToken(refreshTokenString);
+        return new MessageResponse("Logged out successfully.");
     }
 }
