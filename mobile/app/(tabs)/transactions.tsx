@@ -38,13 +38,6 @@ const CATEGORIES: {id: string; name: string; emoji: any}[] = [
   { id: 'freelance',    name: 'Freelance',        emoji: <AntDesign name="laptop" size={24} color="white" /> },
 ];
 
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'date_desc',   label: 'Дата (ново → старо)' },
-  { key: 'date_asc',    label: 'Дата (старо → ново)' },
-  { key: 'amount_desc', label: 'Сума (намаляваща)'   },
-  { key: 'amount_asc',  label: 'Сума (нарастваща)'   },
-];
-
 const PERIODS = ['Ден', 'Седмица', 'Месец', 'Година', 'Период'];
 
 const TRANSACTIONS = [
@@ -163,7 +156,7 @@ export default function TransactionsScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/main')} style={styles.backBtn} activeOpacity={0.7}>
-          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backArrow}><AntDesign name="arrow-left" size={24} color="white" /></Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Транзакции</Text>
         <TouchableOpacity
@@ -264,7 +257,19 @@ export default function TransactionsScreen() {
                 {group.items.map(tx => {
                   const cat = CATEGORIES.find(c => c.id === tx.categoryId)!;
                   return (
-                    <TouchableOpacity key={tx.id} style={styles.txRow} activeOpacity={0.75}>
+                    <TouchableOpacity key={tx.id} style={styles.txRow} activeOpacity={0.75} 
+                    onPress={() => router.replace({
+                      pathname: `/(tabs)/view-transaction`,
+                      params: {
+                        id: tx.id,
+                        accountId: tx.accountId,
+                        amount: tx.amount,
+                        description: tx.description,
+                        categoryId: tx.categoryId,          // добави това
+                        date: tx.date.toISOString(),        // добави това
+                      }
+                    })}>
+
                       <View style={styles.txIconWrap}>
                         <Text style={{ fontSize: 20 }}>{cat?.emoji ?? '💸'}</Text>
                       </View>

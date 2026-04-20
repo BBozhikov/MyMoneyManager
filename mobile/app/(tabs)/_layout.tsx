@@ -57,6 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen name="add-category" options={{ href:null,}}/>
       <Tabs.Screen name="edit-category" options={{ href:null,}}/>
       <Tabs.Screen name="edit-account" options={{ href:null,}}/>
+      <Tabs.Screen name="view-transaction" options={{ href:null,}}/>
       <Tabs.Screen
         name="camera"
         options={{
