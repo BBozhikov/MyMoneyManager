@@ -1,0 +1,6 @@
+package com.example.server.enums;
+
+public enum AccountIcon {
+    CASH, BANK, POUND, CARD, WALLET, SAVINGS, PAYPAL, SAFE, BITCOIN, ETHEREUM,
+    DOLLAR, EURO, YEN, STOCKS, BAG, PERCENT, FINANCE, DIAMOND, GOLD, COINS
+}
