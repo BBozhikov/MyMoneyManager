@@ -44,12 +44,6 @@ const COLORS = [
   '#007aff',
 ];
 
-const CURRENCIES = [
-  'EUR', 'USD', 'GBP', 'CHF',
-  'JPY', 'CAD', 'AUD', 'CNY', 'RUB',
-  'TRY', 'NOK', 'SEK', 'DKK', 'PLN',
-];
-
 export default function NewAccountScreen() {
   const router = useRouter();
 

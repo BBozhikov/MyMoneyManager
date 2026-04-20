@@ -60,12 +60,6 @@ const COLORS = [
   '#007aff', // blue
 ];
 
-const CURRENCIES = [
-  'EUR', 'USD', 'GBP', 'CHF',
-  'JPY', 'CAD', 'AUD', 'CNY', 'RUB',
-  'TRY', 'NOK', 'SEK', 'DKK', 'PLN',
-];
-
 export default function NewCategoryScreen() {
   const router = useRouter();
 
@@ -73,20 +67,21 @@ export default function NewCategoryScreen() {
   const [name, setName]               = useState('');
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-  const [currency, setCurrency]       = useState('EUR');
-  const [excludeBalance, setExcludeBalance] = useState(false);
-  const [currencyModal, setCurrencyModal] = useState(false);
-  const [type, setType] = useState("Приход");
+  const [type, setType] = useState<string | null>(null);
 
   const transactionTypes = [
   { label: "Приход", value: "income" },
   { label: "Разход", value: "expense" },
   ];
 
-  const canSubmit = name.trim().length > 0;
+  const canSubmit = (): boolean => {
+    const hasName = name.trim().length > 0;
+    const hasType = type !== null;
+    return hasName && hasType;
+  };
 
   const handleSubmit = () => {
-    if (!canSubmit) return;
+    if (!canSubmit()) return;
    
 
 
@@ -186,10 +181,10 @@ export default function NewCategoryScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.submitBtn, { backgroundColor: selectedColor, opacity: canSubmit ? 1 : 0.45 }]}
+          style={[styles.submitBtn, { backgroundColor: selectedColor, opacity: canSubmit() ? 1 : 0.45 }]}
           onPress={handleSubmit}
           activeOpacity={0.8}
-          disabled={!canSubmit}
+          disabled={!canSubmit()}
         >
           <Text style={styles.submitText}>Добавяне</Text>
         </TouchableOpacity>
