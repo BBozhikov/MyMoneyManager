@@ -44,12 +44,6 @@ const COLORS = [
   { id: 'blue',        color: '#007aff' },
 ];
 
-const CURRENCIES = [
-  'EUR', 'USD', 'GBP', 'CHF',
-  'JPY', 'CAD', 'AUD', 'CNY', 'RUB',
-  'TRY', 'NOK', 'SEK', 'DKK', 'PLN',
-];
-
 export default function EditAccountScreen() {
   const router = useRouter();
   const {amount, name, colorId, iconId} = useLocalSearchParams<{
@@ -111,9 +105,8 @@ export default function EditAccountScreen() {
             keyboardType="decimal-pad"
             selectionColor={ACCENT}
           />
-          <TouchableOpacity onPress={() => setCurrencyModal(true)} activeOpacity={0.75}>
-            <Text style={styles.currencyLabel}>{currency}</Text>
-          </TouchableOpacity>
+            <Text style={styles.currencyLabel}>EUR</Text>
+
         </View>
         <View style={styles.amountUnderline} />
 
@@ -176,13 +169,6 @@ export default function EditAccountScreen() {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Изберете валута</Text>
-          <TouchableOpacity onPress={() => setCurrencyModal(true)} activeOpacity={0.75}>
-            <Text style={styles.currencyValue}>{currency}</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.toggleRow}>
           <Text style={styles.toggleLabel}>Не включвай в общия баланс</Text>
           <Switch
@@ -205,30 +191,6 @@ export default function EditAccountScreen() {
           <Text style={styles.submitText}>Запазване</Text>
         </TouchableOpacity>
       </View>
-
-      <Modal visible={currencyModal} transparent animationType="slide" onRequestClose={() => setCurrencyModal(false)}>
-        <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setCurrencyModal(false)}>
-          <View style={styles.modalSheet}>
-            <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>Валута</Text>
-            <FlatList
-              data={CURRENCIES}
-              keyExtractor={(item) => item}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.currencyRow}
-                  activeOpacity={0.7}
-                  onPress={() => { setCurrency(item); setCurrencyModal(false); }}
-                >
-                  <Text style={styles.currencyRowText}>{item}</Text>
-                  {item === currency && <Text style={[styles.currencyCheck, { color: ACCENT }]}>✓</Text>}
-                </TouchableOpacity>
-              )}
-              ItemSeparatorComponent={() => <View style={styles.modalDivider} />}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
 
     </SafeAreaView>
   );
