@@ -1,3 +1,4 @@
+import { useRequireAuth } from '@/hooks/useRequireAuth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -17,6 +18,7 @@ const data = [
 ];
 
 export default function MainScreen() {
+  useRequireAuth();
   const router = useRouter();
   const [activeType, setActiveType] = useState<'приход' | 'разход'>('разход');
 
