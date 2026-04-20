@@ -33,6 +33,7 @@ env/
 ENV/
 .env/
 .env
+env.properties
 
 __pycache__/
 *.py[cod]
