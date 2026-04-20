@@ -3,6 +3,7 @@ import json
 
 
 def parse_receipt_text(ocr_text: str) -> dict:
+    ocr_text = ocr_text.replace('\t', '  ')  # problem with hardcodes tabs
     lines = [l.strip() for l in ocr_text.splitlines() if l.strip()]
 
     result = {
@@ -54,7 +55,10 @@ def extract_store_name(text: str) -> str:
         r'\b(БИЛЛА|BILLA)\b',       r'\b(ФАНТАСТИКО|FANTASTICO)\b',
         r'\b(МЕТРО|METRO)\b',       r'\b(ЦБА|CBA)\b',
         r'\b(ТЕХНОМАРКЕТ|TECHNOMARKET)\b', r'\b(ТЕХНОПОЛИС|TECHNOPOLIS)\b',
-        r'\b(ДМ|DM)\b',             
+        r'\b(ДМ|DM)\b',             r'\b(ЕКО|ЕКО)\b',
+        r'\b(ЛУКОЙЛ|LUKOIL)\b',     r'\b(ШЕЛ|SHELL)\b',
+        r'\b(Т-МАРКЕТ|T-MARKET)\b', r'\b(МАКДОНАЛДС|MCDONALDS|MC DONALDS)\b',
+        r'\b(КФС|KFC)\b',           r'\b(АПТЕКИ МАРЕШКИ|MARESHKI)\b',
     ]
     for pattern in known_stores:
         m = re.search(pattern, text_upper)
