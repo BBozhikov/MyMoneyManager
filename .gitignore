@@ -1,15 +1,11 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# ══════════════════════════════════════════════
+# EXPO / REACT NATIVE (Mobile/)
+# ══════════════════════════════════════════════
 node_modules/
-
-# Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-
-# Native
 .kotlin/
 *.orig.*
 *.jks
@@ -17,27 +13,67 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
-
-# Metro
 .metro-health-check*
-
-# debug
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-
-# macOS
-.DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
 *.tsbuildinfo
-
 app-example
+/Mobile/ios
+/Mobile/android
 
-# generated native folders
-/ios
-/android
+# ══════════════════════════════════════════════
+# PYTHON (AI/)
+# ══════════════════════════════════════════════
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+.env
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+.ipynb_checkpoints/
+*.ipynb
+
+ai/categorization/models/*
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.onnx
+
+# ══════════════════════════════════════════════
+# JAVA / SPRING BOOT (Server/)
+# ══════════════════════════════════════════════
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+target/
+.gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+.mvn/
+mvnw
+mvnw.cmd
+*.iml
+
