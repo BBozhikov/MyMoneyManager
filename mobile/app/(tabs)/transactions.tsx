@@ -127,44 +127,6 @@ function PickerModal({
   );
 }
 
-function SortModal({
-  visible,
-  selected,
-  onSelect,
-  onClose,
-}: {
-  visible: boolean;
-  selected: SortKey;
-  onSelect: (k: SortKey) => void;
-  onClose: () => void;
-}) {
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity activeOpacity={1} style={styles.modalSheet}>
-          <View style={styles.modalHandle} />
-          <Text style={styles.modalTitle}>Сортирай по</Text>
-          {SORT_OPTIONS.map((opt, index) => (
-            <View key={opt.key}>
-              <TouchableOpacity
-                style={styles.accountRow}
-                onPress={() => { onSelect(opt.key); onClose(); }}
-                activeOpacity={0.75}
-              >
-                <Text style={[styles.accountName, { marginLeft: 4 }]}>{opt.label}</Text>
-                {selected === opt.key && (
-                  <Text style={[styles.checkmark, { color: ACCENT }]}>✓</Text>
-                )}
-              </TouchableOpacity>
-              {index < SORT_OPTIONS.length - 1 && <View style={styles.modalDivider} />}
-            </View>
-          ))}
-        </TouchableOpacity>
-      </TouchableOpacity>
-    </Modal>
-  );
-}
-
 export default function TransactionsScreen() {
   const router = useRouter();
 
@@ -267,14 +229,6 @@ export default function TransactionsScreen() {
               </TouchableOpacity>
             ))}
           </View>
-
-          <TouchableOpacity
-            style={styles.sortBtn}
-            onPress={() => setSortModal(true)}
-            activeOpacity={0.75}
-          >
-            <Text style={styles.sortIcon}><FontAwesome name="sort" size={24} color="white" /></Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.searchRow}>
@@ -349,12 +303,6 @@ export default function TransactionsScreen() {
         selected={selectedCat}
         onSelect={setSelectedCat}
         onClose={() => setCatModal(false)}
-      />
-      <SortModal
-        visible={sortModal}
-        selected={sort}
-        onSelect={setSort}
-        onClose={() => setSortModal(false)}
       />
     </SafeAreaView>
   );
@@ -435,4 +383,4 @@ const styles = StyleSheet.create({
   accountName:  { flex: 1, color: WHITE, fontSize: 16, fontWeight: '500' },
   checkmark:    { fontSize: 20, fontWeight: '700' },
   modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-});
+}); 
