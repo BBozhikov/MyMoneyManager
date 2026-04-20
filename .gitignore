@@ -44,7 +44,6 @@ __pycache__/
 
 *.egg-info/
 *.egg
-dist/
 build/
 *.whl
 
@@ -62,18 +61,35 @@ ai/categorization/models/*
 # ══════════════════════════════════════════════
 # JAVA / SPRING BOOT (Server/)
 # ══════════════════════════════════════════════
-*.class
-*.jar
-*.war
-*.ear
-*.nar
+HELP.md
 target/
-.gradle/
-build/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 !**/src/main/**/build/
 !**/src/test/**/build/
-.mvn/
-mvnw
-mvnw.cmd
-*.iml
 
+### VS Code ###
+.vscode/
