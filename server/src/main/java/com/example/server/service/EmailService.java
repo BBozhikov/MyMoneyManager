@@ -43,7 +43,7 @@ public class EmailService {
 
     @Async
     public void sendPasswordResetEmail(String toEmail, String token) {
-        String resetLink = "mymoneymanager2://(auth)/reset-password?token=" + token;
+        String resetLink = baseUrl + "/api/auth/redirect-reset?token=" + token;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);

@@ -11,9 +11,12 @@ import com.example.server.entity.User;
 import com.example.server.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -57,6 +60,14 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         return ResponseEntity.ok(authService.requestPasswordReset(request.getEmail()));
+    }
+
+    @GetMapping("/redirect-reset")
+    public ResponseEntity<Void> redirectReset(@RequestParam String token) {
+        String deepLink = "mymoneymanager2://(auth)/reset-password?token=" + token;
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(deepLink))
+                .build();
     }
 
     @PostMapping("/reset-password")
