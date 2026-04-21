@@ -38,11 +38,11 @@ export default function LoginScreen() {
       const data = response.data;
 
       console.log('Login response:', data);
-      console.log('JWT token:', data.token);
+      console.log('JWT accessToken:', data.accessToken);
       console.log('Remember me: ', rememberMe);
   
       if (rememberMe) {
-        await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('accessToken', data.accessToken);
         await AsyncStorage.setItem('refreshToken', data.refreshToken);
       }
       await AsyncStorage.setItem('fullName', data.fullName);

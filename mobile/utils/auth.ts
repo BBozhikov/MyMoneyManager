@@ -23,10 +23,10 @@ export async function tryRefreshToken(): Promise<string | null> {
       refreshToken,
     });
 
-    const newToken: string = response.data.token;
+    const newToken: string = response.data.accessToken;
     const newRefreshToken: string = response.data.refreshToken;
 
-    await AsyncStorage.setItem('token', newToken);
+    await AsyncStorage.setItem('accessToken', newToken);
     await AsyncStorage.setItem('refreshToken', newRefreshToken);
 
     return newToken;
@@ -37,7 +37,7 @@ export async function tryRefreshToken(): Promise<string | null> {
 
 export async function validateWithRefresh(): Promise<boolean> {
   try {
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('accessToken');
     if (!token) return false;
 
     await axios.get(`${BASE_URL}/api/auth/validate-token`, {

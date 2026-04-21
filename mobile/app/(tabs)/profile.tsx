@@ -4,6 +4,14 @@ import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+async function signOut() {
+  await AsyncStorage.removeItem('accessToken');
+  await AsyncStorage.removeItem('refreshToken');
+  await AsyncStorage.removeItem('fullName');
+  await AsyncStorage.removeItem('email');
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -36,20 +44,31 @@ export default function ProfileScreen() {
   };
 
   const handleSignOut = () => {
-    Alert.alert('Изход', 'Сигурни ли сте, че искате да излезете?', [
-      { text: 'Отказ', style: 'cancel' },
-      {
-        text: 'Изход',
-        style: 'destructive',
-        onPress: () => {
-          
+  Alert.alert('Изход', 'Сигурни ли сте, че искате да излезете?', [
+    { text: 'Отказ', style: 'cancel' },
+    {
+      text: 'Изход',
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          const token = await AsyncStorage.getItem('accessToken');
+          const refreshToken = await AsyncStorage.getItem('refreshToken');
 
-
+          await axios.post(
+            'http://192.168.0.6:8080/api/auth/logout',
+            { refreshToken },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error: any) {
+          console.log('Logout error:', error?.response?.data || error.message);
+        } finally {
+          await signOut();
           router.replace('/(auth)/login');
-        },
+        }
       },
-    ]);
-  };
+    },
+  ]);
+};
 
   const handleDeleteAccount = () => {
     Alert.alert(
