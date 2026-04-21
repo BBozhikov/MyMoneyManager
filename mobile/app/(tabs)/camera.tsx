@@ -33,7 +33,7 @@ export default function App() {
   async function takePicture() {
     if (!cameraRef.current) return;
 
-    const photo = await cameraRef.current.takePictureAsync({ quality: 0.8,shutterSound: false, imageType: 'jpg' });
+    const photo = await cameraRef.current.takePictureAsync({ quality: 1,shutterSound: false, imageType: 'jpg', mirror: facing === 'front' });
     setCapturedPhoto(photo.uri);
 
   }

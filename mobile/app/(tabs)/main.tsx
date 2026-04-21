@@ -18,7 +18,7 @@ const data = [
 ];
 
 export default function MainScreen() {
-  //useRequireAuth();
+  useRequireAuth();
   const router = useRouter();
   const [activeType, setActiveType] = useState<'приход' | 'разход'>('разход');
 

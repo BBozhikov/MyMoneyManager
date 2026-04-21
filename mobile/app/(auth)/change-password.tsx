@@ -103,7 +103,7 @@ export default function ChangePasswordScreen() {
           </>
         ) : (
           <>
-            <Text style={styles.successIcon}><Feather name="check-square" size={24} color="black" /></Text>
+            <Text style={styles.successIcon}><Feather name="check-square" size={24} color="white" /></Text>
             <Text style={styles.title}>Паролата е сменена</Text>
             <Text style={styles.subtitle}>Паролата ти беше сменена успешно.</Text>
             <TouchableOpacity

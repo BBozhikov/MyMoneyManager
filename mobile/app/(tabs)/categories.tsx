@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 12,
-    paddingTop: 20,
+    paddingTop: 12,
     paddingBottom: 20,
   },
   categoryItem: {width: `${100 / COLUMN_COUNT}%`,alignItems: 'center',paddingVertical: 10,paddingHorizontal: 4,gap: 8,},

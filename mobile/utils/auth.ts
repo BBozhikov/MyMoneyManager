@@ -61,3 +61,14 @@ export async function validateWithRefresh(): Promise<boolean> {
     return false;
   }
 }
+
+export async function requireAuth(message = 'Сесията ви е изтекла. Моля влезте отново.'): Promise<string | null> {
+  const isValid = await validateWithRefresh();
+
+  if (!isValid) {
+    redirectToLogin(message);
+    return null;
+  }
+
+  return await AsyncStorage.getItem('accessToken');
+}
