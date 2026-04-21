@@ -42,14 +42,22 @@ export async function validateWithRefresh(): Promise<boolean> {
 
     await axios.get(`${BASE_URL}/api/auth/validate-token`, {
       headers: { Authorization: `Bearer ${token}` },
+      timeout: 5000,
     });
 
     return true;
   } catch (error: any) {
+    console.log('Validate status:', error?.response?.status);
+
     if (error?.response?.status === 401) {
       const newToken = await tryRefreshToken();
       if (newToken) return true; 
     }
+    if (!error?.response) {
+      console.log('Мрежова грешка - пропускаме logout');
+      return true;
+    }
+
     return false;
   }
 }

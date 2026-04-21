@@ -40,7 +40,7 @@ export default function ProfileScreen() {
   };
 
   const handleChangePassword = () => {
-    router.push('/(auth)/forgot-password');
+    router.push('/(auth)/change-password');
   };
 
   const handleSignOut = () => {
