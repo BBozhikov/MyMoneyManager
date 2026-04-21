@@ -11,6 +11,7 @@ export default function App() {
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
   const [categorizing, setCategorizing] = useState(false);
+  const [photoFacing, setPhotoFacing] = useState<CameraType>('back');
   const cameraRef = useRef<CameraView>(null);
 
   if (!permission) {
@@ -33,9 +34,9 @@ export default function App() {
   async function takePicture() {
     if (!cameraRef.current) return;
 
-    const photo = await cameraRef.current.takePictureAsync({ quality: 1,shutterSound: false, imageType: 'jpg', mirror: facing === 'front' });
+    const photo = await cameraRef.current.takePictureAsync({ quality: 1,shutterSound: false, imageType: 'jpg'});
+    setPhotoFacing(facing);
     setCapturedPhoto(photo.uri);
-
   }
 
   async function sharePhoto() {
@@ -80,7 +81,9 @@ export default function App() {
     if (capturedPhoto) {
     return (
       <View style={styles.container}>
-        <Image source={{ uri: capturedPhoto }} style={styles.preview} />
+        <Image source={{ uri: capturedPhoto }} style={[styles.preview,
+          photoFacing === 'front' && { transform: [{ scaleX: -1 }] }
+        ]} />
         <View style={styles.previewButtons}>
 
           <View style={styles.previewFabs}>
