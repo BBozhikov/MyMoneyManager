@@ -26,4 +26,11 @@ public class UserService {
 
         return new MessageResponse("Password changed successfully.");
     }
+
+    public MessageResponse deactivateAccount(User user) {
+        user.setActive(false);
+        userRepository.save(user);
+
+        return new MessageResponse("Account deactivated successfully.");
+    }
 }

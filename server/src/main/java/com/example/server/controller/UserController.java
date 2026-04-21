@@ -23,4 +23,9 @@ public class UserController {
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(userService.changePassword(user, request));
     }
+
+    @PostMapping("/deactivate")
+    public ResponseEntity<MessageResponse> deactivateAccount(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.deactivateAccount(user));
+    }
 }
