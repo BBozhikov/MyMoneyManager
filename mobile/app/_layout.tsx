@@ -25,6 +25,7 @@ export default function RootLayout() {
   return (
     <>
     <SystemBars style={{ statusBar: 'light', navigationBar: 'light' }} />
+
     <SafeAreaProvider>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <Stack screenOptions={{

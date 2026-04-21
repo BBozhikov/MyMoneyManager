@@ -43,6 +43,7 @@ export default function LoginScreen() {
   
       if (rememberMe) {
         await AsyncStorage.setItem('token', data.token);
+        await AsyncStorage.setItem('refreshToken', data.refreshToken);
       }
       await AsyncStorage.setItem('fullName', data.fullName);
       await AsyncStorage.setItem('email', data.email);

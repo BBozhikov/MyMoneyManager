@@ -1,75 +1,92 @@
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
+import Feather from '@expo/vector-icons/build/Feather';
 
 const API_BASE_URL = 'http://192.168.0.6:8080';
-type Step = 'email' | 'success';
 
-export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState('');
+type Step = 'form' | 'success';
+
+export default function ResetPasswordScreen() {
+  const { token } = useLocalSearchParams<{ token: string }>();
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<Step>('email');
+  const [step, setStep] = useState<Step>('form');
   const router = useRouter();
 
-  const handleSend = async () => {
-    if (!email.trim()) {
-      Alert.alert('Грешка', 'Моля, въведи имейл адрес.');
+  const handleReset = async () => {
+    if (!newPassword.trim() || !confirmPassword.trim()) {
+      Alert.alert('Грешка', 'Моля, попълни и двете полета.');
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      Alert.alert('Грешка', 'Моля, въведи валиден имейл адрес.');
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Грешка', 'Паролите не съвпадат.');
       return;
     }
+    if (newPassword.length < 8) {
+      Alert.alert('Грешка', 'Паролата трябва да е поне 8 символа.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/api/auth/forgot-password`, {
-        email: email.trim(),
+      await axios.post(`${API_BASE_URL}/api/auth/reset-password`, {
+        token,
+        newPassword,
       });
-
-      
-      await new Promise((resolve) => setTimeout(resolve, 1500));
       setStep('success');
-    } catch {
-      Alert.alert('Грешка', 'Нещо се обърка. Опитай отново.');
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        'Нещо се обърка. Опитай отново.';
+      Alert.alert('Грешка', message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <><Stack.Screen options={{ headerShown: false, animation: 'slide_from_left'}} />
+    <><Stack.Screen options={{ headerShown: false, animation: 'slide_from_left' }} />
     <SafeAreaView style={{ flex: 1, backgroundColor: '#2b4d47' }} edges={['top', 'bottom']}>
     <View style={styles.container}>
-      {step === 'email' ? (
+      {step === 'form' ? (
         <>
-          <Text style={styles.title}>Нулиране на парола</Text>
+          <Text style={styles.title}>Нова парола</Text>
           <Text style={styles.subtitle}>
-            Въведи своя имейл адрес и ще ти изпратим линк за нулиране на паролата.
+            Въведи новата си парола. Тя трябва да съдържа поне 8 символа, главна и малка буква, цифра и специален символ.
           </Text>
 
           <TextInput
             style={styles.input}
-            placeholder="Имейл"
+            placeholder="Нова парола"
             placeholderTextColor="rgba(255,255,255,0.6)"
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
             autoFocus
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Потвърди парола"
+            placeholderTextColor="rgba(255,255,255,0.6)"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
           />
 
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             activeOpacity={0.7}
-            onPress={handleSend}
+            onPress={handleReset}
             disabled={loading}
           >
             {loading
               ? <ActivityIndicator color="#fff" />
-              : <Text style={styles.buttonText}>Изпрати линк</Text>
+              : <Text style={styles.buttonText}>Смени паролата</Text>
             }
           </TouchableOpacity>
 
@@ -79,12 +96,10 @@ export default function ForgotPasswordScreen() {
         </>
       ) : (
         <>
-          <Text style={styles.successIcon}>✉️</Text>
-          <Text style={styles.title}>Провери имейла си</Text>
+          <Text style={styles.successIcon}><Feather name="check-square" size={24} color="white" /></Text>
+          <Text style={styles.title}>Паролата е сменена</Text>
           <Text style={styles.subtitle}>
-            {`Изпратихме линк за нулиране на паролата до\n`}
-            <Text style={styles.emailHighlight}>{email}</Text>
-            {`\n\nПровери папката с нежелана поща, ако не виждаш имейла.`}
+            Паролата ти беше сменена успешно. Вече можеш да влезеш с новата си парола.
           </Text>
 
           <TouchableOpacity
@@ -93,10 +108,6 @@ export default function ForgotPasswordScreen() {
             onPress={() => router.push('/(auth)/login')}
           >
             <Text style={styles.buttonText}>Обратно към вход</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity activeOpacity={0.7} onPress={() => setStep('email')}>
-            <Text style={styles.link}>Не получи имейл? Опитай отново</Text>
           </TouchableOpacity>
         </>
       )}
@@ -110,7 +121,6 @@ const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 24, backgroundColor: '#2b4d47' },
   title: { fontSize: 26, fontWeight: 'bold', color: 'white', textAlign: 'center', marginBottom: 12 },
   subtitle: { fontSize: 15, color: 'rgba(255,255,255,0.75)', textAlign: 'center', marginBottom: 32, lineHeight: 22 },
-  emailHighlight: { color: 'white', fontWeight: '600' },
   successIcon: { fontSize: 56, textAlign: 'center', marginBottom: 16 },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 16, color: 'white' },
   button: { backgroundColor: '#007AFF', borderRadius: 8, padding: 14, alignItems: 'center', marginBottom: 16 },
