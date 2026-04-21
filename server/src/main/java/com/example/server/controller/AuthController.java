@@ -1,10 +1,12 @@
 package com.example.server.controller;
 
 import com.example.server.dto.AuthResponse;
+import com.example.server.dto.ForgotPasswordRequest;
 import com.example.server.dto.LoginRequest;
 import com.example.server.dto.MessageResponse;
 import com.example.server.dto.RefreshTokenRequest;
 import com.example.server.dto.RegisterRequest;
+import com.example.server.dto.ResetPasswordRequest;
 import com.example.server.entity.User;
 import com.example.server.service.AuthService;
 import jakarta.validation.Valid;
@@ -50,6 +52,16 @@ public class AuthController {
     @GetMapping("/validate-token")
     public ResponseEntity<Void> validate() {
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<MessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        return ResponseEntity.ok(authService.requestPasswordReset(request.getEmail()));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request));
     }
 
 }

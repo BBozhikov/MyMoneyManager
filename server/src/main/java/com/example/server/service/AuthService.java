@@ -4,11 +4,14 @@ import com.example.server.dto.AuthResponse;
 import com.example.server.dto.LoginRequest;
 import com.example.server.dto.MessageResponse;
 import com.example.server.dto.RegisterRequest;
+import com.example.server.dto.ResetPasswordRequest;
+import com.example.server.entity.PasswordResetToken;
 import com.example.server.entity.RefreshToken;
 import com.example.server.entity.User;
 import com.example.server.entity.VerificationToken;
 import com.example.server.enums.Currency;
 import com.example.server.exception.InvalidRefreshTokenException;
+import com.example.server.repository.PasswordResetTokenRepository;
 import com.example.server.repository.UserRepository;
 import com.example.server.repository.VerificationTokenRepository;
 import com.example.server.security.JwtService;
@@ -28,6 +31,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailService emailService;
@@ -35,6 +39,9 @@ public class AuthService {
 
     @Value("${app.verification-token-expiry-hours}")
     private int verificationTokenExpiryHours;
+
+    @Value("${app.password-reset-token-expiry-hours}")
+    private int passwordResetTokenExpiryHours;
 
     public MessageResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -129,5 +136,38 @@ public class AuthService {
 
         refreshTokenService.revokeRefreshToken(refreshTokenString);
         return new MessageResponse("Logged out successfully.");
+    }
+
+    public MessageResponse requestPasswordReset(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            String token = UUID.randomUUID().toString();
+            PasswordResetToken resetToken = PasswordResetToken.builder()
+                    .token(token)
+                    .user(user)
+                    .expiresAt(LocalDateTime.now().plusHours(passwordResetTokenExpiryHours))
+                    .build();
+
+            passwordResetTokenRepository.save(resetToken);
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+        });
+
+        return new MessageResponse("If an account exists with this email, a reset link has been sent.");
+    }
+
+    public MessageResponse resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid password reset token"));
+
+        if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Password reset token has expired");
+        }
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.delete(resetToken);
+
+        return new MessageResponse("Password has been reset successfully.");
     }
 }

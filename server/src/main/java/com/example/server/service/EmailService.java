@@ -40,4 +40,25 @@ public class EmailService {
             log.error("Failed to send verification email to {}: {}", toEmail, e.getMessage());
         }
     }
+
+    @Async
+    public void sendPasswordResetEmail(String toEmail, String token) {
+        String resetLink = "mymoneymanager2://(auth)/reset-password?token=" + token;
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(toEmail);
+        message.setSubject("Money Manager - Reset your password");
+        message.setText("You requested a password reset. Click the link below to set a new password:\n\n"
+                + resetLink + "\n\n"
+                + "This link will expire in 1 hour.\n\n"
+                + "If you did not request this, you can safely ignore this email.");
+
+        try {
+            mailSender.send(message);
+            log.info("Password reset email sent to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
+        }
+    }
 }
