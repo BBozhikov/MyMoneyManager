@@ -65,6 +65,7 @@ const ICON_BG = 'rgba(255,255,255,0.12)';
 const WHITE   = '#ffffff';
 const MUTED   = 'rgba(255,255,255,0.45)';
 const ACCENT  = '#3ecf8e';
+const RED = '#ff3b30';
 
 export default function EditCategoryScreen() {
   const router = useRouter();
@@ -91,7 +92,7 @@ export default function EditCategoryScreen() {
     setSelectedIcon(iconId ?? ICONS[0].id);
     setSelectedColor(colorId ?? COLORS[0].id);
     }, [name, colorId, iconId]);
-    
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
       try {
@@ -125,7 +126,47 @@ export default function EditCategoryScreen() {
       setLoading(false);
     }
   };
+  const DeleteCat = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
 
+      await axios.delete(
+        `${baseUrl}/api/categories/${idState}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Категорията "${nameState}" беше изтрита!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)/categories');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Categories error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно редактиране на категория.');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const handleDelete = () => {
+    Alert.alert(
+      'Изтриване',
+      `Сигурни ли сте, че искате да изтриете "${nameState}"?`,
+      [
+        { text: 'Отказ', style: 'cancel' },
+        {
+          text: 'Изтрий',
+          style: 'destructive',
+          onPress: () => DeleteCat(),
+        },
+      ]
+    );
+  };
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
@@ -198,7 +239,9 @@ export default function EditCategoryScreen() {
             })}
           </View>
         </View>
-
+        <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteBtn}>
+          <Text style={styles.deleteBtnText}>ИЗТРИЙ</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -236,4 +279,7 @@ const styles = StyleSheet.create({
   footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 32, backgroundColor: BG },
   submitBtn: { borderRadius: 999, paddingVertical: 17, alignItems: 'center' },
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
+
+  deleteBtn: { marginTop: 16, paddingVertical: 8 },
+  deleteBtnText: { color: RED, fontSize: 16, fontWeight: '700', letterSpacing: 1 },
 });
