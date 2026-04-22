@@ -38,7 +38,4 @@ public class Transaction {
 
     @Column(length = 255)
     private String note;
-
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
 }
