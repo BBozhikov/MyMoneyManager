@@ -10,6 +10,8 @@ import com.example.server.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AccountService {
@@ -44,5 +46,11 @@ public class AccountService {
                 .build();
 
         return AccountResponse.fromEntity(accountRepository.save(account));
+    }
+
+    public List<AccountResponse> getUserAccounts(User user) {
+        return accountRepository.findByUser(user).stream()
+                .map(AccountResponse::fromEntity)
+                .toList();
     }
 }
