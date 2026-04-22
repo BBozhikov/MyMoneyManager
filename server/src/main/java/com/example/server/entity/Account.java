@@ -1,7 +1,6 @@
 package com.example.server.entity;
 
 import com.example.server.enums.AccountIcon;
-import com.example.server.enums.AccountType;
 import com.example.server.enums.Color;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,10 +29,6 @@ public class Account {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AccountType type;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private AccountIcon icon;
 
     @Enumerated(EnumType.STRING)
@@ -43,6 +38,6 @@ public class Account {
     @Column(name = "current_balance", nullable = false)
     private double currentBalance;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    @Column(name = "is_main", nullable = false)
+    private boolean isMain = false;
 }
