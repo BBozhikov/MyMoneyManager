@@ -1,5 +1,6 @@
 package com.example.server.controller;
 
+import com.example.server.dto.MessageResponse;
 import com.example.server.dto.account.AccountResponse;
 import com.example.server.dto.account.CreateAccountRequest;
 import com.example.server.dto.account.UpdateAccountRequest;
@@ -39,5 +40,12 @@ public class AccountController {
             @Valid @RequestBody UpdateAccountRequest request,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(accountService.updateAccount(user, id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponse> deleteAccount(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(accountService.deleteAccount(user, id));
     }
 }

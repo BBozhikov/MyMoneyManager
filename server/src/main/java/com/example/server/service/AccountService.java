@@ -1,5 +1,6 @@
 package com.example.server.service;
 
+import com.example.server.dto.MessageResponse;
 import com.example.server.dto.account.AccountResponse;
 import com.example.server.dto.account.CreateAccountRequest;
 import com.example.server.dto.account.UpdateAccountRequest;
@@ -9,8 +10,10 @@ import com.example.server.enums.AccountIcon;
 import com.example.server.enums.Color;
 import com.example.server.exception.ResourceNotFoundException;
 import com.example.server.repository.AccountRepository;
+import com.example.server.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,6 +22,7 @@ import java.util.List;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
     public void createDefaultAccount(User user) {
         Account account = Account.builder()
@@ -73,5 +77,20 @@ public class AccountService {
         account.setCurrentBalance(request.getCurrentBalance());
 
         return AccountResponse.fromEntity(accountRepository.save(account));
+    }
+
+    @Transactional
+    public MessageResponse deleteAccount(User user, Integer accountId) {
+        Account account = accountRepository.findByIdAndUser(accountId, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        if (account.isMain()) {
+            throw new IllegalArgumentException("Cannot delete the main account");
+        }
+
+        transactionRepository.deleteByAccountId(accountId);
+        accountRepository.delete(account);
+
+        return new MessageResponse("Account deleted");
     }
 }
