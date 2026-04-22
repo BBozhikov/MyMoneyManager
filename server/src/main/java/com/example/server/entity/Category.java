@@ -8,7 +8,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "categories", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "name"})
+        @UniqueConstraint(columnNames = {"user_id", "name", "type"})
 })
 @Getter
 @Setter
@@ -42,4 +42,7 @@ public class Category {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Color color;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 }
