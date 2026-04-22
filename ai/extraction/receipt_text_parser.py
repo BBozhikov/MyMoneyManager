@@ -122,7 +122,7 @@ def extract_items(lines: list) -> list:
 
         m = p_suma_neto.match(line)
         if m and pending_pharmacy_name:
-            items.append({"name": pending_pharmacy_name, "price": float(m.group(1).replace(',', '.'))})
+            items.append({"name": pending_pharmacy_name, "price": float(m.group(1).replace(',', '.')), "category": None})
             pending_pharmacy_name = None
             continue
 
@@ -130,14 +130,14 @@ def extract_items(lines: list) -> list:
 
         m = p_billa.match(line)
         if m:
-            items.append({"name": m.group(1).strip(), "price": float(m.group(2).replace(',', '.'))})
+            items.append({"name": m.group(1).strip(), "price": float(m.group(2).replace(',', '.')), "category": None})
             continue
 
         m = p_standard.match(line)
         if m:
             raw = re.sub(r'\s+', '.', m.group(2).strip()).replace(',', '.')
             try:
-                items.append({"name": m.group(1).strip(), "price": float(raw)})
+                items.append({"name": m.group(1).strip(), "price": float(raw), "category": None})
             except ValueError:
                 pass
 
