@@ -6,8 +6,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import axios from 'axios';
@@ -16,7 +16,6 @@ import { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { requireAuth } from '@/utils/auth';
 
-type CategoryType = 'разход' | 'приход';
 const baseUrl = 'http://192.168.0.6:8080';
 interface Category {
   id: number;
@@ -102,9 +101,11 @@ export default function CategoriesScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [])
+  );
 
   const filtered = categories.filter((c) => c.type === activeType);
   return (

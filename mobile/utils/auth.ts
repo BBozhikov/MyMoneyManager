@@ -49,11 +49,12 @@ export async function validateWithRefresh(): Promise<boolean> {
   } catch (error: any) {
     console.log('Validate status:', error?.response?.status);
 
-    if (error?.response?.status === 401) {
+    if (error?.response?.status === 401 || error?.response?.status === 403) {
       const newToken = await tryRefreshToken();
       if (newToken) return true; 
     }
     if (!error?.response) {
+
       console.log('Мрежова грешка - пропускаме logout');
       return false;
     }
