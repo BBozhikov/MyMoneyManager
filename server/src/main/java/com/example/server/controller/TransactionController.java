@@ -1,5 +1,6 @@
 package com.example.server.controller;
 
+import com.example.server.dto.MessageResponse;
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
 import com.example.server.dto.transaction.UpdateTransactionRequest;
@@ -48,5 +49,12 @@ public class TransactionController {
             @Valid @RequestBody UpdateTransactionRequest request,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(transactionService.updateTransaction(user, id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<MessageResponse> deleteTransaction(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(transactionService.deleteTransaction(user, id));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.server.service;
 
+import com.example.server.dto.MessageResponse;
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
 import com.example.server.dto.transaction.UpdateTransactionRequest;
@@ -100,6 +101,20 @@ public class TransactionService {
         transactionRepository.save(transaction);
 
         return TransactionResponse.fromEntity(transaction);
+    }
+
+    @Transactional
+    public MessageResponse deleteTransaction(User user, Integer transactionId) {
+        Transaction transaction = transactionRepository.findByIdAndUser(transactionId, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+
+        Account account = transaction.getAccount();
+        reverseBalance(account, transaction.getCategory().getType(), transaction.getAmount());
+        accountRepository.save(account);
+
+        transactionRepository.delete(transaction);
+
+        return new MessageResponse("Transaction deleted");
     }
 
     private void updateBalance(Account account, CategoryType type, double amount) {
