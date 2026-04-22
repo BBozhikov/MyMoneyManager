@@ -109,7 +109,8 @@ export default function AccountsScreen() {
                 style={styles.accountRow}
                 activeOpacity={0.7}
                 onPress={() => router.replace({ pathname: `/(tabs)/edit-account`, 
-                params: { id: account.id, amount: account.currentBalance, name: account.name, colorId : account.color, iconId: account.icon,} })}>
+                params: { id: account.id, currentBalance: account.currentBalance, name: account.name, color: account.color, 
+                icon: account.icon, main: account.main.toString(),} })}>
 
                 <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
                   <Text style={styles.accountIconText}>{ICON_MAP[account.icon.toLowerCase()]}</Text>

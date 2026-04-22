@@ -1,8 +1,10 @@
+import { requireAuth } from '@/utils/auth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import axios from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, } from 'react-native';
@@ -43,20 +45,22 @@ const COLORS = [
   { id: 'yellow',      color: '#ffcc00' },
   { id: 'blue',        color: '#007aff' },
 ];
-
+const baseUrl = 'http://192.168.0.6:8080';
 export default function EditAccountScreen() {
   const router = useRouter();
-  const {amount, name, colorId, iconId} = useLocalSearchParams<{
-      id: string;
-      name: string;
-      colorId: string;
-      iconId: string;
-      amount: string;
+  const {id, currentBalance, name, color, icon, main} = useLocalSearchParams<{
+        id: string;
+        name: string;
+        icon: string;
+        color: string;
+        currentBalance: string;
+        main: string;
     }>();
-  const [amountState, setAmount] = useState(amount ?? '');
+
+  const [amountState, setAmount] = useState(currentBalance ?? 0);
   const [nameState, setName] = useState(name ??'');
-  const [selectedIcon, setSelectedIcon] = useState(iconId ?? ICONS[0].id);
-  const [selectedColor, setSelectedColor] = useState(colorId ?? COLORS[0]);
+  const [selectedIcon, setSelectedIcon] = useState(icon ?? ICONS[0].id);
+  const [selectedColor, setSelectedColor] = useState(color ?? COLORS[0]);
   const [currency, setCurrency]       = useState('EUR');
   const [excludeBalance, setExcludeBalance] = useState(false);
   const [currencyModal, setCurrencyModal] = useState(false);
@@ -64,20 +68,45 @@ export default function EditAccountScreen() {
   const canSubmit = nameState.trim().length > 0;
 
   useEffect(() => {
-      setAmount(amount ?? '');
-      setName(name ?? '');
-      setSelectedIcon(iconId ?? ICONS[0].id);
-      setSelectedColor(colorId ?? COLORS[0].id);
-  }, [name, colorId, iconId, amount]);
+    setAmount(currentBalance ?? '0'); 
+    setName(name ?? '');
+    setSelectedIcon(icon?.toLowerCase() ?? ICONS[0].id); 
+    setSelectedColor(color?.toLowerCase() ?? COLORS[0].id); 
+  }, [name, color, icon, currentBalance]);
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-   
+  const handleSubmit = async () => {
+  if (!canSubmit) return;
 
+  const normalizedAmount = amountState.toString().replace(',', '.');
+  const parsedAmount = parseFloat(normalizedAmount);
 
-    Alert.alert('Успех', `Сметката "${name}" беше променена!`, [
-      { text: 'OK', onPress: () => router.replace("/(tabs)/explore") },
-    ]);
+    if (isNaN(parsedAmount)) {
+      Alert.alert('Грешка', 'Въведи валидна сума.');
+      return;
+    }
+
+    try {
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.put(
+        `${baseUrl}/api/accounts/${id}`,
+        {
+          name: nameState,
+          icon: selectedIcon.toUpperCase(),
+          color: selectedColor.toUpperCase(),
+          currentBalance: parsedAmount,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      Alert.alert('Успех', `Сметката "${nameState}" беше променена!`, [
+        { text: 'OK', onPress: () => router.replace('/(tabs)/explore') },
+      ]);
+    } catch (error: any) {
+      console.log('Edit account error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно редактиране на сметка.');
+    }
   };
 
   const currentIcon = ICONS.find(i => i.id === selectedIcon)?.emoji ?? '';

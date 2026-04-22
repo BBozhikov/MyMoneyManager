@@ -70,7 +70,7 @@ export default function NewAccountScreen() {
     if (amount === '') {
       setAmount('0');
     }
-    const normalizedAmount = amount.replace(',', '.'); // "1,5" → "1.5"
+    const normalizedAmount = amount.replace(',', '.');
     const parsedAmount = parseFloat(normalizedAmount);
 
     if (isNaN(parsedAmount)) {
