@@ -11,9 +11,14 @@ import com.example.server.exception.ResourceNotFoundException;
 import com.example.server.repository.AccountRepository;
 import com.example.server.repository.CategoryRepository;
 import com.example.server.repository.TransactionRepository;
+import com.example.server.repository.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +52,31 @@ public class TransactionService {
         accountRepository.save(account);
 
         return TransactionResponse.fromEntity(transaction);
+    }
+
+    public List<TransactionResponse> getTransactions(User user, Integer accountId, Integer categoryId,
+                                                     CategoryType type, LocalDate startDate,
+                                                     LocalDate endDate, String note) {
+        Specification<Transaction> spec = TransactionSpecification.hasUser(user);
+
+        if (accountId != null) {
+            spec = spec.and(TransactionSpecification.hasAccount(accountId));
+        }
+        if (categoryId != null) {
+            spec = spec.and(TransactionSpecification.hasCategory(categoryId));
+        } else if (type != null) {
+            spec = spec.and(TransactionSpecification.hasCategoryType(type));
+        }
+        if (startDate != null && endDate != null) {
+            spec = spec.and(TransactionSpecification.createdBetween(startDate, endDate));
+        }
+        if (note != null && !note.isBlank()) {
+            spec = spec.and(TransactionSpecification.noteContains(note));
+        }
+
+        return transactionRepository.findAll(spec).stream()
+                .map(TransactionResponse::fromEntity)
+                .toList();
     }
 
     private void updateBalance(Account account, CategoryType type, double amount) {
