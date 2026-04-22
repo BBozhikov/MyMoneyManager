@@ -1,0 +1,48 @@
+package com.example.server.service;
+
+import com.example.server.dto.account.AccountResponse;
+import com.example.server.dto.account.CreateAccountRequest;
+import com.example.server.entity.Account;
+import com.example.server.entity.User;
+import com.example.server.enums.AccountIcon;
+import com.example.server.enums.Color;
+import com.example.server.repository.AccountRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AccountService {
+
+    private final AccountRepository accountRepository;
+
+    public void createDefaultAccount(User user) {
+        Account account = Account.builder()
+                .user(user)
+                .name("Основна")
+                .icon(AccountIcon.CASH)
+                .color(Color.LIGHT_GREEN)
+                .currentBalance(0)
+                .isMain(true)
+                .build();
+
+        accountRepository.save(account);
+    }
+
+    public AccountResponse createAccount(User user, CreateAccountRequest request) {
+        if (accountRepository.existsByUserAndName(user, request.getName())) {
+            throw new IllegalArgumentException("Account with this name already exists");
+        }
+
+        Account account = Account.builder()
+                .user(user)
+                .name(request.getName())
+                .icon(request.getIcon())
+                .color(request.getColor())
+                .currentBalance(request.getCurrentBalance())
+                .isMain(false)
+                .build();
+
+        return AccountResponse.fromEntity(accountRepository.save(account));
+    }
+}
