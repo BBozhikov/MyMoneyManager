@@ -1,4 +1,4 @@
-package com.example.server.dto;
+package com.example.server.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResetPasswordRequest {
+public class ChangePasswordRequest {
 
     @NotBlank
-    private String token;
+    private String currentPassword;
 
     @NotBlank
     @Size(min = 8, max = 120)

@@ -1,9 +1,9 @@
 package com.example.server.service;
 
-import com.example.server.dto.CategoryResponse;
-import com.example.server.dto.CreateCategoryRequest;
+import com.example.server.dto.category.CategoryResponse;
+import com.example.server.dto.category.CreateCategoryRequest;
 import com.example.server.dto.MessageResponse;
-import com.example.server.dto.UpdateCategoryRequest;
+import com.example.server.dto.category.UpdateCategoryRequest;
 import com.example.server.entity.Category;
 import com.example.server.entity.User;
 import com.example.server.enums.CategoryIcon;

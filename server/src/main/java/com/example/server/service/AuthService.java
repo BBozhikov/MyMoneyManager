@@ -1,10 +1,10 @@
 package com.example.server.service;
 
-import com.example.server.dto.AuthResponse;
-import com.example.server.dto.LoginRequest;
+import com.example.server.dto.auth.AuthResponse;
+import com.example.server.dto.auth.LoginRequest;
 import com.example.server.dto.MessageResponse;
-import com.example.server.dto.RegisterRequest;
-import com.example.server.dto.ResetPasswordRequest;
+import com.example.server.dto.auth.RegisterRequest;
+import com.example.server.dto.auth.ResetPasswordRequest;
 import com.example.server.entity.PasswordResetToken;
 import com.example.server.entity.RefreshToken;
 import com.example.server.entity.User;

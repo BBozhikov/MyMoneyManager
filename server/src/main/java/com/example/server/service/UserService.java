@@ -1,6 +1,6 @@
 package com.example.server.service;
 
-import com.example.server.dto.ChangePasswordRequest;
+import com.example.server.dto.user.ChangePasswordRequest;
 import com.example.server.dto.MessageResponse;
 import com.example.server.entity.User;
 import com.example.server.repository.UserRepository;

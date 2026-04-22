@@ -1,4 +1,4 @@
-package com.example.server.dto;
+package com.example.server.dto.category;
 
 import com.example.server.entity.Category;
 import com.example.server.enums.CategoryIcon;

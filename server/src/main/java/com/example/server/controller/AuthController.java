@@ -1,12 +1,12 @@
 package com.example.server.controller;
 
-import com.example.server.dto.AuthResponse;
-import com.example.server.dto.ForgotPasswordRequest;
-import com.example.server.dto.LoginRequest;
+import com.example.server.dto.auth.AuthResponse;
+import com.example.server.dto.auth.ForgotPasswordRequest;
+import com.example.server.dto.auth.LoginRequest;
 import com.example.server.dto.MessageResponse;
-import com.example.server.dto.RefreshTokenRequest;
-import com.example.server.dto.RegisterRequest;
-import com.example.server.dto.ResetPasswordRequest;
+import com.example.server.dto.auth.RefreshTokenRequest;
+import com.example.server.dto.auth.RegisterRequest;
+import com.example.server.dto.auth.ResetPasswordRequest;
 import com.example.server.entity.User;
 import com.example.server.service.AuthService;
 import jakarta.validation.Valid;
