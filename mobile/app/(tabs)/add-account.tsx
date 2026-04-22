@@ -7,7 +7,10 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
 
+const baseUrl = 'http://192.168.0.6:8080';
 const ICONS = [
   { id: 'cash',       emoji: <FontAwesome name="money" size={24} color="white" /> },
   { id: 'bank',       emoji: <AntDesign name="bank" size={24} color="white" /> },
@@ -32,39 +35,80 @@ const ICONS = [
 ];
 
 const COLORS = [
-  '#f5a623', 
-  '#00d4ff',
-  '#e91e8c', 
-  '#ff7043',
-  '#4a7c6f',
-  '#34c759',
-  '#ff3b30',
-  '#5856d6',
-  '#ffcc00',
-  '#007aff',
+  { id: 'amber', color: '#f5a623' },
+  { id: 'cyan', color: '#00d4ff' },
+  { id: 'pink', color: '#e91e8c' },
+  { id: 'orange', color: '#ff7043' },
+  { id: 'dark_green', color: '#4a7c6f' },
+  { id: 'light_green', color: '#34c759' },
+  { id: 'red', color: '#ff3b30' },
+  { id: 'purple', color: '#5856d6' },
+  { id: 'yellow', color: '#ffcc00' },
+  { id: 'blue', color: '#007aff' },
 ];
 
 export default function NewAccountScreen() {
   const router = useRouter();
 
-  const [amount, setAmount]           = useState('');
-  const [name, setName]               = useState('');
+  const [amount, setAmount] = useState('');
+  const [name, setName] = useState('');
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
-  const [currency, setCurrency]       = useState('EUR');
   const [excludeBalance, setExcludeBalance] = useState(false);
-  const [currencyModal, setCurrencyModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const canSubmit = name.trim().length > 0;
+  const resetForm = () => {
+      setAmount('');  
+      setName('');
+      setSelectedIcon(ICONS[0].id);
+      setSelectedColor(COLORS[0]);
+    };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-   
+    if (amount === '') {
+      setAmount('0');
+    }
+    const normalizedAmount = amount.replace(',', '.'); // "1,5" → "1.5"
+    const parsedAmount = parseFloat(normalizedAmount);
 
+    if (isNaN(parsedAmount)) {
+      Alert.alert('Грешка', 'Въведи валидна сума.');
+      return;
+    }
+      try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
 
-    Alert.alert('Успех', `Сметката "${name}" беше създадена!`, [
-      { text: 'OK', onPress: () => router.replace("/(tabs)/explore") },
-    ]);
+      await axios.post(
+        `${baseUrl}/api/accounts`,
+        {
+          name,
+          icon: selectedIcon.toUpperCase(),
+          color: selectedColor.id.toUpperCase(), 
+          currentBalance: parsedAmount,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Сметката "${name}" беше създадена!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            router.replace('/(tabs)/explore');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Accounts error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно създаване на сметка.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const currentIcon = ICONS.find(i => i.id === selectedIcon)?.emoji ?? '💵';
@@ -74,7 +118,7 @@ export default function NewAccountScreen() {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/(tabs)/explore")} style={styles.backBtn} activeOpacity={0.7}>
-          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backArrow}><AntDesign name="arrow-left" size={24} color="white" /></Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Добавяне на сметка</Text>
         <View style={{ width: 40 }} />
@@ -119,8 +163,8 @@ export default function NewAccountScreen() {
                   key={icon.id}
                   style={[
                     styles.iconBtn,
-                    { backgroundColor: isSelected ? selectedColor : ICON_BG },
-                    isSelected && { borderWidth: 2.5, borderColor: selectedColor + 'aa' },
+                    { backgroundColor: isSelected ? selectedColor.color : ICON_BG },
+                    isSelected && { borderWidth: 2.5, borderColor: selectedColor.color + 'aa' },
                   ]}
                   onPress={() => setSelectedIcon(icon.id)}
                   activeOpacity={0.75}
@@ -139,10 +183,10 @@ export default function NewAccountScreen() {
               const isSelected = color === selectedColor;
               return (
                 <TouchableOpacity
-                  key={color}
+                  key={color.color}
                   style={[
                     styles.colorBtn,
-                    { backgroundColor: color },
+                    { backgroundColor: color.color },
                     isSelected && styles.colorBtnSelected,
                   ]}
                   onPress={() => setSelectedColor(color)}
@@ -169,7 +213,7 @@ export default function NewAccountScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.submitBtn, { backgroundColor: selectedColor, opacity: canSubmit ? 1 : 0.45 }]}
+          style={[styles.submitBtn, { backgroundColor: selectedColor.color, opacity: canSubmit ? 1 : 0.45 }]}
           onPress={handleSubmit}
           activeOpacity={0.8}
           disabled={!canSubmit}
