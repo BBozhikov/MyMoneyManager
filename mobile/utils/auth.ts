@@ -55,7 +55,7 @@ export async function validateWithRefresh(): Promise<boolean> {
     }
     if (!error?.response) {
       console.log('Мрежова грешка - пропускаме logout');
-      return true;
+      return false;
     }
 
     return false;
