@@ -10,7 +10,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
 const ICONS = [
   { id: 'receipt',          emoji: <FontAwesome5 name="receipt" size={24} color="white" /> },
   { id: 'plane',            emoji: <FontAwesome name="plane" size={24} color="white" /> },
@@ -57,28 +58,30 @@ const COLORS = [
   { id: 'yellow',      color: '#ffcc00' },
   { id: 'blue',        color: '#007aff' },
 ];
-
+const baseUrl = 'http://192.168.0.6:8080';
 const BG      = '#3b6861';
 const HEADER  = '#3b6861';
 const ICON_BG = 'rgba(255,255,255,0.12)';
 const WHITE   = '#ffffff';
 const MUTED   = 'rgba(255,255,255,0.45)';
 const ACCENT  = '#3ecf8e';
+const RED = '#ff3b30';
 
 export default function EditCategoryScreen() {
   const router = useRouter();
 
-  const { name, colorId, iconId, type } = useLocalSearchParams<{
+  const { id, name, colorId, iconId, type } = useLocalSearchParams<{
     id: string;
     name: string;
     colorId: string;
     iconId: string;
     type: string;
   }>();
-
+  const [idState, setId] = useState(id ?? '11');
   const [nameState, setName]           = useState(name ?? '');
   const [selectedIcon, setSelectedIcon] = useState(iconId ?? ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(colorId ?? COLORS[0].id);
+  const [loading, setLoading] = useState(false);
   const typeState = type ?? '';
 
   const currentColorHex = COLORS.find(c => c.id === selectedColor)?.color ?? COLORS[0].color;
@@ -89,13 +92,81 @@ export default function EditCategoryScreen() {
     setSelectedIcon(iconId ?? ICONS[0].id);
     setSelectedColor(colorId ?? COLORS[0].id);
     }, [name, colorId, iconId]);
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-    Alert.alert('Успех', `Категорията "${nameState}" беше променена!`, [
-      { text: 'OK', onPress: () => router.replace('/(tabs)/categories') },
-    ]);
-  };
 
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+      try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.put(
+        `${baseUrl}/api/categories/${idState}`,
+        {
+          name: nameState,
+          icon: selectedIcon.toUpperCase(),
+          color: selectedColor.toUpperCase(), 
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Категорията "${nameState}" беше променена!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)/categories');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Categories error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно редактиране на категория.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const DeleteCat = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.delete(
+        `${baseUrl}/api/categories/${idState}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Категорията "${nameState}" беше изтрита!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)/categories');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Categories error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно редактиране на категория.');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const handleDelete = () => {
+    Alert.alert(
+      'Изтриване',
+      `Сигурни ли сте, че искате да изтриете "${nameState}"?`,
+      [
+        { text: 'Отказ', style: 'cancel' },
+        {
+          text: 'Изтрий',
+          style: 'destructive',
+          onPress: () => DeleteCat(),
+        },
+      ]
+    );
+  };
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
@@ -108,7 +179,6 @@ export default function EditCategoryScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
-        {/* Име */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Име на категорията</Text>
           <TextInput
@@ -120,12 +190,10 @@ export default function EditCategoryScreen() {
           <View style={styles.nameUnderline} />
         </View>
 
-        {/* Тип — само показва, не се редактира */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Тип: <Text style={{ color: WHITE }}>{typeState}</Text></Text>
         </View>
 
-        {/* Икони */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Икони</Text>
           <View style={styles.iconsGrid}>
@@ -149,7 +217,6 @@ export default function EditCategoryScreen() {
           </View>
         </View>
 
-        {/* Цветове */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Цвят</Text>
           <View style={styles.colorsRow}>
@@ -172,7 +239,9 @@ export default function EditCategoryScreen() {
             })}
           </View>
         </View>
-
+        <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteBtn}>
+          <Text style={styles.deleteBtnText}>ИЗТРИЙ</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <View style={styles.footer}>
@@ -210,4 +279,7 @@ const styles = StyleSheet.create({
   footer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 32, backgroundColor: BG },
   submitBtn: { borderRadius: 999, paddingVertical: 17, alignItems: 'center' },
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
+
+  deleteBtn: { marginTop: 16, paddingVertical: 8 },
+  deleteBtnText: { color: RED, fontSize: 16, fontWeight: '700', letterSpacing: 1 },
 });

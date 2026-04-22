@@ -6,21 +6,25 @@ import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIc
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router';
-import React from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback } from 'react';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { PieChart } from 'react-native-gifted-charts';
+import axios from 'axios';
+import { Alert, ActivityIndicator } from 'react-native';
+import { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { requireAuth } from '@/utils/auth';
 
-type CategoryType = 'разход' | 'приход';
-
+const baseUrl = 'http://192.168.0.6:8080';
 interface Category {
-  id: string;
+  id: number;
   name: string;
-  iconId: string;
-  colorId: string;
-  type: CategoryType;
+  type: 'EXPENSE' | 'INCOME';
+  icon: string;
+  color: string;
+  active: boolean;
+  default: boolean;
 }
 const iconSize = 46;
 const ICONS = [
@@ -71,83 +75,89 @@ const COLORS = [
 ];
 const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
 
-const categories: Category[] = [
-  // Разходи
-  { id: '1', name: 'Здраве', iconId: 'first_aid', colorId: 'red', type: 'разход' },
-  { id: '2', name: 'Свободно', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '3', name: 'Къща', iconId: 'house', colorId: 'blue', type: 'разход' },
-  { id: '4', name: 'Кафене', iconId: 'cafe', colorId: 'yellow', type: 'разход' },
-  { id: '5', name: 'Образование', iconId: 'education', colorId: 'pink', type: 'разход' },
-  { id: '6', name: 'Подаръци', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '7', name: 'Хранителни', iconId: 'shopping_cart', colorId: 'cyan', type: 'разход' },
-  { id: '8', name: 'Семейство', iconId: 'family', colorId: 'red', type: 'разход' },
-  { id: '9', name: 'Тренировки', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '10', name: 'Транспорт', iconId: 'transport', colorId: 'blue', type: 'разход' },
-  { id: '11', name: 'Други', iconId: 'others', colorId: 'red', type: 'разход' },
-  { id: '12', name: 'Пазаруване', iconId: 'shopping_cart', colorId: 'red', type: 'разход' },
-  { id: '13', name: 'Споделено', iconId: 'car', colorId: 'amber', type: 'разход' },
-  { id: '14', name: 'Пране', iconId: 'washing_machine', colorId: 'pink', type: 'разход' },
-  { id: '15', name: 'Стол', iconId: 'restaurant', colorId: 'orange', type: 'разход' },
-  { id: '16', name: 'Петлето', iconId: 'food', colorId: 'cyan', type: 'разход' },
-  { id: '17', name: 'Steam', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '18', name: 'Бръснар', iconId: 'tag', colorId: 'orange', type: 'разход' },
-  { id: '19', name: 'Гироланд', iconId: 'cafe', colorId: 'pink', type: 'разход' },
-
-  // Приходи
-  { id: '21', name: 'Заплата', iconId: 'salary', colorId: 'light_green', type: 'приход' },
-  { id: '23', name: 'Freelance', iconId: 'trade', colorId: 'blue', type: 'приход' },
-  { id: '25', name: 'Наем', iconId: 'house', colorId: 'purple', type: 'приход' },
-  { id: '27', name: 'Подарък', iconId: 'gift', colorId: 'pink', type: 'приход' },
-  { id: '28', name: 'Лихви', iconId: 'loan', colorId: 'cyan', type: 'приход' },
-  { id: '29', name: 'Други', iconId: 'others', colorId: 'amber', type: 'приход' },
-];
-
 const FAB_COLOR = '#f5a623'; 
 const WHITE     = '#ffffff';
 const BG_COLOR = '#3b6861';
 
 export default function CategoriesScreen() {
   const router = useRouter();
-  const [activeType, setActiveType] = useState<CategoryType>('разход');
+  const [activeType, setActiveType] = useState<'EXPENSE' | 'INCOME'>('EXPENSE');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      const response = await axios.get(`${baseUrl}/api/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(response.data);
+    } catch (error: any) {
+      console.log('Categories error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на категории.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [])
+  );
 
   const filtered = categories.filter((c) => c.type === activeType);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#3b6861' }} edges={['top']}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#3ecf8e" style={{ marginTop: 40 }} />
+      ) : (
       <ScrollView style={styles.scroll} contentContainerStyle={styles.grid}>
 
         <View style={styles.toggleContainer}>
           <TouchableOpacity
-            style={[styles.toggleButton, activeType === 'разход' && styles.toggleActiveExpense]}
-            onPress={() => setActiveType('разход')}
+            style={[styles.toggleButton, activeType === 'EXPENSE' && styles.toggleActiveExpense]}
+            onPress={() => setActiveType('EXPENSE')}
           >
-            <Text style={[styles.toggleText, activeType === 'разход' && styles.toggleTextActive]}>
+            <Text style={[styles.toggleText, activeType === 'EXPENSE' && styles.toggleTextActive]}>
               Разход
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.toggleButton, activeType === 'приход' && styles.toggleActive]}
-            onPress={() => setActiveType('приход')}
+            style={[styles.toggleButton, activeType === 'INCOME' && styles.toggleActive]}
+            onPress={() => setActiveType('INCOME')}
           >
-            <Text style={[styles.toggleText, activeType === 'приход' && styles.toggleTextActive]}>
+            <Text style={[styles.toggleText, activeType === 'INCOME' && styles.toggleTextActive]}>
               Приход
             </Text>
           </TouchableOpacity>
         </View>
+
         {filtered.map((cat) => (
-          <TouchableOpacity key={cat.id} style={styles.categoryItem} activeOpacity={0.75} 
-          onPress={() => router.replace({ pathname: `/(tabs)/edit-category`, 
-          params: { id: cat.id, name: cat.name, colorId : cat.colorId, iconId: cat.iconId, type: cat.type } })}>
-            
-            <View style={[styles.circle, { backgroundColor: COLOR_MAP[cat.colorId] }]}>
-              {ICON_MAP[cat.iconId]}
+          <TouchableOpacity
+            key={cat.id} style={styles.categoryItem}
+            onPress={() => {
+                if (cat.default) {
+                  Alert.alert('Системна категория', 'Тази категория не може да бъде редактирана.');
+                  return;}
+                router.replace({
+                  pathname: '/(tabs)/edit-category',
+                  params: {
+                    id: cat.id,
+                    name: cat.name,
+                    colorId: cat.color.toLowerCase(),
+                    iconId: cat.icon.toLowerCase(),
+                    type: cat.type,}});
+          }}>
+            <View style={[styles.circle, { backgroundColor: COLOR_MAP[cat.color.toLowerCase()] }]}>
+              <Text>{ICON_MAP[cat.icon.toLowerCase()]}</Text>
             </View>
-            <Text style={styles.categoryName} numberOfLines={2}>
-              {cat.name}
-            </Text>
+            <Text style={styles.categoryName}>{cat.name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-
+      )}
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.8}
@@ -172,13 +182,7 @@ const styles = StyleSheet.create({
   toggleText: {color: 'rgba(255,255,255,0.55)',fontSize: 15,fontWeight: '600',},
   toggleTextActive: {color: 'white',},
 
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    paddingBottom: 20,
-  },
+  grid: {flexDirection: 'row',flexWrap: 'wrap',paddingHorizontal: 12,paddingTop: 12,paddingBottom: 20,},
   categoryItem: {width: `${100 / COLUMN_COUNT}%`,alignItems: 'center',paddingVertical: 10,paddingHorizontal: 4,gap: 8,},
   circle: {width: CIRCLE_SIZE,height: CIRCLE_SIZE,borderRadius: CIRCLE_SIZE / 2,alignItems: 'center',justifyContent: 'center',
     shadowColor: '#000',shadowOffset: { width: 0, height: 3 },shadowOpacity: 0.3,shadowRadius: 6,elevation: 5,},

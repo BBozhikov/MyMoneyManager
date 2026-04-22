@@ -11,7 +11,10 @@ import React from 'react';
 import { useState } from 'react';
 import { Alert, FlatList, Modal, ScrollView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
 
+const baseUrl = 'http://192.168.0.6:8080';
 const ICONS = [
     { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={24} color="white" /> },
     { id: 'plane',      emoji: <FontAwesome name="plane" size={24} color="white" /> },
@@ -48,16 +51,16 @@ const ICONS = [
 
 
 const COLORS = [
-  '#f5a623', // amber
-  '#00d4ff', // cyan
-  '#e91e8c', // pink
-  '#ff7043', // orange
-  '#4a7c6f', // dark_green
-  '#34c759', // light_green
-  '#ff3b30', // red
-  '#5856d6', // purple
-  '#ffcc00', // yellow
-  '#007aff', // blue
+  { id: 'amber', color: '#f5a623' },
+  { id: 'cyan', color: '#00d4ff' },
+  { id: 'pink', color: '#e91e8c' },
+  { id: 'orange', color: '#ff7043' },
+  { id: 'dark_green', color: '#4a7c6f' },
+  { id: 'light_green', color: '#34c759' },
+  { id: 'red', color: '#ff3b30' },
+  { id: 'purple', color: '#5856d6' },
+  { id: 'yellow', color: '#ffcc00' },
+  { id: 'blue', color: '#007aff' },
 ];
 
 export default function NewCategoryScreen() {
@@ -68,10 +71,11 @@ export default function NewCategoryScreen() {
   const [selectedIcon, setSelectedIcon] = useState(ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [type, setType] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const transactionTypes = [
-  { label: "Приход", value: "income" },
-  { label: "Разход", value: "expense" },
+  { label: "Приход", value: "INCOME" },
+  { label: "Разход", value: "EXPENSE" },
   ];
 
   const canSubmit = (): boolean => {
@@ -79,16 +83,47 @@ export default function NewCategoryScreen() {
     const hasType = type !== null;
     return hasName && hasType;
   };
+  const resetForm = () => {
+    setName('');
+    setType(null);
+    setSelectedIcon(ICONS[0].id);
+    setSelectedColor(COLORS[0]);
+  };
+  const handleSubmit = async () => {
+  if (!canSubmit()) return;
+  try {
+    setLoading(true);
+    const token = await requireAuth();
+    if (!token) return;
 
-  const handleSubmit = () => {
-    if (!canSubmit()) return;
-   
-
+    await axios.post(
+      `${baseUrl}/api/categories`,
+      {
+        name,
+        type,
+        icon: selectedIcon.toUpperCase(),
+        color: selectedColor.id.toUpperCase(), 
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
     Alert.alert('Успех', `Категорията "${name}" беше създадена!`, [
-      { text: 'OK', onPress: () => router.replace("/(tabs)/categories") },
+      {
+        text: 'OK',
+        onPress: () => {
+          resetForm();
+          router.replace('/(tabs)/categories');
+        }},
     ]);
-  };
+  } catch (error: any) {
+    console.log('Categories error:', JSON.stringify(error?.response?.data));
+    Alert.alert('Грешка', 'Неуспешно създаване на категория.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const currentIcon = ICONS.find(i => i.id === selectedIcon)?.emoji ?? <FontAwesome5 name="receipt" size={24} color="white" />;
 
@@ -141,8 +176,8 @@ export default function NewCategoryScreen() {
                   key={icon.id}
                   style={[
                     styles.iconBtn,
-                    { backgroundColor: isSelected ? selectedColor : ICON_BG },
-                    isSelected && { borderWidth: 2.5, borderColor: selectedColor + 'aa' },
+                    { backgroundColor: isSelected ? selectedColor.color : ICON_BG },
+                    isSelected && { borderWidth: 2.5, borderColor: selectedColor.color + 'aa' },
                   ]}
                   onPress={() => setSelectedIcon(icon.id)}
                   activeOpacity={0.75}
@@ -161,10 +196,10 @@ export default function NewCategoryScreen() {
               const isSelected = color === selectedColor;
               return (
                 <TouchableOpacity
-                  key={color}
+                  key={color.color}
                   style={[
                     styles.colorBtn,
-                    { backgroundColor: color },
+                    { backgroundColor: color.color },
                     isSelected && styles.colorBtnSelected,
                   ]}
                   onPress={() => setSelectedColor(color)}
@@ -181,7 +216,7 @@ export default function NewCategoryScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.submitBtn, { backgroundColor: selectedColor, opacity: canSubmit() ? 1 : 0.45 }]}
+          style={[styles.submitBtn, { backgroundColor: selectedColor.color, opacity: canSubmit() ? 1 : 0.45 }]}
           onPress={handleSubmit}
           activeOpacity={0.8}
           disabled={!canSubmit()}
@@ -237,14 +272,8 @@ const styles = StyleSheet.create({
 
   radioContainer: { flexDirection: "row", gap: 24, marginBottom: 10 },
   radioRow: { flexDirection: "row", alignItems: "center" },
-  radioOuter: {
-    width: 22, height: 22, borderRadius: 11,
-    borderWidth: 2, borderColor: ACCENT,
-    alignItems: "center", justifyContent: "center", marginRight: 8,
-  },
-  radioInner: {
-    width: 11, height: 11, borderRadius: 6,
-    backgroundColor: ACCENT,
-  },
+  radioOuter: {width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: ACCENT,
+    alignItems: "center", justifyContent: "center", marginRight: 8,},
+  radioInner: {width: 11, height: 11, borderRadius: 6,backgroundColor: ACCENT,},
   radioLabel: { fontSize: 16, color:"white" },
 });
