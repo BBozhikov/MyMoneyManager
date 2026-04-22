@@ -4,10 +4,14 @@ import FontAwesome6 from '@expo/vector-icons/build/FontAwesome6';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useRouter } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
+import { use, useCallback, useState } from 'react';
 
+const baseUrl = 'http://192.168.0.6:8080';
 const iconSize = 24;
 const ICONS = [
   { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
@@ -50,15 +54,11 @@ const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
 interface Account {
   id: string;
   name: string;
-  iconId: string;
-  colorId: string;
-  amount: number;
+  icon: string;
+  color: string;
+  currentBalance: number;
+  main: boolean;
 }
-const ACCOUNTS = [
-  { id: '1', name: 'Основен', amount: 202.58, iconId: 'cash', colorId: 'amber' },
-  { id: '2', name: 'Банкова сметка', amount: 1031.00, iconId: 'bank', colorId: 'cyan' },
-  { id: '3', name: 'Спестявания', amount: 540.00, iconId: 'savings', colorId: 'light_green' },
-];
 
 function formatAmount(amount: number) {
   return amount.toLocaleString('bg-BG', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' €';
@@ -66,9 +66,33 @@ function formatAmount(amount: number) {
 
 export default function AccountsScreen() {
   const router = useRouter();
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const total = ACCOUNTS.reduce((sum, a) => sum + a.amount, 0);
 
+  const fetchAccounts = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return; 
+      
+      const response = await axios.get(`${baseUrl}/api/accounts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAccounts(response.data);
+    } catch (error : any) {
+      console.log('Accounts error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на сметки.');
+    } finally{
+      setLoading(false);
+    }
+  }
+  useFocusEffect(
+    useCallback(() => {
+      fetchAccounts();
+    }, [])
+  );
+  const total = accounts.reduce((sum, a) => sum + a.currentBalance, 0);
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -78,46 +102,22 @@ export default function AccountsScreen() {
           <Text style={styles.totalAmount}>{formatAmount(total)}</Text>
         </View>
 
-        <View style={styles.actionsRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            activeOpacity={0.75}
-            onPress={() => router.push('/(tabs)/transfer-history')}
-          >
-            <View style={styles.actionIcon}>
-              <Text style={styles.actionIconText}><AntDesign name="clock-circle" size={24} color="white" /></Text>
-            </View>
-            <Text style={styles.actionLabel}>История на{'\n'}преводите</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionButton}
-            activeOpacity={0.75}
-            onPress={() => router.push('/(tabs)/add-transfer')}
-          >
-            <View style={styles.actionIcon}>
-              <Text style={styles.actionIconText}><MaterialCommunityIcons name="bank-transfer" size={24} color="white" /></Text>
-            </View>
-            <Text style={styles.actionLabel}>Нов превод</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.accountsList}>
-          {ACCOUNTS.map((account, index) => (
+          {accounts.map((account, index) => (
             <View key={account.id}>
               <TouchableOpacity
                 style={styles.accountRow}
                 activeOpacity={0.7}
                 onPress={() => router.replace({ pathname: `/(tabs)/edit-account`, 
-                params: { id: account.id, amount: account.amount, name: account.name, colorId : account.colorId, iconId: account.iconId,} })}>
+                params: { id: account.id, amount: account.currentBalance, name: account.name, colorId : account.color, iconId: account.icon,} })}>
 
-                <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.colorId] }]}>
-                  <Text style={styles.accountIconText}>{ICON_MAP[account.iconId]}</Text>
+                <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
+                  <Text style={styles.accountIconText}>{ICON_MAP[account.icon.toLowerCase()]}</Text>
                 </View>
                 <Text style={styles.accountName}>{account.name}</Text>
-                <Text style={styles.accountBalance}>{formatAmount(account.amount)}</Text>
+                <Text style={styles.accountBalance}>{formatAmount(account.currentBalance)}</Text>
               </TouchableOpacity>
-              {index < ACCOUNTS.length - 1 && <View style={styles.divider} />}
+              {index < accounts.length - 1 && <View style={styles.divider} />}
             </View>
           ))}
         </View>
@@ -152,15 +152,9 @@ const styles = StyleSheet.create({
   totalLabel: {color: MUTED,fontSize: 16,},
   totalAmount: {color: WHITE,fontSize: 40,fontWeight: '700',letterSpacing: -1,},
 
-  actionsRow: {flexDirection: 'row',justifyContent: 'center',gap: 40,},
-  actionButton: {alignItems: 'center',gap: 8,},
-  actionIcon: {width: 60,height: 60,borderRadius: 18,backgroundColor: ACCENT,alignItems: 'center',justifyContent: 'center',},
-  actionIconText: {fontSize: 26,},
-  actionLabel: {color: MUTED,fontSize: 13,textAlign: 'center',lineHeight: 18,},
-
   accountsList: {backgroundColor: CARD,borderRadius: 20,overflow: 'hidden',},
   accountRow: {flexDirection: 'row',alignItems: 'center',gap: 14,paddingVertical: 16,paddingHorizontal: 18,},
-  accountIcon: {width: 44,height: 44,borderRadius: 14,backgroundColor: 'rgba(255,255,255,0.1)',alignItems: 'center',justifyContent: 'center',},
+  accountIcon: {width: 44,height: 44,borderRadius: 999,backgroundColor: 'rgba(255,255,255,0.1)',alignItems: 'center',justifyContent: 'center',},
   accountIconText: {fontSize: 22,},
   accountName: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '500',},
   accountBalance: {color: WHITE,fontSize: 16,fontWeight: '600',letterSpacing: -0.2,},
