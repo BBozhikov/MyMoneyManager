@@ -2,10 +2,12 @@ package com.example.server.service;
 
 import com.example.server.dto.account.AccountResponse;
 import com.example.server.dto.account.CreateAccountRequest;
+import com.example.server.dto.account.UpdateAccountRequest;
 import com.example.server.entity.Account;
 import com.example.server.entity.User;
 import com.example.server.enums.AccountIcon;
 import com.example.server.enums.Color;
+import com.example.server.exception.ResourceNotFoundException;
 import com.example.server.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,5 +54,24 @@ public class AccountService {
         return accountRepository.findByUser(user).stream()
                 .map(AccountResponse::fromEntity)
                 .toList();
+    }
+
+    public AccountResponse updateAccount(User user, Integer accountId, UpdateAccountRequest request) {
+        Account account = accountRepository.findByIdAndUser(accountId, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        if (request.getName() != null && !request.getName().equals(account.getName())
+                && accountRepository.existsByUserAndName(user, request.getName())) {
+            throw new IllegalArgumentException("Account with this name already exists");
+        }
+
+        if (request.getName() != null) {
+            account.setName(request.getName());
+        }
+        account.setIcon(request.getIcon());
+        account.setColor(request.getColor());
+        account.setCurrentBalance(request.getCurrentBalance());
+
+        return AccountResponse.fromEntity(accountRepository.save(account));
     }
 }
