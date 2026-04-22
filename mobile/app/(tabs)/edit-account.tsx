@@ -61,12 +61,11 @@ export default function EditAccountScreen() {
   const [nameState, setName] = useState(name ??'');
   const [selectedIcon, setSelectedIcon] = useState(icon ?? ICONS[0].id);
   const [selectedColor, setSelectedColor] = useState(color ?? COLORS[0]);
-  const [currency, setCurrency]       = useState('EUR');
-  const [excludeBalance, setExcludeBalance] = useState(false);
-  const [currencyModal, setCurrencyModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const currentColorHex = COLORS.find(c => c.id === selectedColor)?.color ?? COLORS[0].color;
   const canSubmit = nameState.trim().length > 0;
 
+  const isMain = main === 'true';
   useEffect(() => {
     setAmount(currentBalance ?? '0'); 
     setName(name ?? '');
@@ -74,6 +73,47 @@ export default function EditAccountScreen() {
     setSelectedColor(color?.toLowerCase() ?? COLORS[0].id); 
   }, [name, color, icon, currentBalance]);
 
+  const DeleteAcc = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.delete(
+        `${baseUrl}/api/accounts/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Сметката "${nameState}" беше изтрита!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)/explore');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Accounts error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно редактиране на сметка.');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const handleDelete = () => {
+      Alert.alert(
+        'Изтриване',
+        `Сигурни ли сте, че искате да изтриете "${nameState}"?`,
+        [
+          { text: 'Отказ', style: 'cancel' },
+          {
+            text: 'Изтрий',
+            style: 'destructive',
+            onPress: () => DeleteAcc(),
+          },
+        ]
+      );
+    };
   const handleSubmit = async () => {
   if (!canSubmit) return;
 
@@ -116,7 +156,7 @@ export default function EditAccountScreen() {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace("/(tabs)/explore")} style={styles.backBtn} activeOpacity={0.7}>
-          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backArrow}><AntDesign name="arrow-left" size={24} color="white" /></Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Редактиране на сметка</Text>
         <View style={{ width: 40 }} />
@@ -148,7 +188,13 @@ export default function EditAccountScreen() {
             //placeholder=""
             placeholderTextColor={MUTED}
             selectionColor={ACCENT}
+            editable={!isMain}
           />
+          {isMain && (
+          <Text style={{ color: MUTED, fontSize: 12, marginTop: 4 }}>
+            Името на основната сметка не може да се промени
+          </Text>
+          )}
           <View style={styles.nameUnderline} />
         </View>
 
@@ -198,15 +244,11 @@ export default function EditAccountScreen() {
           </View>
         </View>
 
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Не включвай в общия баланс</Text>
-          <Switch
-            value={excludeBalance}
-            onValueChange={setExcludeBalance}
-            trackColor={{ false: 'rgba(255,255,255,0.15)', true: ACCENT }}
-            thumbColor={excludeBalance ? '#fff' : 'rgba(255,255,255,0.6)'}
-          />
-        </View>
+       {!isMain && (
+        <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.deleteBtn}>
+          <Text style={styles.deleteBtnText}>ИЗТРИЙ</Text>
+        </TouchableOpacity>
+       )}
 
       </ScrollView>
 
@@ -232,6 +274,7 @@ const ICON_BG = 'rgba(255,255,255,0.12)';
 const WHITE   = '#ffffff';
 const MUTED   = 'rgba(255,255,255,0.45)';
 const ACCENT  = '#3ecf8e';
+const RED = '#ff3b30';
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
@@ -273,14 +316,7 @@ const styles = StyleSheet.create({
   footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 32,backgroundColor: BG,},
   submitBtn: {borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
-
-
-  modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
-  modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '60%',},
-  modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},
-  modalTitle: { color: WHITE, fontSize: 18, fontWeight: '700', marginBottom: 16 },
-  currencyRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 14,},
-  currencyRowText: { color: WHITE, fontSize: 16 },
-  currencyCheck: { fontSize: 18, fontWeight: '700' },
-  modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
+  
+  deleteBtn: { marginTop: 16, paddingVertical: 8 },
+  deleteBtnText: { color: RED, fontSize: 16, fontWeight: '700', letterSpacing: 1 },
 });
