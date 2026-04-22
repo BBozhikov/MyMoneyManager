@@ -2,6 +2,7 @@ package com.example.server.controller;
 
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
+import com.example.server.dto.transaction.UpdateTransactionRequest;
 import com.example.server.entity.User;
 import com.example.server.enums.CategoryType;
 import com.example.server.service.TransactionService;
@@ -39,5 +40,13 @@ public class TransactionController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String note) {
         return ResponseEntity.ok(transactionService.getTransactions(user, accountId, categoryId, type, startDate, endDate, note));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionResponse> updateTransaction(
+            @PathVariable Integer id,
+            @Valid @RequestBody UpdateTransactionRequest request,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(transactionService.updateTransaction(user, id, request));
     }
 }

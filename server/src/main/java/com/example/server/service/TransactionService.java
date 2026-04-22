@@ -2,6 +2,7 @@ package com.example.server.service;
 
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
+import com.example.server.dto.transaction.UpdateTransactionRequest;
 import com.example.server.entity.Account;
 import com.example.server.entity.Category;
 import com.example.server.entity.Transaction;
@@ -79,11 +80,41 @@ public class TransactionService {
                 .toList();
     }
 
+    @Transactional
+    public TransactionResponse updateTransaction(User user, Integer transactionId, UpdateTransactionRequest request) {
+        Transaction transaction = transactionRepository.findByIdAndUser(transactionId, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+
+        Category newCategory = categoryRepository.findByIdAndUser(request.getCategoryId(), user)
+                .filter(Category::isActive)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+
+        Account account = transaction.getAccount();
+        reverseBalance(account, transaction.getCategory().getType(), transaction.getAmount());
+        updateBalance(account, newCategory.getType(), request.getAmount());
+        accountRepository.save(account);
+
+        transaction.setCategory(newCategory);
+        transaction.setAmount(request.getAmount());
+        transaction.setNote(request.getNote());
+        transactionRepository.save(transaction);
+
+        return TransactionResponse.fromEntity(transaction);
+    }
+
     private void updateBalance(Account account, CategoryType type, double amount) {
         if (type == CategoryType.INCOME) {
             account.setCurrentBalance(account.getCurrentBalance() + amount);
         } else {
             account.setCurrentBalance(account.getCurrentBalance() - amount);
+        }
+    }
+
+    private void reverseBalance(Account account, CategoryType type, double amount) {
+        if (type == CategoryType.INCOME) {
+            account.setCurrentBalance(account.getCurrentBalance() - amount);
+        } else {
+            account.setCurrentBalance(account.getCurrentBalance() + amount);
         }
     }
 }
