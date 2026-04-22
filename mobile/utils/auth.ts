@@ -23,10 +23,10 @@ export async function tryRefreshToken(): Promise<string | null> {
       refreshToken,
     });
 
-    const newToken: string = response.data.token;
+    const newToken: string = response.data.accessToken;
     const newRefreshToken: string = response.data.refreshToken;
 
-    await AsyncStorage.setItem('token', newToken);
+    await AsyncStorage.setItem('accessToken', newToken);
     await AsyncStorage.setItem('refreshToken', newRefreshToken);
 
     return newToken;
@@ -37,19 +37,38 @@ export async function tryRefreshToken(): Promise<string | null> {
 
 export async function validateWithRefresh(): Promise<boolean> {
   try {
-    const token = await AsyncStorage.getItem('token');
+    const token = await AsyncStorage.getItem('accessToken');
     if (!token) return false;
 
     await axios.get(`${BASE_URL}/api/auth/validate-token`, {
       headers: { Authorization: `Bearer ${token}` },
+      timeout: 5000,
     });
 
     return true;
   } catch (error: any) {
+    console.log('Validate status:', error?.response?.status);
+
     if (error?.response?.status === 401) {
       const newToken = await tryRefreshToken();
       if (newToken) return true; 
     }
+    if (!error?.response) {
+      console.log('Мрежова грешка - пропускаме logout');
+      return true;
+    }
+
     return false;
   }
+}
+
+export async function requireAuth(message = 'Сесията ви е изтекла. Моля влезте отново.'): Promise<string | null> {
+  const isValid = await validateWithRefresh();
+
+  if (!isValid) {
+    redirectToLogin(message);
+    return null;
+  }
+
+  return await AsyncStorage.getItem('accessToken');
 }

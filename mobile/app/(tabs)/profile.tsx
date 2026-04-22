@@ -3,7 +3,16 @@ import { useRouter } from 'expo-router';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
+
+async function signOut() {
+  await AsyncStorage.removeItem('accessToken');
+  await AsyncStorage.removeItem('refreshToken');
+  await AsyncStorage.removeItem('fullName');
+  await AsyncStorage.removeItem('email');
+}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -32,45 +41,68 @@ export default function ProfileScreen() {
   };
 
   const handleChangePassword = () => {
-    router.push('/(auth)/forgot-password');
+    router.push('/(auth)/change-password');
   };
 
   const handleSignOut = () => {
-    Alert.alert('Изход', 'Сигурни ли сте, че искате да излезете?', [
-      { text: 'Отказ', style: 'cancel' },
-      {
-        text: 'Изход',
-        style: 'destructive',
-        onPress: () => {
-          
+  Alert.alert('Изход', 'Сигурни ли сте, че искате да излезете?', [
+    { text: 'Отказ', style: 'cancel' },
+    {
+      text: 'Изход',
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          const token = await requireAuth();
+          if (!token) return;
 
+          const refreshToken = await AsyncStorage.getItem('refreshToken');
 
+          await axios.post(
+            'http://192.168.0.6:8080/api/auth/logout',
+            { refreshToken },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error: any) {
+          console.log('Logout error:', error?.response?.data || error.message);
+        } finally {
+          await signOut();
           router.replace('/(auth)/login');
-        },
+        }
       },
-    ]);
-  };
+    },
+  ]);
+};
 
   const handleDeleteAccount = () => {
     Alert.alert(
-      'Изтриване на акаунт',
-      'Сигурни ли сте? Това действие е необратимо и всичките ви данни ще бъдат изтрити завинаги.',
+      'Деактивиране на акаунт',
+      'Сигурни ли сте? Това действие е необратимо и всичките ви данни ще бъдат недостъпни завинаги.',
       [
         { text: 'Отказ', style: 'cancel' },
         {
-          text: 'Изтрий',
+          text: 'Деактивирай',
           style: 'destructive',
-          onPress: () => {
-            
+          onPress: async () => {
+            try {
+              const token = await requireAuth();
+              if (!token) return;
 
-
-            router.replace('/(auth)/login');
+              await axios.post(
+                'http://192.168.0.6:8080/api/user/deactivate', {},
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+            } catch (error: any) {
+              console.log('Logout error:', error?.response?.data || error.message);
+            } finally {
+              await signOut();
+              router.replace('/(auth)/login');
+            }
           },
         },
       ]
     );
   };
-``
+
   useEffect(() => {
     handleGetUserData();
   }, []);
@@ -127,7 +159,7 @@ export default function ProfileScreen() {
             activeOpacity={0.75}
             onPress={handleDeleteAccount}
           >
-            <Text style={styles.deleteText}>Изтрий акаунт</Text>
+            <Text style={styles.deleteText}>Деактивирай акаунт</Text>
           </TouchableOpacity>
         </View>
 
@@ -165,7 +197,7 @@ const styles = StyleSheet.create({
 
   bottomRow: {flexDirection: 'row',width: '100%',gap: 12,},
   signOutButton: {flex: 1,backgroundColor: CARD,borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
-  signOutText: {color: WHITE_MUTED,fontSize: 15,fontWeight: '600',},
-  deleteButton: {flex: 1,backgroundColor: 'rgba(255,59,48,0.18)',borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
-  deleteText: {color: '#FF3B30',fontSize: 15,fontWeight: '600',},
+  signOutText: {color: WHITE_MUTED,fontSize: 12,fontWeight: '600',},
+  deleteButton: {flex: 1,backgroundColor: 'rgba(182, 42, 34, 0.18)',borderRadius: 16,paddingVertical: 16,alignItems: 'center',},
+  deleteText: {color: '#ff0d00',fontSize: 12,fontWeight: '600',},
 });
