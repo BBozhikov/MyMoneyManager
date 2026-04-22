@@ -36,6 +36,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final EmailService emailService;
     private final RefreshTokenService refreshTokenService;
+    private final CategoryService categoryService;
 
     @Value("${app.verification-token-expiry-hours}")
     private int verificationTokenExpiryHours;
@@ -57,6 +58,8 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
+        categoryService.createDefaultCategories(user);
 
         String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = VerificationToken.builder()
