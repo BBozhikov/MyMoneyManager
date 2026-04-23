@@ -14,8 +14,7 @@ import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextIn
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 const baseUrl = 'http://192.168.0.6:8080';
-//Da gi vzimame ot backend
-const CATEGORIES = ['Храна', 'Транспорт', 'Сметки', 'Развлечения', 'Здраве', 'Жилище', 'Заплата', 'Инвестиции', 'Друго'];
+
 const ACCOUNTS   = ['Кеш', 'ДСК', 'Revolut'];
 
 const BG      = '#3b6861';
@@ -23,6 +22,9 @@ const SURFACE = 'rgba(0,0,0,0.22)';
 const BORDER  = 'rgba(255,255,255,0.1)';
 const GREEN   = '#34C759';
 const RED     = '#FF6B6B';
+const WHITE     = '#ffffff';
+const MUTED     = 'rgba(255,255,255,0.55)';
+const DIVIDER   = 'rgba(255,255,255,0.08)';
 
 type TxType = 'EXPENSE' | 'INCOME';
 
@@ -34,6 +36,14 @@ interface Category {
   color: string;
   active: boolean;
   default: boolean;
+}
+interface Account {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  currentBalance: number;
+  main: boolean;
 }
 
 const iconSize = 32;
@@ -71,6 +81,30 @@ const ICONS = [
     { id: 'others', emoji: <AntDesign name="question" size={iconSize} color="white" />},
   ];
 const ICON_MAP = Object.fromEntries(ICONS.map(i => [i.id, i.emoji]));
+
+const ICONS2 = [
+  { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
+  { id: 'bank',       emoji: <AntDesign name="bank" size={iconSize} color="white" /> },
+  { id: 'pound',      emoji: <AntDesign name="pound-circle" size={iconSize} color="white" /> },
+  { id: 'card',       emoji: <FontAwesome name="credit-card" size={iconSize} color="white" /> },
+  { id: 'wallet',     emoji: <FontAwesome5 name="wallet" size={iconSize} color="white" /> },
+  { id: 'savings',    emoji: <FontAwesome5 name="piggy-bank" size={iconSize} color="white" />  },
+  { id: 'paypal',     emoji: <FontAwesome name="paypal" size={iconSize} color="white" /> },
+  { id: 'safe',       emoji: <MaterialCommunityIcons name="safe" size={iconSize} color="white" /> },
+  { id: 'bitcoin',    emoji: <FontAwesome name="bitcoin" size={iconSize} color="white" /> },
+  { id: 'ethereum',   emoji: <FontAwesome5 name="ethereum" size={iconSize} color="white" /> },
+  { id: 'dollar',     emoji: <FontAwesome name="dollar" size={iconSize} color="white" /> },
+  { id: 'euro',       emoji: <FontAwesome name="euro" size={iconSize} color="white" /> },
+  { id: 'yen',        emoji: <FontAwesome name="yen" size={iconSize} color="white" /> },
+  { id: 'stocks',     emoji: <AntDesign name="stock" size={iconSize} color="white" /> },
+  { id: 'bag',        emoji: <FontAwesome6 name="sack-dollar" size={iconSize} color="white" /> },
+  { id: 'percent',    emoji: <FontAwesome5 name="percent" size={iconSize} color="white" /> },
+  { id: 'finance',    emoji: <MaterialCommunityIcons name="finance" size={iconSize} color= "white" /> },
+  { id: 'diamond',    emoji: <FontAwesome name="diamond" size={iconSize} color="white" /> },
+  { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={iconSize} color="white" /> },
+  { id: 'coins',      emoji: <FontAwesome5 name="coins" size={iconSize} color="white" /> },
+];
+const ICON_MAP2 = Object.fromEntries(ICONS2.map(i => [i.id, i.emoji]));
 const COLORS = [
   {id: 'amber', color: '#f5a623'}, // amber
   {id: 'cyan', color: '#00d4ff'}, // cyan
@@ -88,7 +122,7 @@ export default function AddTransactionScreen() {
   const [type,setType] = useState<TxType>('EXPENSE');
   const [amount,setAmount] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
-  const [account, setAccount] = useState('');
+  const [account, setAccount] = useState<Account | null>(null);
   const [date, setDate] = useState(new Date());
   const [note, setNote] = useState('');
   const [accModal, setAccModal] = useState(false);
@@ -96,6 +130,7 @@ export default function AddTransactionScreen() {
   const [activeType, setActiveType] = useState<'EXPENSE' | 'INCOME'>('EXPENSE');
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
 
   const fetchCategories = async () => {
     try {
@@ -112,10 +147,27 @@ export default function AddTransactionScreen() {
       setLoading(false);
     }
   };
-
+  const fetchAccounts = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return; 
+      
+      const response = await axios.get(`${baseUrl}/api/accounts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAccounts(response.data);
+    } catch (error : any) {
+      console.log('Accounts error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на сметки.');
+    } finally{
+      setLoading(false);
+    }
+  }
   useFocusEffect(
     useCallback(() => {
       fetchCategories();
+      fetchAccounts();
     }, [])
   );
   const accentColor = type === 'EXPENSE' ? RED : GREEN;
@@ -126,7 +178,7 @@ export default function AddTransactionScreen() {
   const canSubmit = (): boolean => {
     const hasAmount = amount.trim().length > 0 && parseFloat(amount) > 0;
     const hasCategory = category !== null;
-    const hasAccount = account.trim().length > 0;
+    const hasAccount = account !== null;
     return hasAmount && hasCategory && hasAccount;
   };
   const handleSubmit = () => {
@@ -223,7 +275,7 @@ export default function AddTransactionScreen() {
           <Text style={styles.label}>Сметка</Text>
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldValue, !account && styles.fieldPlaceholder]}>
-              {account || 'Избери сметка'}
+              {account?.name || 'Избери сметка'}
             </Text>
             <Text style={styles.chevron}>›</Text>
           </View>
@@ -293,19 +345,22 @@ export default function AddTransactionScreen() {
         <Pressable style={styles.overlay} onPress={() => setAccModal(false)}>
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>Избери сметка</Text>
-            {ACCOUNTS.map(acc => (
-              <TouchableOpacity
-                key={acc}
-                style={[styles.sheetOption, account === acc && styles.sheetOptionActive]}
-                onPress={() => { setAccount(acc); setAccModal(false); }}
-                activeOpacity={0.75}
-              >
-                <Text style={[styles.sheetOptionText, account === acc && styles.sheetOptionTextActive]}>
-                  {acc}
-                </Text>
-                {account === acc && <Text style={{ color: GREEN }}>✓</Text>}
-              </TouchableOpacity>
+            {accounts.map((account, index) => (
+              <View key={account.id}>
+                <TouchableOpacity
+                  style={styles.accountRow}
+                  activeOpacity={0.7}
+                  onPress={() => { setAccount(account); setAccModal(false); }}>
+  
+                  <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
+                    <Text style={styles.accountIconText}>{ICON_MAP2[account.icon.toLowerCase()]}</Text>
+                  </View>
+                  <Text style={styles.accountName}>{account.name}</Text>
+                </TouchableOpacity>
+                {index < accounts.length - 1 && <View style={styles.divider} />}
+              </View>
             ))}
+            
           </View>
         </Pressable>
       </Modal>
@@ -355,9 +410,15 @@ const styles = StyleSheet.create({
 
   categoryGrid: {flexDirection: 'row',flexWrap: 'wrap',marginTop: 8},
   categoryItem: {width: '25%',alignItems: 'center',paddingVertical: 8,gap: 4,},
-  categoryCircle: {width: 56,height: 56,borderRadius: 28,alignItems: 'center',justifyContent: 'center',shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },shadowOpacity: 0.3,shadowRadius: 16,elevation: 5},
+  categoryCircle: {width: 56,height: 56,borderRadius: 28,alignItems: 'center',justifyContent: 'center'},
   categoryCircleSelected: {borderWidth: 3,borderColor: 'white',},
   categoryEmoji: {fontSize: 24,},
   categoryName: {color: 'rgba(255,255,255,0.6)',fontSize: 11,textAlign: 'center',lineHeight: 14,},
+
+  accountRow: {flexDirection: 'row',alignItems: 'center',gap: 14,paddingVertical: 16,paddingHorizontal: 18,},
+  accountIcon: {width: 44,height: 44,borderRadius: 999,backgroundColor: 'rgba(255,255,255,0.1)',alignItems: 'center',justifyContent: 'center',},
+  accountIconText: {fontSize: 22,},
+  accountName: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '500',},
+  accountBalance: {color: WHITE,fontSize: 16,fontWeight: '600',letterSpacing: -0.2,},
+  divider: {height: 1,backgroundColor: DIVIDER,marginHorizontal: 16,},
 });
