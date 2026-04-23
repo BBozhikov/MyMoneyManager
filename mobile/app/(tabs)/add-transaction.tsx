@@ -1,3 +1,4 @@
+import { requireAuth } from '@/utils/auth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/build/Feather';
 import FontAwesome from '@expo/vector-icons/build/FontAwesome';
@@ -7,11 +8,12 @@ import Ionicons from '@expo/vector-icons/build/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router, Stack } from 'expo-router';
-import React, { useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import { router, Stack, useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import axios from 'axios';
+const baseUrl = 'http://192.168.0.6:8080';
 //Da gi vzimame ot backend
 const CATEGORIES = ['Храна', 'Транспорт', 'Сметки', 'Развлечения', 'Здраве', 'Жилище', 'Заплата', 'Инвестиции', 'Друго'];
 const ACCOUNTS   = ['Кеш', 'ДСК', 'Revolut'];
@@ -22,47 +24,18 @@ const BORDER  = 'rgba(255,255,255,0.1)';
 const GREEN   = '#34C759';
 const RED     = '#FF6B6B';
 
-type TxType = 'expense' | 'income';
-
-type CategoryType = 'разход' | 'приход';
+type TxType = 'EXPENSE' | 'INCOME';
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
-  iconId: string;
-  colorId: string;
-  type: CategoryType;
+  type: 'EXPENSE' | 'INCOME';
+  icon: string;
+  color: string;
+  active: boolean;
+  default: boolean;
 }
-const categories: Category[] = [
-  // Разходи
-  { id: '1', name: 'Здраве', iconId: 'first_aid', colorId: 'red', type: 'разход' },
-  { id: '2', name: 'Свободно', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '3', name: 'Къща', iconId: 'house', colorId: 'blue', type: 'разход' },
-  { id: '4', name: 'Кафене', iconId: 'cafe', colorId: 'yellow', type: 'разход' },
-  { id: '5', name: 'Образование', iconId: 'education', colorId: 'pink', type: 'разход' },
-  { id: '6', name: 'Подаръци', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '7', name: 'Хранителни', iconId: 'shopping_cart', colorId: 'cyan', type: 'разход' },
-  { id: '8', name: 'Семейство', iconId: 'family', colorId: 'red', type: 'разход' },
-  { id: '9', name: 'Тренировки', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '10', name: 'Транспорт', iconId: 'transport', colorId: 'blue', type: 'разход' },
-  { id: '11', name: 'Други', iconId: 'others', colorId: 'red', type: 'разход' },
-  { id: '12', name: 'Пазаруване', iconId: 'shopping_cart', colorId: 'red', type: 'разход' },
-  { id: '13', name: 'Споделено', iconId: 'car', colorId: 'amber', type: 'разход' },
-  { id: '14', name: 'Пране', iconId: 'washing_machine', colorId: 'pink', type: 'разход' },
-  { id: '15', name: 'Стол', iconId: 'restaurant', colorId: 'orange', type: 'разход' },
-  { id: '16', name: 'Петлето', iconId: 'food', colorId: 'cyan', type: 'разход' },
-  { id: '17', name: 'Steam', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '18', name: 'Бръснар', iconId: 'tag', colorId: 'orange', type: 'разход' },
-  { id: '19', name: 'Гироланд', iconId: 'cafe', colorId: 'pink', type: 'разход' },
 
-  // Приходи
-  { id: '21', name: 'Заплата', iconId: 'salary', colorId: 'light_green', type: 'приход' },
-  { id: '23', name: 'Freelance', iconId: 'trade', colorId: 'blue', type: 'приход' },
-  { id: '25', name: 'Наем', iconId: 'house', colorId: 'purple', type: 'приход' },
-  { id: '27', name: 'Подарък', iconId: 'gift', colorId: 'pink', type: 'приход' },
-  { id: '28', name: 'Лихви', iconId: 'loan', colorId: 'cyan', type: 'приход' },
-  { id: '29', name: 'Други', iconId: 'others', colorId: 'amber', type: 'приход' },
-];
 const iconSize = 32;
 const ICONS = [
     { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={iconSize} color="white" /> },
@@ -112,16 +85,40 @@ const COLORS = [
 ];
 const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
 export default function AddTransactionScreen() {
-  const [type,         setType]         = useState<TxType>('expense');
-  const [amount,       setAmount]       = useState('');
+  const [type,setType] = useState<TxType>('EXPENSE');
+  const [amount,setAmount] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
-  const [account,      setAccount]      = useState('');
-  const [date,         setDate]         = useState(new Date());
-  const [note,         setNote]         = useState('');
-  const [accModal,     setAccModal]     = useState(false);
+  const [account, setAccount] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [note, setNote] = useState('');
+  const [accModal, setAccModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [activeType, setActiveType] = useState<'EXPENSE' | 'INCOME'>('EXPENSE');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const accentColor = type === 'expense' ? RED : GREEN;
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      const response = await axios.get(`${baseUrl}/api/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(response.data);
+    } catch (error: any) {
+      console.log('Categories error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на категории.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+    }, [])
+  );
+  const accentColor = type === 'EXPENSE' ? RED : GREEN;
 
   const formatDate = (d: Date) =>
     d.toLocaleDateString('bg-BG', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -154,20 +151,20 @@ export default function AddTransactionScreen() {
 
         <View style={styles.typeToggle}>
           <TouchableOpacity
-            style={[styles.typeBtn, type === 'expense' && { backgroundColor: 'rgba(255,107,107,0.25)', borderRadius: 10 }]}
-            onPress={() => handleTypeChange('expense')}
+            style={[styles.typeBtn, type === 'EXPENSE' && { backgroundColor: 'rgba(255,107,107,0.25)', borderRadius: 10 }]}
+            onPress={() => handleTypeChange('EXPENSE')}
             activeOpacity={0.75}
           >
-            <Text style={[styles.typeBtnText, type === 'expense' && { color: RED }]}>
+            <Text style={[styles.typeBtnText, type === 'EXPENSE' && { color: RED }]}>
               Разход
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.typeBtn, type === 'income' && { backgroundColor: 'rgba(52,199,89,0.25)', borderRadius: 10 }]}
-            onPress={() => handleTypeChange('income')}
+            style={[styles.typeBtn, type === 'INCOME' && { backgroundColor: 'rgba(52,199,89,0.25)', borderRadius: 10 }]}
+            onPress={() => handleTypeChange('INCOME')}
             activeOpacity={0.75}
           >
-            <Text style={[styles.typeBtnText, type === 'income' && { color: GREEN }]}>
+            <Text style={[styles.typeBtnText, type === 'INCOME' && { color: GREEN }]}>
               Приход
             </Text>
           </TouchableOpacity>
@@ -192,10 +189,10 @@ export default function AddTransactionScreen() {
           <Text style={styles.label}>Категория</Text>
           <View style={styles.categoryGrid}>
             {categories
-              .filter(cat => cat.type === (type === 'expense' ? 'разход' : 'приход'))
+              .filter(cat => cat.type === (type === 'EXPENSE' ? 'EXPENSE' : 'INCOME'))
               .map((cat) => {
                 const isSelected = category?.id === cat.id;
-                const color = COLOR_MAP[cat.colorId];
+                const color = COLOR_MAP[cat.color.toLowerCase()];
                 return (
                   <TouchableOpacity
                     key={cat.id}
@@ -208,7 +205,7 @@ export default function AddTransactionScreen() {
                       { backgroundColor: color },
                       isSelected && styles.categoryCircleSelected,
                     ]}>
-                      <Text style={styles.categoryEmoji}>{ICON_MAP[cat.iconId]}</Text>
+                      <Text style={styles.categoryEmoji}>{ICON_MAP[cat.icon.toLocaleLowerCase()]}</Text>
                     </View>
                     <Text style={[
                       styles.categoryName,
@@ -287,7 +284,7 @@ export default function AddTransactionScreen() {
           disabled={!canSubmit()}
         >
           <Text style={styles.submitBtnText}>
-            {type === 'expense' ? 'Добави разход' : 'Добави приход'}
+            {type === 'EXPENSE' ? 'Добави разход' : 'Добави приход'}
           </Text>
         </TouchableOpacity>
       </View>
