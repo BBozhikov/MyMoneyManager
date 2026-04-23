@@ -132,6 +132,11 @@ export default function AddTransactionScreen() {
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
 
+  const resetForm = () => {
+      setAmount('');  
+      setCategory(null);
+      setAccount(null);
+  };
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -181,9 +186,49 @@ export default function AddTransactionScreen() {
     const hasAccount = account !== null;
     return hasAmount && hasCategory && hasAccount;
   };
-  const handleSubmit = () => {
-    if (!canSubmit()) return;
-    console.log({ type, amount, category: category?.name, account, date: date.toISOString(), note });
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+
+    const normalizedAmount = amount.replace(',', '.');
+    const parsedAmount = parseFloat(normalizedAmount);
+
+    if (isNaN(parsedAmount)) {
+      Alert.alert('Грешка', 'Въведи валидна сума.');
+      return;
+    }
+      try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.post(
+        `${baseUrl}/api/transactions`,
+        {
+          accountId: account?.id,
+          categoryId: category?.id,
+          amount: parsedAmount,
+          createdAt: date.toISOString(),
+          note: note.trim(),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Транзакцията беше създадена!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            router.replace('/(tabs)/main');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Transaction error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно създаване на транзакция.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTypeChange = (newType: TxType) => {
