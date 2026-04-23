@@ -126,6 +126,18 @@ export default function NewAccountScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
         <View style={styles.amountRow}>
+          <TouchableOpacity
+            onPress={() => {
+              if (amount === '' || amount === '0') return;
+              setAmount(prev =>
+                prev.startsWith('-') ? prev.slice(1) : '-' + prev
+              );
+            }}
+            style={styles.signBtn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.signBtnText}>+/−</Text>
+          </TouchableOpacity>
           <TextInput
             style={styles.amountInput}
             value={amount}
@@ -283,4 +295,7 @@ const styles = StyleSheet.create({
   currencyRowText: { color: WHITE, fontSize: 16 },
   currencyCheck: { fontSize: 18, fontWeight: '700' },
   modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
+
+  signBtn: {paddingHorizontal: 10,paddingVertical: 6,borderRadius: 8,backgroundColor: 'rgba(255,255,255,0.1)',},
+  signBtnText: {color: 'rgba(255,255,255,0.7)',fontSize: 16,fontWeight: '600',},
 });
