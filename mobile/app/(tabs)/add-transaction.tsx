@@ -1,3 +1,4 @@
+import { requireAuth } from '@/utils/auth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/build/Feather';
 import FontAwesome from '@expo/vector-icons/build/FontAwesome';
@@ -7,13 +8,13 @@ import Ionicons from '@expo/vector-icons/build/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router, Stack } from 'expo-router';
-import React, { useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
+import { router, Stack, useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+const baseUrl = 'http://192.168.0.6:8080';
 
-//Da gi vzimame ot backend
-const CATEGORIES = ['Храна', 'Транспорт', 'Сметки', 'Развлечения', 'Здраве', 'Жилище', 'Заплата', 'Инвестиции', 'Друго'];
 const ACCOUNTS   = ['Кеш', 'ДСК', 'Revolut'];
 
 const BG      = '#3b6861';
@@ -21,48 +22,30 @@ const SURFACE = 'rgba(0,0,0,0.22)';
 const BORDER  = 'rgba(255,255,255,0.1)';
 const GREEN   = '#34C759';
 const RED     = '#FF6B6B';
+const WHITE     = '#ffffff';
+const MUTED     = 'rgba(255,255,255,0.55)';
+const DIVIDER   = 'rgba(255,255,255,0.08)';
 
-type TxType = 'expense' | 'income';
-
-type CategoryType = 'разход' | 'приход';
+type TxType = 'EXPENSE' | 'INCOME';
 
 interface Category {
+  id: number;
+  name: string;
+  type: 'EXPENSE' | 'INCOME';
+  icon: string;
+  color: string;
+  active: boolean;
+  default: boolean;
+}
+interface Account {
   id: string;
   name: string;
-  iconId: string;
-  colorId: string;
-  type: CategoryType;
+  icon: string;
+  color: string;
+  currentBalance: number;
+  main: boolean;
 }
-const categories: Category[] = [
-  // Разходи
-  { id: '1', name: 'Здраве', iconId: 'first_aid', colorId: 'red', type: 'разход' },
-  { id: '2', name: 'Свободно', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '3', name: 'Къща', iconId: 'house', colorId: 'blue', type: 'разход' },
-  { id: '4', name: 'Кафене', iconId: 'cafe', colorId: 'yellow', type: 'разход' },
-  { id: '5', name: 'Образование', iconId: 'education', colorId: 'pink', type: 'разход' },
-  { id: '6', name: 'Подаръци', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '7', name: 'Хранителни', iconId: 'shopping_cart', colorId: 'cyan', type: 'разход' },
-  { id: '8', name: 'Семейство', iconId: 'family', colorId: 'red', type: 'разход' },
-  { id: '9', name: 'Тренировки', iconId: 'sports', colorId: 'light_green', type: 'разход' },
-  { id: '10', name: 'Транспорт', iconId: 'transport', colorId: 'blue', type: 'разход' },
-  { id: '11', name: 'Други', iconId: 'others', colorId: 'red', type: 'разход' },
-  { id: '12', name: 'Пазаруване', iconId: 'shopping_cart', colorId: 'red', type: 'разход' },
-  { id: '13', name: 'Споделено', iconId: 'car', colorId: 'amber', type: 'разход' },
-  { id: '14', name: 'Пране', iconId: 'washing_machine', colorId: 'pink', type: 'разход' },
-  { id: '15', name: 'Стол', iconId: 'restaurant', colorId: 'orange', type: 'разход' },
-  { id: '16', name: 'Петлето', iconId: 'food', colorId: 'cyan', type: 'разход' },
-  { id: '17', name: 'Steam', iconId: 'gift', colorId: 'amber', type: 'разход' },
-  { id: '18', name: 'Бръснар', iconId: 'tag', colorId: 'orange', type: 'разход' },
-  { id: '19', name: 'Гироланд', iconId: 'cafe', colorId: 'pink', type: 'разход' },
 
-  // Приходи
-  { id: '21', name: 'Заплата', iconId: 'salary', colorId: 'light_green', type: 'приход' },
-  { id: '23', name: 'Freelance', iconId: 'trade', colorId: 'blue', type: 'приход' },
-  { id: '25', name: 'Наем', iconId: 'house', colorId: 'purple', type: 'приход' },
-  { id: '27', name: 'Подарък', iconId: 'gift', colorId: 'pink', type: 'приход' },
-  { id: '28', name: 'Лихви', iconId: 'loan', colorId: 'cyan', type: 'приход' },
-  { id: '29', name: 'Други', iconId: 'others', colorId: 'amber', type: 'приход' },
-];
 const iconSize = 32;
 const ICONS = [
     { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={iconSize} color="white" /> },
@@ -98,6 +81,30 @@ const ICONS = [
     { id: 'others', emoji: <AntDesign name="question" size={iconSize} color="white" />},
   ];
 const ICON_MAP = Object.fromEntries(ICONS.map(i => [i.id, i.emoji]));
+
+const ICONS2 = [
+  { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
+  { id: 'bank',       emoji: <AntDesign name="bank" size={iconSize} color="white" /> },
+  { id: 'pound',      emoji: <AntDesign name="pound-circle" size={iconSize} color="white" /> },
+  { id: 'card',       emoji: <FontAwesome name="credit-card" size={iconSize} color="white" /> },
+  { id: 'wallet',     emoji: <FontAwesome5 name="wallet" size={iconSize} color="white" /> },
+  { id: 'savings',    emoji: <FontAwesome5 name="piggy-bank" size={iconSize} color="white" />  },
+  { id: 'paypal',     emoji: <FontAwesome name="paypal" size={iconSize} color="white" /> },
+  { id: 'safe',       emoji: <MaterialCommunityIcons name="safe" size={iconSize} color="white" /> },
+  { id: 'bitcoin',    emoji: <FontAwesome name="bitcoin" size={iconSize} color="white" /> },
+  { id: 'ethereum',   emoji: <FontAwesome5 name="ethereum" size={iconSize} color="white" /> },
+  { id: 'dollar',     emoji: <FontAwesome name="dollar" size={iconSize} color="white" /> },
+  { id: 'euro',       emoji: <FontAwesome name="euro" size={iconSize} color="white" /> },
+  { id: 'yen',        emoji: <FontAwesome name="yen" size={iconSize} color="white" /> },
+  { id: 'stocks',     emoji: <AntDesign name="stock" size={iconSize} color="white" /> },
+  { id: 'bag',        emoji: <FontAwesome6 name="sack-dollar" size={iconSize} color="white" /> },
+  { id: 'percent',    emoji: <FontAwesome5 name="percent" size={iconSize} color="white" /> },
+  { id: 'finance',    emoji: <MaterialCommunityIcons name="finance" size={iconSize} color= "white" /> },
+  { id: 'diamond',    emoji: <FontAwesome name="diamond" size={iconSize} color="white" /> },
+  { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={iconSize} color="white" /> },
+  { id: 'coins',      emoji: <FontAwesome5 name="coins" size={iconSize} color="white" /> },
+];
+const ICON_MAP2 = Object.fromEntries(ICONS2.map(i => [i.id, i.emoji]));
 const COLORS = [
   {id: 'amber', color: '#f5a623'}, // amber
   {id: 'cyan', color: '#00d4ff'}, // cyan
@@ -112,16 +119,63 @@ const COLORS = [
 ];
 const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
 export default function AddTransactionScreen() {
-  const [type,         setType]         = useState<TxType>('expense');
-  const [amount,       setAmount]       = useState('');
+  const [type,setType] = useState<TxType>('EXPENSE');
+  const [amount,setAmount] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
-  const [account,      setAccount]      = useState('');
-  const [date,         setDate]         = useState(new Date());
-  const [note,         setNote]         = useState('');
-  const [accModal,     setAccModal]     = useState(false);
+  const [account, setAccount] = useState<Account | null>(null);
+  const [date, setDate] = useState(new Date());
+  const [note, setNote] = useState('');
+  const [accModal, setAccModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [activeType, setActiveType] = useState<'EXPENSE' | 'INCOME'>('EXPENSE');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [accounts, setAccounts] = useState<Account[]>([]);
 
-  const accentColor = type === 'expense' ? RED : GREEN;
+  const resetForm = () => {
+      setAmount('');  
+      setCategory(null);
+      setAccount(null);
+  };
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      const response = await axios.get(`${baseUrl}/api/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(response.data);
+    } catch (error: any) {
+      console.log('Categories error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на категории.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchAccounts = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return; 
+      
+      const response = await axios.get(`${baseUrl}/api/accounts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAccounts(response.data);
+    } catch (error : any) {
+      console.log('Accounts error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на сметки.');
+    } finally{
+      setLoading(false);
+    }
+  }
+  useFocusEffect(
+    useCallback(() => {
+      fetchCategories();
+      fetchAccounts();
+    }, [])
+  );
+  const accentColor = type === 'EXPENSE' ? RED : GREEN;
 
   const formatDate = (d: Date) =>
     d.toLocaleDateString('bg-BG', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -129,12 +183,52 @@ export default function AddTransactionScreen() {
   const canSubmit = (): boolean => {
     const hasAmount = amount.trim().length > 0 && parseFloat(amount) > 0;
     const hasCategory = category !== null;
-    const hasAccount = account.trim().length > 0;
+    const hasAccount = account !== null;
     return hasAmount && hasCategory && hasAccount;
   };
-  const handleSubmit = () => {
-    if (!canSubmit()) return;
-    console.log({ type, amount, category: category?.name, account, date: date.toISOString(), note });
+  const handleSubmit = async () => {
+    if (!canSubmit) return;
+
+    const normalizedAmount = amount.replace(',', '.');
+    const parsedAmount = parseFloat(normalizedAmount);
+
+    if (isNaN(parsedAmount)) {
+      Alert.alert('Грешка', 'Въведи валидна сума.');
+      return;
+    }
+      try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.post(
+        `${baseUrl}/api/transactions`,
+        {
+          accountId: account?.id,
+          categoryId: category?.id,
+          amount: parsedAmount,
+          createdAt: date.toISOString(),
+          note: note.trim(),
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Транзакцията беше създадена!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            router.replace('/(tabs)/main');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Transaction error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно създаване на транзакция.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTypeChange = (newType: TxType) => {
@@ -154,20 +248,20 @@ export default function AddTransactionScreen() {
 
         <View style={styles.typeToggle}>
           <TouchableOpacity
-            style={[styles.typeBtn, type === 'expense' && { backgroundColor: 'rgba(255,107,107,0.25)', borderRadius: 10 }]}
-            onPress={() => handleTypeChange('expense')}
+            style={[styles.typeBtn, type === 'EXPENSE' && { backgroundColor: 'rgba(255,107,107,0.25)', borderRadius: 10 }]}
+            onPress={() => handleTypeChange('EXPENSE')}
             activeOpacity={0.75}
           >
-            <Text style={[styles.typeBtnText, type === 'expense' && { color: RED }]}>
+            <Text style={[styles.typeBtnText, type === 'EXPENSE' && { color: RED }]}>
               Разход
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.typeBtn, type === 'income' && { backgroundColor: 'rgba(52,199,89,0.25)', borderRadius: 10 }]}
-            onPress={() => handleTypeChange('income')}
+            style={[styles.typeBtn, type === 'INCOME' && { backgroundColor: 'rgba(52,199,89,0.25)', borderRadius: 10 }]}
+            onPress={() => handleTypeChange('INCOME')}
             activeOpacity={0.75}
           >
-            <Text style={[styles.typeBtnText, type === 'income' && { color: GREEN }]}>
+            <Text style={[styles.typeBtnText, type === 'INCOME' && { color: GREEN }]}>
               Приход
             </Text>
           </TouchableOpacity>
@@ -192,10 +286,10 @@ export default function AddTransactionScreen() {
           <Text style={styles.label}>Категория</Text>
           <View style={styles.categoryGrid}>
             {categories
-              .filter(cat => cat.type === (type === 'expense' ? 'разход' : 'приход'))
+              .filter(cat => cat.type === (type === 'EXPENSE' ? 'EXPENSE' : 'INCOME'))
               .map((cat) => {
                 const isSelected = category?.id === cat.id;
-                const color = COLOR_MAP[cat.colorId];
+                const color = COLOR_MAP[cat.color.toLowerCase()];
                 return (
                   <TouchableOpacity
                     key={cat.id}
@@ -208,7 +302,7 @@ export default function AddTransactionScreen() {
                       { backgroundColor: color },
                       isSelected && styles.categoryCircleSelected,
                     ]}>
-                      <Text style={styles.categoryEmoji}>{ICON_MAP[cat.iconId]}</Text>
+                      <Text style={styles.categoryEmoji}>{ICON_MAP[cat.icon.toLocaleLowerCase()]}</Text>
                     </View>
                     <Text style={[
                       styles.categoryName,
@@ -226,7 +320,7 @@ export default function AddTransactionScreen() {
           <Text style={styles.label}>Сметка</Text>
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldValue, !account && styles.fieldPlaceholder]}>
-              {account || 'Избери сметка'}
+              {account?.name || 'Избери сметка'}
             </Text>
             <Text style={styles.chevron}>›</Text>
           </View>
@@ -287,7 +381,7 @@ export default function AddTransactionScreen() {
           disabled={!canSubmit()}
         >
           <Text style={styles.submitBtnText}>
-            {type === 'expense' ? 'Добави разход' : 'Добави приход'}
+            {type === 'EXPENSE' ? 'Добави разход' : 'Добави приход'}
           </Text>
         </TouchableOpacity>
       </View>
@@ -295,20 +389,24 @@ export default function AddTransactionScreen() {
       <Modal visible={accModal} transparent animationType="slide">
         <Pressable style={styles.overlay} onPress={() => setAccModal(false)}>
           <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>Избери сметка</Text>
-            {ACCOUNTS.map(acc => (
-              <TouchableOpacity
-                key={acc}
-                style={[styles.sheetOption, account === acc && styles.sheetOptionActive]}
-                onPress={() => { setAccount(acc); setAccModal(false); }}
-                activeOpacity={0.75}
-              >
-                <Text style={[styles.sheetOptionText, account === acc && styles.sheetOptionTextActive]}>
-                  {acc}
-                </Text>
-                {account === acc && <Text style={{ color: GREEN }}>✓</Text>}
-              </TouchableOpacity>
-            ))}
+            <ScrollView>
+              <Text style={styles.sheetTitle}>Избери сметка</Text>
+              {accounts.map((account, index) => (
+                <View key={account.id}>
+                  <TouchableOpacity
+                    style={styles.accountRow}
+                    activeOpacity={0.7}
+                    onPress={() => { setAccount(account); setAccModal(false); }}>
+    
+                    <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
+                      <Text style={styles.accountIconText}>{ICON_MAP2[account.icon.toLowerCase()]}</Text>
+                    </View>
+                    <Text style={styles.accountName}>{account.name}</Text>
+                  </TouchableOpacity>
+                  {index < accounts.length - 1 && <View style={styles.divider} />}
+                </View>
+              ))}
+            </ScrollView>
           </View>
         </Pressable>
       </Modal>
@@ -358,9 +456,15 @@ const styles = StyleSheet.create({
 
   categoryGrid: {flexDirection: 'row',flexWrap: 'wrap',marginTop: 8},
   categoryItem: {width: '25%',alignItems: 'center',paddingVertical: 8,gap: 4,},
-  categoryCircle: {width: 56,height: 56,borderRadius: 28,alignItems: 'center',justifyContent: 'center',shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },shadowOpacity: 0.3,shadowRadius: 16,elevation: 5},
+  categoryCircle: {width: 56,height: 56,borderRadius: 28,alignItems: 'center',justifyContent: 'center'},
   categoryCircleSelected: {borderWidth: 3,borderColor: 'white',},
   categoryEmoji: {fontSize: 24,},
   categoryName: {color: 'rgba(255,255,255,0.6)',fontSize: 11,textAlign: 'center',lineHeight: 14,},
+
+  accountRow: {flexDirection: 'row',alignItems: 'center',gap: 14,paddingVertical: 16,paddingHorizontal: 18,},
+  accountIcon: {width: 44,height: 44,borderRadius: 999,backgroundColor: 'rgba(255,255,255,0.1)',alignItems: 'center',justifyContent: 'center',},
+  accountIconText: {fontSize: 22,},
+  accountName: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '500',},
+  accountBalance: {color: WHITE,fontSize: 16,fontWeight: '600',letterSpacing: -0.2,},
+  divider: {height: 1,backgroundColor: DIVIDER,marginHorizontal: 16,},
 });

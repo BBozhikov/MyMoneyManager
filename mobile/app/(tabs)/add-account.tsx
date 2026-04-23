@@ -67,10 +67,9 @@ export default function NewAccountScreen() {
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
-    if (amount === '') {
-      setAmount('0');
-    }
-    const normalizedAmount = amount.replace(',', '.');
+
+    const rawAmount = amount.trim() === '' ? '0' : amount.trim();
+    const normalizedAmount = rawAmount.replace(',', '.');
     const parsedAmount = parseFloat(normalizedAmount);
 
     if (isNaN(parsedAmount)) {
