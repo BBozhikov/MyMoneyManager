@@ -4,7 +4,7 @@ import os
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODEL_PATH = os.path.join(BASE_DIR, 'models', 'trained_receipt_classifier')
+MODEL_PATH = os.path.join(BASE_DIR, 'models', 'trained_receipt_classifier2')
 # you can execute this script from everywhere in the project now
 # exit()
 
