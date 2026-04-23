@@ -165,6 +165,18 @@ export default function EditAccountScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
 
         <View style={styles.amountRow}>
+          <TouchableOpacity
+            onPress={() => {
+              if (amountState === '' || amountState === '0') return;
+              setAmount(prev =>
+                prev.startsWith('-') ? prev.slice(1) : '-' + prev
+              );
+            }}
+            style={styles.signBtn}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.signBtnText}>+/−</Text>
+          </TouchableOpacity>
           <TextInput
             style={styles.amountInput}
             value={amountState}
@@ -319,4 +331,7 @@ const styles = StyleSheet.create({
   
   deleteBtn: { marginTop: 16, paddingVertical: 8 },
   deleteBtnText: { color: RED, fontSize: 16, fontWeight: '700', letterSpacing: 1 },
+
+  signBtn: {paddingHorizontal: 10,paddingVertical: 6,borderRadius: 8,backgroundColor: 'rgba(255,255,255,0.1)',},
+  signBtnText: {color: 'rgba(255,255,255,0.7)',fontSize: 16,fontWeight: '600',},
 });
