@@ -344,23 +344,24 @@ export default function AddTransactionScreen() {
       <Modal visible={accModal} transparent animationType="slide">
         <Pressable style={styles.overlay} onPress={() => setAccModal(false)}>
           <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>Избери сметка</Text>
-            {accounts.map((account, index) => (
-              <View key={account.id}>
-                <TouchableOpacity
-                  style={styles.accountRow}
-                  activeOpacity={0.7}
-                  onPress={() => { setAccount(account); setAccModal(false); }}>
-  
-                  <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
-                    <Text style={styles.accountIconText}>{ICON_MAP2[account.icon.toLowerCase()]}</Text>
-                  </View>
-                  <Text style={styles.accountName}>{account.name}</Text>
-                </TouchableOpacity>
-                {index < accounts.length - 1 && <View style={styles.divider} />}
-              </View>
-            ))}
-            
+            <ScrollView>
+              <Text style={styles.sheetTitle}>Избери сметка</Text>
+              {accounts.map((account, index) => (
+                <View key={account.id}>
+                  <TouchableOpacity
+                    style={styles.accountRow}
+                    activeOpacity={0.7}
+                    onPress={() => { setAccount(account); setAccModal(false); }}>
+    
+                    <View style={[styles.accountIcon, { backgroundColor: COLOR_MAP[account.color.toLowerCase()] }]}>
+                      <Text style={styles.accountIconText}>{ICON_MAP2[account.icon.toLowerCase()]}</Text>
+                    </View>
+                    <Text style={styles.accountName}>{account.name}</Text>
+                  </TouchableOpacity>
+                  {index < accounts.length - 1 && <View style={styles.divider} />}
+                </View>
+              ))}
+            </ScrollView>
           </View>
         </Pressable>
       </Modal>
