@@ -52,6 +52,7 @@ build/
 *.ipynb
 
 ai/categorization/models/*
+!ai/categorization/models/.gitkeep
 *.pt
 *.pth
 *.bin
