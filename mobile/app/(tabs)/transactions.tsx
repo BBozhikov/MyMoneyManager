@@ -1,13 +1,20 @@
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Feather from '@expo/vector-icons/build/Feather';
+import FontAwesome from '@expo/vector-icons/build/FontAwesome';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import FontAwesome6 from '@expo/vector-icons/build/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Alert, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
+
+const baseUrl = 'http://192.168.0.6:8080';
 
 const BG     = '#3b6861';
 const CARD   = '#1e2d22';
@@ -17,63 +24,160 @@ const ACCENT = '#3ecf8e';
 const FAB    = '#f5a623';
 
 type TxType = 'all' | 'expense' | 'income';
-type SortKey = 'date_desc' | 'date_asc' | 'amount_desc' | 'amount_asc';
 
-const ACCOUNTS: {id: string; name: string; emoji: any}[]= [
-  { id: 'all', name: 'Всички сметки', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> },
-  { id: '1',   name: 'Кеш',          emoji: <FontAwesome name="money" size={24} color="white" /> },
-  { id: '2',   name: 'ДСК',          emoji: <AntDesign name="bank" size={24} color="white" /> },
-  { id: '3',   name: 'Revolut',      emoji: <FontAwesome name="credit-card" size={24} color="white" /> },
+interface AccountDTO {
+  id: number;
+  name: string;
+  icon: string;
+  color: string;
+  currentBalance: number;
+  main: boolean;
+}
+
+interface CategoryDTO {
+  id: number;
+  name: string;
+  type: 'EXPENSE' | 'INCOME';
+  icon: string;
+  color: string;
+  active: boolean;
+  default: boolean;
+}
+
+interface TransactionDTO {
+  id: number;
+  accountId: number;
+  accountName: string;
+  categoryId: number;
+  categoryName: string;
+  amount: number;
+  createdAt: string;
+  note: string | null;
+}
+
+const iconSize = 20;
+const CATEGORY_ICONS: { id: string; emoji: React.ReactNode }[] = [
+  { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={iconSize} color="white" /> },
+  { id: 'plane',      emoji: <FontAwesome name="plane" size={iconSize} color="white" /> },
+  { id: 'tag',        emoji: <AntDesign name="tag" size={iconSize} color="white" /> },
+  { id: 'pet',        emoji: <MaterialIcons name="pets" size={iconSize} color="white" /> },
+  { id: 'monitor',    emoji: <Feather name="monitor" size={iconSize} color="white" /> },
+  { id: 'pot',        emoji: <MaterialCommunityIcons name="pot-mix" size={iconSize} color="white" /> },
+  { id: 'shopping_cart', emoji: <AntDesign name="shopping-cart" size={iconSize} color="white" /> },
+  { id: 'brush',      emoji: <FontAwesome5 name="brush" size={iconSize} color="white" /> },
+  { id: 'washing_machine', emoji: <MaterialCommunityIcons name="washing-machine" size={iconSize} color="white" /> },
+  { id: 'tent',       emoji: <FontAwesome6 name="tent" size={iconSize} color="white" /> },
+  { id: 'controller', emoji: <Ionicons name="game-controller-sharp" size={iconSize} color="white" /> },
+  { id: 'car',        emoji: <AntDesign name="car" size={iconSize} color="white" /> },
+  { id: 'first_aid',  emoji: <FontAwesome5 name="first-aid" size={iconSize} color="white" /> },
+  { id: 'book',       emoji: <Feather name="book-open" size={iconSize} color="white" /> },
+  { id: 'tshirt',     emoji: <FontAwesome5 name="tshirt" size={iconSize} color="white" /> },
+  { id: 'shoe',       emoji: <MaterialCommunityIcons name="shoe-sneaker" size={iconSize} color="white" /> },
+  { id: 'food',       emoji: <MaterialCommunityIcons name="food-variant" size={iconSize} color="white" /> },
+  { id: 'restaurant', emoji: <Ionicons name="restaurant" size={iconSize} color="white" /> },
+  { id: 'cafe',       emoji: <Ionicons name="cafe" size={iconSize} color="white" /> },
+  { id: 'house',      emoji: <FontAwesome6 name="house-chimney" size={iconSize} color="white" /> },
+  { id: 'therapy',    emoji: <MaterialIcons name="local-pharmacy" size={iconSize} color="white" /> },
+  { id: 'education',  emoji: <FontAwesome name="graduation-cap" size={iconSize} color="white" /> },
+  { id: 'gift',       emoji: <Feather name="gift" size={iconSize} color="white" /> },
+  { id: 'cleaning',   emoji: <FontAwesome5 name="pump-soap" size={iconSize} color="white" /> },
+  { id: 'family',     emoji: <MaterialIcons name="family-restroom" size={iconSize} color="white" /> },
+  { id: 'sports',     emoji: <MaterialIcons name="sports-football" size={iconSize} color="white" /> },
+  { id: 'transport',  emoji: <MaterialIcons name="emoji-transportation" size={iconSize} color="white" /> },
+  { id: 'salary',     emoji: <MaterialCommunityIcons name="account-cash" size={iconSize} color="white" /> },
+  { id: 'loan',       emoji: <MaterialIcons name="account-balance" size={iconSize} color="white" /> },
+  { id: 'trade',      emoji: <FontAwesome name="handshake-o" size={iconSize} color="white" /> },
+  { id: 'others',     emoji: <AntDesign name="question" size={iconSize} color="white" /> },
 ];
+const CATEGORY_ICON_MAP: Record<string, React.ReactNode> = Object.fromEntries(CATEGORY_ICONS.map(i => [i.id, i.emoji]));
 
-const CATEGORIES: {id: string; name: string; emoji: any}[] = [
-  { id: 'all',          name: 'Всички категории', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> },
-  { id: 'food',         name: 'Храна',            emoji: <FontAwesome5 name="hamburger" size={24} color="white" /> },
-  { id: 'transport',    name: 'Транспорт',        emoji: <AntDesign name="car" size={24} color="white" /> },
-  { id: 'bills',        name: 'Сметки',           emoji: <AntDesign name="audit" size={24} color="white" /> },
-  { id: 'fun',          name: 'Развлечения',      emoji: <Ionicons name="game-controller-sharp" size={24} color="white" /> },
-  { id: 'health',       name: 'Здраве',           emoji: <FontAwesome5 name="pills" size={24} color="white" /> },
-  { id: 'home',         name: 'Жилище',           emoji: <FontAwesome5 name="house-user" size={24} color="white" /> },
-  { id: 'salary',       name: 'Заплата',          emoji: <FontAwesome6 name="sack-dollar" size={24} color="white" /> },
-  { id: 'freelance',    name: 'Freelance',        emoji: <AntDesign name="laptop" size={24} color="white" /> },
+const ACCOUNT_ICONS: { id: string; emoji: React.ReactNode }[] = [
+  { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
+  { id: 'bank',       emoji: <AntDesign name="bank" size={iconSize} color="white" /> },
+  { id: 'pound',      emoji: <AntDesign name="pound-circle" size={iconSize} color="white" /> },
+  { id: 'card',       emoji: <FontAwesome name="credit-card" size={iconSize} color="white" /> },
+  { id: 'wallet',     emoji: <FontAwesome5 name="wallet" size={iconSize} color="white" /> },
+  { id: 'savings',    emoji: <FontAwesome5 name="piggy-bank" size={iconSize} color="white" /> },
+  { id: 'paypal',     emoji: <FontAwesome name="paypal" size={iconSize} color="white" /> },
+  { id: 'safe',       emoji: <MaterialCommunityIcons name="safe" size={iconSize} color="white" /> },
+  { id: 'bitcoin',    emoji: <FontAwesome name="bitcoin" size={iconSize} color="white" /> },
+  { id: 'ethereum',   emoji: <FontAwesome5 name="ethereum" size={iconSize} color="white" /> },
+  { id: 'dollar',     emoji: <FontAwesome name="dollar" size={iconSize} color="white" /> },
+  { id: 'euro',       emoji: <FontAwesome name="euro" size={iconSize} color="white" /> },
+  { id: 'yen',        emoji: <FontAwesome name="yen" size={iconSize} color="white" /> },
+  { id: 'stocks',     emoji: <AntDesign name="stock" size={iconSize} color="white" /> },
+  { id: 'bag',        emoji: <FontAwesome6 name="sack-dollar" size={iconSize} color="white" /> },
+  { id: 'percent',    emoji: <FontAwesome5 name="percent" size={iconSize} color="white" /> },
+  { id: 'finance',    emoji: <MaterialCommunityIcons name="finance" size={iconSize} color="white" /> },
+  { id: 'diamond',    emoji: <FontAwesome name="diamond" size={iconSize} color="white" /> },
+  { id: 'gold',       emoji: <MaterialCommunityIcons name="gold" size={iconSize} color="white" /> },
+  { id: 'coins',      emoji: <FontAwesome5 name="coins" size={iconSize} color="white" /> },
 ];
-
-const PERIODS = ['Ден', 'Седмица', 'Месец', 'Година', 'Период'];
-
-const TRANSACTIONS = [
-  { id: '1',  accountId: '1', categoryId: 'food',      type: 'expense', description: 'Kaufland',          amount: -47.30,  date: new Date(2025, 3, 10) },
-  { id: '2',  accountId: '2', categoryId: 'transport', type: 'expense', description: 'Градски транспорт', amount: -3.00,   date: new Date(2025, 3, 10) },
-  { id: '3',  accountId: '3', categoryId: 'salary',    type: 'income',  description: 'Заплата Април',     amount: +2000,   date: new Date(2025, 3, 8)  },
-  { id: '4',  accountId: '1', categoryId: 'fun',       type: 'expense', description: 'Кино',              amount: -22.00,  date: new Date(2025, 3, 7)  },
-  { id: '5',  accountId: '2', categoryId: 'bills',     type: 'expense', description: 'Ток',               amount: -89.50,  date: new Date(2025, 3, 5)  },
-  { id: '6',  accountId: '1', categoryId: 'food',      type: 'expense', description: 'Лидл',              amount: -31.20,  date: new Date(2025, 3, 4)  },
-  { id: '7',  accountId: '3', categoryId: 'freelance', type: 'income',  description: 'Проект уебсайт',    amount: +450,    date: new Date(2025, 3, 2)  },
-  { id: '8',  accountId: '2', categoryId: 'health',    type: 'expense', description: 'Аптека',            amount: -18.70,  date: new Date(2025, 2, 30) },
-  { id: '9',  accountId: '1', categoryId: 'home',      type: 'expense', description: 'Наем',              amount: -550.00, date: new Date(2025, 2, 28) },
-  { id: '10', accountId: '3', categoryId: 'transport', type: 'expense', description: 'Гориво',            amount: -65.00,  date: new Date(2025, 2, 25) },
+const ACCOUNT_ICON_MAP: Record<string, React.ReactNode> = Object.fromEntries(ACCOUNT_ICONS.map(i => [i.id, i.emoji]));
+const COLORS: { id: string; color: string }[] = [
+  { id: 'amber', color: '#f5a623' },
+  { id: 'cyan', color: '#00d4ff' },
+  { id: 'pink', color: '#e91e8c' },
+  { id: 'orange', color: '#ff7043' },
+  { id: 'dark_green', color: '#4a7c6f' },
+  { id: 'light_green', color: '#34c759' },
+  { id: 'red', color: '#ff3b30' },
+  { id: 'purple', color: '#5856d6' },
+  { id: 'yellow', color: '#ffcc00' },
+  { id: 'blue', color: '#007aff' },
 ];
+const COLOR_MAP: Record<string, string> = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
 
-function formatAmount(n: number) {
-  const sign = n >= 0 ? '+ ' : '- ';
+const PERIODS = ['Ден', 'Седмица', 'Месец', 'Година', 'Винаги'];
+
+function getDateRange(period: string): { startDate?: string; endDate?: string } {
+  const today = new Date();
+  const fmt = (d: Date) => d.toISOString().split('T')[0];
+
+  if (period === 'Ден') {
+    const s = fmt(today);
+    return { startDate: s, endDate: s };
+  }
+  if (period === 'Седмица') {
+    const day = today.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    const start = new Date(today);
+    start.setDate(today.getDate() - diff);
+    return { startDate: fmt(start), endDate: fmt(today) };
+  }
+  if (period === 'Месец') {
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    return { startDate: fmt(start), endDate: fmt(today) };
+  }
+  if (period === 'Година') {
+    const start = new Date(today.getFullYear(), 0, 1);
+    return { startDate: fmt(start), endDate: fmt(today) };
+  }
+  return {};
+}
+
+function formatAmount(n: number, isExpense: boolean) {
+  const sign = isExpense ? '- ' : '+ ';
   return sign + Math.abs(n).toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 }
 
-function formatDateHeader(d: Date) {
+function formatDateHeader(dateStr: string) {
+  const parts = dateStr.split('-');
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
   return d.toLocaleDateString('bg-BG', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function groupByDate(txs: typeof TRANSACTIONS) {
-  const map = new Map<string, typeof TRANSACTIONS>();
+function groupByDate(txs: TransactionDTO[], categories: Map<number, CategoryDTO>) {
+  const map = new Map<string, TransactionDTO[]>();
   for (const t of txs) {
-    const key = t.date.toDateString();
+    const key = t.createdAt;
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(t);
   }
   return Array.from(map.entries())
-    .sort((a, b) => new Date(b[0]).getTime() - new Date(a[0]).getTime())
-    .map(([key, items]) => ({ date: new Date(key), items }));
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([date, items]) => ({ date, items }));
 }
-
 
 function PickerModal({
   visible,
@@ -85,7 +189,7 @@ function PickerModal({
 }: {
   visible: boolean;
   title: string;
-  items: { id: string; name: string; emoji: string }[];
+  items: { id: string; name: string; emoji: React.ReactNode; color?: string }[];
   selected: string;
   onSelect: (id: string) => void;
   onClose: () => void;
@@ -94,26 +198,28 @@ function PickerModal({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={onClose}>
         <TouchableOpacity activeOpacity={1} style={styles.modalSheet}>
-          <View style={styles.modalHandle} />
-          <Text style={styles.modalTitle}>{title}</Text>
-          {items.map((item, index) => (
-            <View key={item.id}>
-              <TouchableOpacity
-                style={styles.accountRow}
-                onPress={() => { onSelect(item.id); onClose(); }}
-                activeOpacity={0.75}
-              >
-                <View style={[styles.accountIcon, { backgroundColor: 'rgba(255,255,255,0.08)' }]}>
-                  <Text style={styles.accountEmoji}>{item.emoji}</Text>
-                </View>
-                <Text style={styles.accountName}>{item.name}</Text>
-                {selected === item.id && (
-                  <Text style={[styles.checkmark, { color: ACCENT }]}>✓</Text>
-                )}
-              </TouchableOpacity>
-              {index < items.length - 1 && <View style={styles.modalDivider} />}
-            </View>
-          ))}
+          <ScrollView>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>{title}</Text>
+            {items.map((item, index) => (
+              <View key={item.id}>
+                <TouchableOpacity
+                  style={styles.accountRow}
+                  onPress={() => { onSelect(item.id); onClose(); }}
+                  activeOpacity={0.75}
+                >
+                  <View style={[styles.accountIcon, { backgroundColor: item.color ? item.color : 'rgba(255,255,255,0.08)' }]}>
+                    <Text style={styles.accountEmoji}>{item.emoji}</Text>
+                  </View>
+                  <Text style={styles.accountName}>{item.name}</Text>
+                  {selected === item.id && (
+                    <Text style={[styles.checkmark, { color: ACCENT }]}>✓</Text>
+                  )}
+                </TouchableOpacity>
+                {index < items.length - 1 && <View style={styles.modalDivider} />}
+              </View>
+            ))}
+          </ScrollView>
         </TouchableOpacity>
       </TouchableOpacity>
     </Modal>
@@ -128,29 +234,117 @@ export default function TransactionsScreen() {
   const [search,          setSearch]          = useState('');
   const [selectedAccount, setSelectedAccount] = useState('all');
   const [selectedCat,     setSelectedCat]     = useState('all');
-  const [sort,            setSort]            = useState<SortKey>('date_desc');
   const [accountModal,    setAccountModal]    = useState(false);
   const [catModal,        setCatModal]        = useState(false);
-  const [sortModal,       setSortModal]       = useState(false);
 
-  const activeAccount  = ACCOUNTS.find(a => a.id === selectedAccount)!;
-  const activeCategory = CATEGORIES.find(c => c.id === selectedCat)!;
+  const [accounts,     setAccounts]     = useState<AccountDTO[]>([]);
+  const [categories,   setCategories]   = useState<CategoryDTO[]>([]);
+  const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
+  const [loading,      setLoading]      = useState(false);
 
-  let filtered = TRANSACTIONS
-    .filter(t => selectedAccount === 'all' || t.accountId === selectedAccount)
-    .filter(t => selectedCat     === 'all' || t.categoryId === selectedCat)
-    .filter(t => txType          === 'all' || (txType === 'expense' ? t.amount < 0 : t.amount > 0))
-    .filter(t => search.trim() === '' || t.description.toLowerCase().includes(search.toLowerCase()));
+  const categoryMap = new Map(categories.map(c => [c.id, c]));
 
-  filtered = [...filtered].sort((a, b) => {
-    if (sort === 'date_desc')   return b.date.getTime() - a.date.getTime();
-    if (sort === 'date_asc')    return a.date.getTime() - b.date.getTime();
-    if (sort === 'amount_desc') return Math.abs(b.amount) - Math.abs(a.amount);
-    return Math.abs(a.amount) - Math.abs(b.amount);
-  });
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
 
-  const groups = groupByDate(filtered);
-  const catEntry = CATEGORIES.find(c => c.id === selectedCat)!;
+      const headers = { Authorization: `Bearer ${token}` };
+
+      const [accRes, catRes] = await Promise.all([
+        axios.get(`${baseUrl}/api/accounts`, { headers }),
+        axios.get(`${baseUrl}/api/categories`, { headers }),
+      ]);
+
+      setAccounts(accRes.data);
+      setCategories(catRes.data);
+
+      await fetchTransactions(token);
+    } catch (error: any) {
+      console.log('Fetch error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на данните.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTransactions = async (token?: string) => {
+    try {
+      if (!token) {
+        token = await requireAuth() ?? undefined;
+        if (!token) return;
+      }
+
+      const params: Record<string, string> = {};
+
+      if (selectedAccount !== 'all') {
+        params.accountId = selectedAccount;
+      }
+      if (selectedCat !== 'all') {
+        params.categoryId = selectedCat;
+      } else if (txType !== 'all') {
+        params.type = txType === 'expense' ? 'EXPENSE' : 'INCOME';
+      }
+
+      const { startDate, endDate } = getDateRange(period);
+      if (startDate) params.startDate = startDate;
+      if (endDate) params.endDate = endDate;
+
+      if (search.trim()) {
+        params.note = search.trim();
+      }
+
+      const res = await axios.get(`${baseUrl}/api/transactions`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params,
+      });
+
+      setTransactions(res.data);
+    } catch (error: any) {
+      console.log('Transactions error:', error?.response?.data || error.message);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  React.useEffect(() => {
+    fetchTransactions();
+  }, [selectedAccount, selectedCat, txType, period, search]);
+
+  const accountPickerItems = [
+    { id: 'all', name: 'Всички сметки', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> as React.ReactNode },
+    ...accounts.map(a => ({
+      id: String(a.id),
+      name: a.name,
+      emoji: (ACCOUNT_ICON_MAP[a.icon.toLowerCase()] ?? <FontAwesome5 name="wallet" size={24} color="white" />) as React.ReactNode,
+      color: COLOR_MAP[a.color?.toLowerCase()] ?? undefined,
+    })),
+  ];
+
+  const categoryPickerItems = [
+    { id: 'all', name: 'Всички категории', emoji: <FontAwesome5 name="clipboard" size={24} color="white" /> as React.ReactNode },
+    ...categories.filter(c => {
+        if (!c.active) return false;
+        if (txType === 'expense') return c.type === 'EXPENSE';
+        if (txType === 'income')  return c.type === 'INCOME';
+        return true;
+      }).map(c => ({
+      id: String(c.id),
+      name: c.name,
+      emoji: (CATEGORY_ICON_MAP[c.icon.toLowerCase()] ?? <AntDesign name="question" size={24} color="white" />) as React.ReactNode,
+      color: COLOR_MAP[c.color?.toLowerCase()] ?? undefined,
+    })),
+  ];
+
+  const activeAccount  = accountPickerItems.find(a => a.id === selectedAccount);
+  const activeCategory = categoryPickerItems.find(c => c.id === selectedCat);
+
+  const groups = groupByDate(transactions, categoryMap);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -164,7 +358,7 @@ export default function TransactionsScreen() {
           onPress={() => setAccountModal(true)}
           activeOpacity={0.75}
         >
-          <Text style={styles.accountPickerEmoji}>{activeAccount.emoji}</Text>
+          <Text style={styles.accountPickerEmoji}>{activeAccount?.emoji}</Text>
         </TouchableOpacity>
       </View>
 
@@ -194,9 +388,9 @@ export default function TransactionsScreen() {
             onPress={() => setCatModal(true)}
             activeOpacity={0.75}
           >
-            <Text style={styles.comboEmoji}>{activeCategory.emoji}</Text>
+            <Text style={styles.comboEmoji}>{activeCategory?.emoji}</Text>
             <Text style={styles.comboText} numberOfLines={1}>
-              {selectedCat === 'all' ? 'Категория' : activeCategory.name}
+              {selectedCat === 'all' ? 'Категория' : activeCategory?.name}
             </Text>
             <Text style={styles.comboChevron}>⌄</Text>
           </TouchableOpacity>
@@ -213,11 +407,15 @@ export default function TransactionsScreen() {
                     : 'rgba(255,255,255,0.12)',
                   borderRadius: 8,
                 }]}
-                onPress={() => setTxType(t)}
+                onPress={() => {
+                  setTxType(t);
+                  setSelectedCat('all');
+                }}
                 activeOpacity={0.75}
               >
                 <Text style={[styles.typeBtnText, txType === t && styles.typeBtnTextActive]}>
-                  {t === 'all' ? '∞' : t === 'expense' ? '↓' : '↑'}
+                  {t === 'all' ? <FontAwesome6 name="infinity" size={12} color="white" /> : t === 'expense' 
+                  ? <FontAwesome6 name="arrow-down" size={12} color="white" /> : <FontAwesome6 name="arrow-up" size={12} color="white" />}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -228,7 +426,7 @@ export default function TransactionsScreen() {
           <Text style={styles.searchIcon}><Entypo name="magnifying-glass" size={24} color="white" /></Text>
           <TextInput
             style={styles.searchInput}
-            placeholder="Търси транзакция…"
+            placeholder="Търси транзакция по бележка..."
             placeholderTextColor={MUTED}
             value={search}
             onChangeText={setSearch}
@@ -240,53 +438,60 @@ export default function TransactionsScreen() {
           )}
         </View>
 
-        <ScrollView
-          style={styles.listScroll}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {groups.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyIcon}>📭</Text>
-              <Text style={styles.emptyText}>Няма транзакции</Text>
-            </View>
-          ) : (
-            groups.map(group => (
-              <View key={group.date.toDateString()} style={styles.group}>
-                <Text style={styles.dateHeader}>{formatDateHeader(group.date)}</Text>
-                {group.items.map(tx => {
-                  const cat = CATEGORIES.find(c => c.id === tx.categoryId)!;
-                  return (
-                    <TouchableOpacity key={tx.id} style={styles.txRow} activeOpacity={0.75} 
-                    onPress={() => router.replace({
-                      pathname: `/(tabs)/view-transaction`,
-                      params: {
-                        id: tx.id,
-                        accountId: tx.accountId,
-                        amount: tx.amount,
-                        description: tx.description,
-                        categoryId: tx.categoryId,          // добави това
-                        date: tx.date.toISOString(),        // добави това
-                      }
-                    })}>
-
-                      <View style={styles.txIconWrap}>
-                        <Text style={{ fontSize: 20 }}>{cat?.emoji ?? '💸'}</Text>
-                      </View>
-                      <View style={styles.txInfo}>
-                        <Text style={styles.txName}>{tx.description}</Text>
-                        <Text style={styles.txMeta}>{cat?.name} · {ACCOUNTS.find(a => a.id === tx.accountId)?.name}</Text>
-                      </View>
-                      <Text style={[styles.txAmount, { color: tx.amount >= 0 ? ACCENT : '#ff3b30' }]}>
-                        {formatAmount(tx.amount)}
-                      </Text>
-                    </TouchableOpacity>
-                  );
-                })}
+        {loading ? (
+          <ActivityIndicator size="large" color={ACCENT} style={{ marginTop: 40 }} />
+        ) : (
+          <ScrollView
+            style={styles.listScroll}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {groups.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyIcon}><AntDesign name="dropbox" size={48} color="white" /></Text>
+                <Text style={styles.emptyText}>Няма транзакции</Text>
               </View>
-            ))
-          )}
-        </ScrollView>
+            ) : (
+              groups.map(group => (
+                <View key={group.date} style={styles.group}>
+                  <Text style={styles.dateHeader}>{formatDateHeader(group.date)}</Text>
+                  {group.items.map(tx => {
+                    const cat = categoryMap.get(tx.categoryId);
+                    const catIcon = cat ? CATEGORY_ICON_MAP[cat.icon.toLowerCase()] : null;
+                    const catColor = cat ? COLOR_MAP[cat.color.toLowerCase()] : '#888';
+                    const isExpense = cat ? cat.type === 'EXPENSE' : tx.amount < 0;
+
+                    return (
+                      <TouchableOpacity key={tx.id} style={styles.txRow} activeOpacity={0.75}
+                        onPress={() => router.replace({
+                          pathname: '/(tabs)/view-transaction',
+                          params: {
+                            id: String(tx.id),
+                            accountId: String(tx.accountId),
+                            amount: String(isExpense ? -tx.amount : tx.amount),
+                            description: tx.note ?? '',
+                            categoryId: String(tx.categoryId),
+                            date: tx.createdAt,
+                          }
+                        })}>
+                        <View style={[styles.txIconWrap, { backgroundColor: catColor }]}>
+                          <Text style={{ fontSize: 20 }}>{catIcon ?? <AntDesign name="question" size={20} color="white" />}</Text>
+                        </View>
+                        <View style={styles.txInfo}>
+                          <Text style={styles.txName}>{tx.note || tx.categoryName}</Text>
+                          <Text style={styles.txMeta}>{tx.categoryName} · {tx.accountName}</Text>
+                        </View>
+                        <Text style={[styles.txAmount, { color: isExpense ? '#ff3b30' : ACCENT }]}>
+                          {formatAmount(tx.amount, isExpense)}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ))
+            )}
+          </ScrollView>
+        )}
       </View>
 
       <TouchableOpacity style={styles.fab} onPress={() => router.push('/(tabs)/add-transaction')} activeOpacity={0.85}>
@@ -296,7 +501,7 @@ export default function TransactionsScreen() {
       <PickerModal
         visible={accountModal}
         title="Изберете сметка"
-        items={ACCOUNTS}
+        items={accountPickerItems}
         selected={selectedAccount}
         onSelect={setSelectedAccount}
         onClose={() => setAccountModal(false)}
@@ -304,7 +509,7 @@ export default function TransactionsScreen() {
       <PickerModal
         visible={catModal}
         title="Изберете категория"
-        items={CATEGORIES}
+        items={categoryPickerItems}
         selected={selectedCat}
         onSelect={setSelectedCat}
         onClose={() => setCatModal(false)}
@@ -346,10 +551,6 @@ const styles = StyleSheet.create({
   typeBtnText:     { color: MUTED, fontSize: 14, fontWeight: '700' },
   typeBtnTextActive: { color: WHITE },
 
-  sortBtn: {width: 40, height: 40, backgroundColor: 'rgba(255,255,255,0.07)',borderRadius: 10, alignItems: 'center', 
-    justifyContent: 'center',borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',},
-  sortIcon: { color: WHITE, fontSize: 18 },
-
   searchRow: {flexDirection: 'row', alignItems: 'center',marginHorizontal: 16, marginBottom: 8,backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: 10, paddingHorizontal: 12,borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', gap: 8,},
   searchIcon:  { fontSize: 13 },
@@ -363,7 +564,7 @@ const styles = StyleSheet.create({
   dateHeader: { color: MUTED, fontSize: 13, fontWeight: '500', paddingVertical: 6 },
 
   txRow: {flexDirection: 'row', alignItems: 'center', gap: 12,paddingVertical: 12, paddingHorizontal: 4,},
-  txIconWrap: {width: 40, height: 40, borderRadius: 20,backgroundColor: 'rgba(255,255,255,0.07)',alignItems: 'center', justifyContent: 'center',},
+  txIconWrap: {width: 40, height: 40, borderRadius: 20,alignItems: 'center', justifyContent: 'center',},
   txInfo:   { flex: 1 },
   txName:   { color: WHITE, fontSize: 15, fontWeight: '600' },
   txMeta:   { color: MUTED, fontSize: 12, marginTop: 2 },
@@ -373,7 +574,7 @@ const styles = StyleSheet.create({
   emptyIcon:  { fontSize: 40 },
   emptyText:  { color: MUTED, fontSize: 16 },
 
-  fab: {position: 'absolute', bottom: 28, alignSelf: 'center',width: 60, height: 60, borderRadius: 30,backgroundColor: FAB, alignItems: 'center', 
+  fab: {position: 'absolute', bottom: 28, alignSelf: 'center',width: 60, height: 60, borderRadius: 30,backgroundColor: FAB, alignItems: 'center',
     justifyContent: 'center',shadowColor: FAB, shadowOffset: { width: 0, height: 4 },shadowOpacity: 0.4, shadowRadius: 10, elevation: 8,
   },
   fabIcon: { color: WHITE, fontSize: 28, fontWeight: '300', lineHeight: 32 },
@@ -388,4 +589,4 @@ const styles = StyleSheet.create({
   accountName:  { flex: 1, color: WHITE, fontSize: 16, fontWeight: '500' },
   checkmark:    { fontSize: 20, fontWeight: '700' },
   modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
-}); 
+});
