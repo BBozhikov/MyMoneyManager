@@ -116,7 +116,7 @@ function formatAmount(n: number) {
   const sign = n >= 0 ? '+ ' : '- ';
   return sign + Math.abs(n).toLocaleString('bg-BG', {
     minimumFractionDigits: 2, maximumFractionDigits: 2,
-  }) + ' лв';
+  }) + ' €';
 }
 
 function formatDate(dateStr: string) {
@@ -224,7 +224,7 @@ export default function TransactionDetailsScreen() {
   }
   const handleEdit = () => {
     router.push({
-      pathname: '/(tabs)/add-transaction',
+      pathname: '/(tabs)/edit-transaction',
       params: {
       id: String(id),
       accountId: String(accountId),
@@ -305,7 +305,7 @@ export default function TransactionDetailsScreen() {
           </>
         ) : null}
 
-        <TouchableOpacity onPress={handleDelete} activeOpacity={0.7} style={styles.editBtn}>
+        <TouchableOpacity onPress={handleEdit} activeOpacity={0.7} style={styles.editBtn}>
           <Text style={styles.editBtnText}>РЕДАКТИРАЙ</Text>
         </TouchableOpacity>
 
