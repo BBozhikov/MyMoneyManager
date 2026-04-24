@@ -11,7 +11,6 @@ const API_BASE_URL = 'http://192.168.0.6:8080';
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -39,12 +38,9 @@ export default function LoginScreen() {
 
       console.log('Login response:', data);
       console.log('JWT accessToken:', data.accessToken);
-      console.log('Remember me: ', rememberMe);
   
-      if (rememberMe) {
-        await AsyncStorage.setItem('accessToken', data.accessToken);
-        await AsyncStorage.setItem('refreshToken', data.refreshToken);
-      }
+      await AsyncStorage.setItem('accessToken', data.accessToken);
+      await AsyncStorage.setItem('refreshToken', data.refreshToken);
       await AsyncStorage.setItem('fullName', data.fullName);
       await AsyncStorage.setItem('email', data.email);
 
@@ -92,17 +88,6 @@ export default function LoginScreen() {
 
       <View style={styles.row}>
         <TouchableOpacity
-          style={styles.checkboxRow}
-          activeOpacity={0.7}
-          onPress={() => setRememberMe(!rememberMe)}
-        >
-          <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-            {rememberMe && <Text style={styles.checkmark}>✓</Text>}
-          </View>
-          <Text style={styles.rememberText}>Запомни ме</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => router.push('/(auth)/forgot-password')}
         >
@@ -130,9 +115,7 @@ const styles = StyleSheet.create({
   checkboxRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   checkbox: { width: 20, height: 20, borderWidth: 2, borderColor: '#ccc', borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
   checkboxChecked: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
-  checkmark: { color: 'white', fontSize: 13, fontWeight: 'bold', lineHeight: 16 },
-  rememberText: { color: 'white', fontSize: 14 },
-  forgotText: { color: '#007AFF', fontSize: 14 },
+  forgotText: { color: '#007AFF', fontSize: 14},
   button: { backgroundColor: '#007AFF', borderRadius: 8, padding: 14, alignItems: 'center', marginBottom: 16 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   link: { color: '#007AFF', textAlign: 'center', fontSize: 14 },
