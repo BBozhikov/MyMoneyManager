@@ -1,7 +1,7 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import { useState, useRef } from 'react';
-import { Alert, Button, StyleSheet, Text, TouchableOpacity, View, Image, Switch } from 'react-native';
+import { Alert, Button, StyleSheet, Text, TouchableOpacity, View, Image, Switch, ActivityIndicator } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import * as Sharing from 'expo-sharing';
@@ -56,52 +56,61 @@ export default function App() {
   }
 
   async function sendToBackend() {
-    if (!capturedPhoto) return;
-    setLoading(true);
+  if (!capturedPhoto) return;
+  setLoading(true);
 
-    const formData = new FormData();
-    formData.append('file', {
-      uri: capturedPhoto,
-      name: 'receipt.jpg',
-      type: 'image/jpeg',
-    } as any);
+  const formData = new FormData();
+  formData.append('file', {
+    uri: capturedPhoto,
+    name: 'receipt.jpg',
+    type: 'image/jpeg',
+  } as any);
 
-    try {
-      const response = await fetch(
-        `${API_ENDPOINTS.parseReceipt}?categorize=${categorizing}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'multipart/form-data' },
-          body: formData,
-        }
-      );
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
-      if (!response.ok) {
-        const err = await response.text();
-        Alert.alert('Грешка от сървъра', err);
-        return;
+    const response = await fetch(
+      `${API_ENDPOINTS.parseReceipt}?categorize=${categorizing}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/form-data' },
+        body: formData,
+        signal: controller.signal,
       }
+    );
+    clearTimeout(timeout);
 
-      const result = await response.json();
-
-      router.push({
-        pathname: '/(tabs)/add-transaction',
-        params: {
-          store: result.store_name ?? '',
-          date: result.date ?? '',
-          total: result.total ?? '',
-          total_euro: result.total_euro ?? '',
-          items: JSON.stringify(result.items),
-        },
-      });
-
-    } catch (error) {
-      Alert.alert('Грешка при изпращане', 'Провери връзката с сървъра');
-    } finally {
-      setLoading(false);
-      setCapturedPhoto(null);
+    if (!response.ok) {
+      const err = await response.text();
+      Alert.alert('Грешка от сървъра', err);
+      return;
     }
+
+    const result = await response.json();
+
+    router.push({
+      pathname: '/(tabs)/add-transaction',
+      params: {
+        store: result.store_name ?? '',
+        date: result.date ?? '',
+        total: result.total ?? '',
+        total_euro: result.total_euro ?? '',
+        items: JSON.stringify(result.items),
+      },
+    });
+
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      Alert.alert('Timeout', 'Сървърът не отговори навреме');
+    } else {
+      Alert.alert('Грешка при изпращане', error.message ?? 'Провери връзката с сървъра');
+    }
+  } finally {
+    setLoading(false);
+    setCapturedPhoto(null);
   }
+}
 
   if (capturedPhoto) {
     return (
@@ -153,6 +162,12 @@ export default function App() {
         </TouchableOpacity>
         <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={toggleCameraFacing}>
           <Text style={styles.fabIcon}><MaterialCommunityIcons name="camera-flip" size={24} color="white" /></Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.fab} onPress={sendToBackend} disabled={loading}>
+          {loading
+            ? <ActivityIndicator color="white" size="small" />
+            : <MaterialCommunityIcons name="upload" size={24} color="white" />
+          }
         </TouchableOpacity>
       </View>
     </View>
