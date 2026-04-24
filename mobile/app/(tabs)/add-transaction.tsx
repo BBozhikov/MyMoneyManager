@@ -136,6 +136,7 @@ export default function AddTransactionScreen() {
       setAmount('');  
       setCategory(null);
       setAccount(null);
+      setNote('');
   };
   const fetchCategories = async () => {
     try {

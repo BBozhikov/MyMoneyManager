@@ -260,7 +260,7 @@ export default function TransactionsScreen() {
       setAccounts(accRes.data);
       setCategories(catRes.data);
 
-      await fetchTransactions(token);
+      await fetchTransactions(token, 'Месец');
     } catch (error: any) {
       console.log('Fetch error:', error?.response?.data || error.message);
       Alert.alert('Грешка', 'Неуспешно зареждане на данните.');
@@ -269,7 +269,7 @@ export default function TransactionsScreen() {
     }
   };
 
-  const fetchTransactions = async (token?: string) => {
+  const fetchTransactions = async (token?: string, overridePeriod?: string) => {
     try {
       if (!token) {
         token = await requireAuth() ?? undefined;
@@ -287,7 +287,7 @@ export default function TransactionsScreen() {
         params.type = txType === 'expense' ? 'EXPENSE' : 'INCOME';
       }
 
-      const { startDate, endDate } = getDateRange(period);
+      const { startDate, endDate } = getDateRange(overridePeriod ?? period);
       if (startDate) params.startDate = startDate;
       if (endDate) params.endDate = endDate;
 
@@ -308,6 +308,12 @@ export default function TransactionsScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      setPeriod('Месец');
+      setTxType('all');
+      setSearch('');
+      setSelectedAccount('all');
+      setSelectedCat('all');
+
       fetchData();
     }, [])
   );
