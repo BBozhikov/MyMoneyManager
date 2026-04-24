@@ -1,0 +1,97 @@
+# ══════════════════════════════════════════════
+# EXPO / REACT NATIVE (Mobile/)
+# ══════════════════════════════════════════════
+node_modules/
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.tsbuildinfo
+app-example
+/Mobile/ios
+/Mobile/android
+
+# ══════════════════════════════════════════════
+# PYTHON (AI/)
+# ══════════════════════════════════════════════
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.env/
+.env
+env.properties
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+*.egg-info/
+*.egg
+build/
+*.whl
+
+.ipynb_checkpoints/
+*.ipynb
+
+ai/categorization/models/*
+!ai/categorization/models/.gitkeep
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.onnx
+
+# ══════════════════════════════════════════════
+# JAVA / SPRING BOOT (Server/)
+# ══════════════════════════════════════════════
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
