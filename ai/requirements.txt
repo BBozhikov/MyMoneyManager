@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+python-multipart
+
+opencv-python
+Pillow
+numpy
+
+requests
+pytesseract
+torch
+transformers
+
+python-dotenv
+pydantic
