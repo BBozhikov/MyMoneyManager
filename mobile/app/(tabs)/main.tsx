@@ -1,28 +1,121 @@
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { PieChart } from 'react-native-gifted-charts';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { requireAuth } from '@/utils/auth';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-const data = [
-  //{ value: 500, color: '#007AFF', text: 'Храна', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  //{ value: 300, color: '#34C759', text: 'Транспорт', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  //{ value: 200, color: '#FF9500', text: 'Развлечения', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-  //{ value: 150, color: '#FF3B30', text: 'Сметки', type: 'разход', strokeWidth: 2, strokeColor: '#3b6861' },
-
-  { value: 2000, color: '#5AC8FA', text: 'Заплата', type: 'приход', strokeWidth: 2, strokeColor: '#3b6861' },
-  { value: 400, color: '#BF5AF2', text: 'Freelance', type: 'приход', strokeWidth: 2, strokeColor: '#3b6861' },
-  { value: 150, color: '#FFD60A', text: 'Дивиденти', type: 'приход', strokeWidth: 2, strokeColor: '#3b6861' },
+const COLORS: { id: string; color: string }[] = [
+  { id: 'amber', color: '#f5a623' },
+  { id: 'cyan', color: '#00d4ff' },
+  { id: 'pink', color: '#e91e8c' },
+  { id: 'orange', color: '#ff7043' },
+  { id: 'dark_green', color: '#4a7c6f' },
+  { id: 'light_green', color: '#34c759' },
+  { id: 'red', color: '#ff3b30' },
+  { id: 'purple', color: '#5856d6' },
+  { id: 'yellow', color: '#ffcc00' },
+  { id: 'blue', color: '#007aff' },
 ];
+const COLOR_MAP: Record<string, string> = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
+const iconSize = 20;
+const CATEGORY_ICONS: { id: string; emoji: React.ReactNode }[] = [
+  { id: 'receipt',    emoji: <FontAwesome5 name="receipt" size={iconSize} color="white" /> },
+  { id: 'plane',      emoji: <FontAwesome name="plane" size={iconSize} color="white" /> },
+  { id: 'tag',        emoji: <AntDesign name="tag" size={iconSize} color="white" /> },
+  { id: 'pet',        emoji: <MaterialIcons name="pets" size={iconSize} color="white" /> },
+  { id: 'monitor',    emoji: <Feather name="monitor" size={iconSize} color="white" /> },
+  { id: 'pot',        emoji: <MaterialCommunityIcons name="pot-mix" size={iconSize} color="white" /> },
+  { id: 'shopping_cart', emoji: <AntDesign name="shopping-cart" size={iconSize} color="white" /> },
+  { id: 'brush',      emoji: <FontAwesome5 name="brush" size={iconSize} color="white" /> },
+  { id: 'washing_machine', emoji: <MaterialCommunityIcons name="washing-machine" size={iconSize} color="white" /> },
+  { id: 'tent',       emoji: <FontAwesome6 name="tent" size={iconSize} color="white" /> },
+  { id: 'controller', emoji: <Ionicons name="game-controller-sharp" size={iconSize} color="white" /> },
+  { id: 'car',        emoji: <AntDesign name="car" size={iconSize} color="white" /> },
+  { id: 'first_aid',  emoji: <FontAwesome5 name="first-aid" size={iconSize} color="white" /> },
+  { id: 'book',       emoji: <Feather name="book-open" size={iconSize} color="white" /> },
+  { id: 'tshirt',     emoji: <FontAwesome5 name="tshirt" size={iconSize} color="white" /> },
+  { id: 'shoe',       emoji: <MaterialCommunityIcons name="shoe-sneaker" size={iconSize} color="white" /> },
+  { id: 'food',       emoji: <MaterialCommunityIcons name="food-variant" size={iconSize} color="white" /> },
+  { id: 'restaurant', emoji: <Ionicons name="restaurant" size={iconSize} color="white" /> },
+  { id: 'cafe',       emoji: <Ionicons name="cafe" size={iconSize} color="white" /> },
+  { id: 'house',      emoji: <FontAwesome6 name="house-chimney" size={iconSize} color="white" /> },
+  { id: 'therapy',    emoji: <MaterialIcons name="local-pharmacy" size={iconSize} color="white" /> },
+  { id: 'education',  emoji: <FontAwesome name="graduation-cap" size={iconSize} color="white" /> },
+  { id: 'gift',       emoji: <Feather name="gift" size={iconSize} color="white" /> },
+  { id: 'cleaning',   emoji: <FontAwesome5 name="pump-soap" size={iconSize} color="white" /> },
+  { id: 'family',     emoji: <MaterialIcons name="family-restroom" size={iconSize} color="white" /> },
+  { id: 'sports',     emoji: <MaterialIcons name="sports-football" size={iconSize} color="white" /> },
+  { id: 'transport',  emoji: <MaterialIcons name="emoji-transportation" size={iconSize} color="white" /> },
+  { id: 'salary',     emoji: <MaterialCommunityIcons name="account-cash" size={iconSize} color="white" /> },
+  { id: 'loan',       emoji: <MaterialIcons name="account-balance" size={iconSize} color="white" /> },
+  { id: 'trade',      emoji: <FontAwesome name="handshake-o" size={iconSize} color="white" /> },
+  { id: 'others',     emoji: <AntDesign name="question" size={iconSize} color="white" /> },
+];
+const CATEGORY_ICON_MAP: Record<string, React.ReactNode> = Object.fromEntries(CATEGORY_ICONS.map(i => [i.id, i.emoji]));
+const baseUrl = 'http://192.168.0.6:8080';
+type CategoryType = 'INCOME' | 'EXPENSE';
+
+interface CategoryStatisticsResponse {
+  categoryName: string;
+  type: CategoryType;
+  icon: string;
+  color: string;
+  totalAmount: number;
+}
+
+function mapToChartItem(item: CategoryStatisticsResponse) {
+  return {
+    value: item.totalAmount,
+    color: COLOR_MAP[item.color.toLowerCase()] ?? '#888888',
+    icon: CATEGORY_ICON_MAP[item.icon.toLowerCase()] ?? '',
+    text: item.categoryName,
+    type: item.type === 'INCOME' ? 'приход' : 'разход',
+    strokeWidth: 2,
+    strokeColor: '#3b6861',
+  };
+}
 
 export default function MainScreen() {
-  useRequireAuth();
   const router = useRouter();
   const [activeType, setActiveType] = useState<'приход' | 'разход'>('разход');
 
-  const filtered = data.filter(item => item.type === activeType);
+  const [chartData, setChartData] = useState<ReturnType<typeof mapToChartItem>[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchStatistics = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+      
+      const response = await axios.get<CategoryStatisticsResponse[]>(
+        `${baseUrl}/api/transactions/statistics`, {
+          headers: { Authorization: `Bearer ${token}` } 
+        });
+      setChartData(response.data.map(mapToChartItem));
+    } catch (error) {
+      console.error('Failed to fetch statistics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchStatistics();
+    }, [])
+  );
+  const filtered = chartData.filter(item => item.type === activeType);
   const total = filtered.reduce((sum, item) => sum + item.value, 0);
 
   return (
@@ -86,6 +179,16 @@ export default function MainScreen() {
             <Text style={styles.secondaryButtonIcon}><AntDesign name="menu" size={24} color="cyan" /></Text>
             <Text style={styles.secondaryButtonText}>История на транзакциите</Text>
           </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => router.push('/(tabs)/transactions')}
+          >
+            <Text style={styles.secondaryButtonIcon}><AntDesign name="clock-circle" size={24} color="yellow" /></Text>
+            <Text style={styles.secondaryButtonText}>Чакащи транзакции</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.legendCard}>
@@ -94,7 +197,9 @@ export default function MainScreen() {
           </Text>
           {filtered.map((item, index) => (
             <View key={index} style={styles.legendRow}>
-              <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+              <View style={[styles.legendDot, { backgroundColor: item.color }]}>
+                <Text style={styles.legendIcon}>{item.icon}</Text>
+              </View>
               <Text style={styles.legendText}>{item.text}</Text>
               <Text style={styles.legendValue}>{item.value} €</Text>
               <Text style={styles.legendPercent}>
@@ -133,8 +238,10 @@ const styles = StyleSheet.create({
   legendCard: {backgroundColor: 'rgba(0,0,0,0.18)',borderRadius: 20,padding: 20,width: '100%',gap: 12,},
   legendTitle: {color: 'rgba(255,255,255,0.7)',fontSize: 13,fontWeight: '600',textTransform: 'uppercase',letterSpacing: 1,marginBottom: 4,},
   legendRow: {flexDirection: 'row',alignItems: 'center',gap: 12,},
-  legendDot: {width: 12,height: 12,borderRadius: 6,},
+  legendDot: {width: 36,height: 36,borderRadius: 18,alignItems: 'center',justifyContent: 'center',},
+  legendIcon: {lineHeight: 36,textAlign: 'center',},
   legendText: {color: 'white',fontSize: 15,fontWeight: '500',flex: 1,},
   legendValue: {color: 'white',fontSize: 15,fontWeight: '600',},
   legendPercent: {color: 'rgba(255,255,255,0.55)',fontSize: 13,width: 38,textAlign: 'right',},
+  
 });
