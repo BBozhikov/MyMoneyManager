@@ -19,14 +19,15 @@ class ReceiptClassifier:
         with open(os.path.join(MODEL_PATH, 'label_mappings.json'), encoding='utf-8') as f:
             mappings = json.load(f)
 
-        self.id2label = {int(k): v for k, v in mappings['id2label'].items()}
-        self.id2label_en = {int(k): v for k, v in mappings['id2label_en'].items()}
+        self.id2label = {int(k): v for k, v in mappings["id2label"].items()}
+        self.label2id = {v: int(k) for k, v in mappings["id2label"].items()}
 
     def predict(self, item_name: str) -> dict:
         inputs = self.tokenizer(
             item_name,
             return_tensors="pt",
             padding=True,
+            truncation=True,
             max_length=64
         )
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
@@ -39,8 +40,7 @@ class ReceiptClassifier:
         predicted_id = torch.argmax(probs).item()
 
         return {
-            "category_bg": self.id2label[predicted_id],
-            "category_en": self.id2label_en[predicted_id],
+            "category": self.id2label[predicted_id],
             "confidence": round(probs[predicted_id].item(), 4),
             "label_id": predicted_id
         }
