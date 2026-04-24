@@ -229,18 +229,18 @@ function PickerModal({
 export default function TransactionsScreen() {
   const router = useRouter();
 
-  const [period,          setPeriod]          = useState('Период');
-  const [txType,          setTxType]          = useState<TxType>('all');
-  const [search,          setSearch]          = useState('');
+  const [period, setPeriod]  = useState('Период');
+  const [txType, setTxType] = useState<TxType>('all');
+  const [search, setSearch] = useState('');
   const [selectedAccount, setSelectedAccount] = useState('all');
-  const [selectedCat,     setSelectedCat]     = useState('all');
-  const [accountModal,    setAccountModal]    = useState(false);
-  const [catModal,        setCatModal]        = useState(false);
+  const [selectedCat, setSelectedCat]  = useState('all');
+  const [accountModal, setAccountModal] = useState(false);
+  const [catModal, setCatModal] = useState(false);
 
-  const [accounts,     setAccounts]     = useState<AccountDTO[]>([]);
-  const [categories,   setCategories]   = useState<CategoryDTO[]>([]);
+  const [accounts, setAccounts] = useState<AccountDTO[]>([]);
+  const [categories, setCategories] = useState<CategoryDTO[]>([]);
   const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
-  const [loading,      setLoading]      = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const categoryMap = new Map(categories.map(c => [c.id, c]));
 
@@ -439,7 +439,7 @@ export default function TransactionsScreen() {
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch('')}>
-              <Text style={styles.clearIcon}>✕</Text>
+              <Text style={styles.clearIcon}><Entypo name="cross" size={16} color="white" /></Text>
             </TouchableOpacity>
           )}
         </View>
@@ -474,10 +474,12 @@ export default function TransactionsScreen() {
                           params: {
                             id: String(tx.id),
                             accountId: String(tx.accountId),
-                            amount: String(isExpense ? -tx.amount : tx.amount),
-                            description: tx.note ?? '',
+                            accountName: tx.accountName,
                             categoryId: String(tx.categoryId),
-                            date: tx.createdAt,
+                            categoryName: tx.categoryName,
+                            amount: String(isExpense ? -tx.amount : tx.amount),
+                            createdAt: tx.createdAt,
+                            note: tx.note ?? '',
                           }
                         })}>
                         <View style={[styles.txIconWrap, { backgroundColor: catColor }]}>
