@@ -189,12 +189,53 @@ export default function TransactionDetailsScreen() {
         {
           text: 'Изтрий',
           style: 'destructive',
-          onPress: () => router.replace('/(tabs)/transactions'),
+          onPress: () => {deleteTransaction()},
         },
       ]
     );
   };
 
+  const deleteTransaction = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      if (!token) return;
+
+      await axios.delete(
+        `${baseUrl}/api/transactions/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      Alert.alert('Успех', `Транзакцията "${note ?? categoryName}" беше изтрита!`, [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)/transactions');
+          }},
+      ]);
+    } catch (error: any) {
+      console.log('Transactions error:', JSON.stringify(error?.response?.data));
+      Alert.alert('Грешка', 'Неуспешно изтриване на транзакция.');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const handleEdit = () => {
+    router.push({
+      pathname: '/(tabs)/add-transaction',
+      params: {
+      id: String(id),
+      accountId: String(accountId),
+      accountName: String(accountName),
+      categoryId: String(categoryId),
+      categoryName: String(categoryName),
+      amount: String(amount),
+      note: String(note),
+      createdAt: String(createdAt),
+    }});
+  }
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
 
