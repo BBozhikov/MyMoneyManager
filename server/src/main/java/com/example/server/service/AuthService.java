@@ -21,8 +21,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,23 +47,35 @@ public class AuthService {
     @Value("${app.password-reset-token-expiry-hours}")
     private int passwordResetTokenExpiryHours;
 
+    @Transactional
     public MessageResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+
+        if (existingUser.isPresent() && existingUser.get().isActive()) {
             throw new IllegalArgumentException("Email already in use");
         }
 
-        User user = User.builder()
-                .fullName(request.getFullName())
-                .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .currency(Currency.EUR)
-                .isActive(false)
-                .build();
+        User user;
+        if (existingUser.isPresent()) {
+            user = existingUser.get();
+            user.setFullName(request.getFullName());
+            user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            userRepository.save(user);
+            verificationTokenRepository.deleteByUser(user);
+        } else {
+            user = User.builder()
+                    .fullName(request.getFullName())
+                    .email(request.getEmail())
+                    .passwordHash(passwordEncoder.encode(request.getPassword()))
+                    .currency(Currency.EUR)
+                    .isActive(false)
+                    .build();
 
-        userRepository.save(user);
+            userRepository.save(user);
 
-        categoryService.createDefaultCategories(user);
-        accountService.createDefaultAccount(user);
+            categoryService.createDefaultCategories(user);
+            accountService.createDefaultAccount(user);
+        }
 
         String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = VerificationToken.builder()

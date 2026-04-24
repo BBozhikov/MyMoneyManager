@@ -11,6 +11,7 @@ import com.example.server.entity.User;
 import com.example.server.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,9 @@ import java.net.URI;
 public class AuthController {
 
     private final AuthService authService;
+
+    @Value("${app.expo-url}")
+    private String expoUrl;
 
     @PostMapping("/register")
     public ResponseEntity<MessageResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -64,7 +68,7 @@ public class AuthController {
 
     @GetMapping("/redirect-reset")
     public ResponseEntity<Void> redirectReset(@RequestParam String token) {
-        String deepLink = "mymoneymanager2://(auth)/reset-password?token=" + token;
+        String deepLink = expoUrl + "/--/(auth)/reset-password?token=" + token;
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(deepLink))
                 .build();
