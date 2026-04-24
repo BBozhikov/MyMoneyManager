@@ -1,22 +1,52 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { router } from 'expo-router';
-import { useState, useRef } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useState, useRef, useCallback } from 'react';
 import { Alert, Button, StyleSheet, Text, TouchableOpacity, View, Image, Switch, ActivityIndicator } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Entypo from '@expo/vector-icons/Entypo';
 import * as Sharing from 'expo-sharing';
 import { API_ENDPOINTS } from '@/constants/api';
+import { requireAuth } from '@/utils/auth';
+import axios from 'axios';
 
-
+interface Category {
+  id: number;
+  name: string;
+  type: 'EXPENSE' | 'INCOME';
+  icon: string;
+  color: string;
+  active: boolean;
+  default: boolean;
+}
+const baseUrl = 'http://192.168.0.6:8080';
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [capturedPhoto, setCapturedPhoto] = useState<string | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [categorizing, setCategorizing] = useState(false);
   const [photoFacing, setPhotoFacing] = useState<CameraType>('back');
   const [loading, setLoading] = useState(false);
   const cameraRef = useRef<CameraView>(null);
-
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const token = await requireAuth();
+      const response = await axios.get(`${baseUrl}/api/categories`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCategories(response.data);
+    } catch (error: any) {
+      console.log('Categories error:', error?.response?.data || error.message);
+      Alert.alert('Грешка', 'Неуспешно зареждане на категории.');
+    } finally {
+      setLoading(false);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+    fetchCategories();
+  }, []));
 
   if (!permission) {
     return <View />;
@@ -30,7 +60,6 @@ export default function App() {
       </View>
     );
   }
-
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
   }
@@ -71,10 +100,9 @@ export default function App() {
     const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
     const response = await fetch(
-      `${API_ENDPOINTS.parseReceipt}?categorize=${categorizing}`,
+      `http://192.168.0.6:8000/api/v2/parse-receipt?categorize=${categorizing}`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'multipart/form-data' },
         body: formData,
         signal: controller.signal,
       }
@@ -89,14 +117,29 @@ export default function App() {
 
     const result = await response.json();
 
+    function getMostFrequentCategory(items: { category: string }[]): string {
+      const freq = items.reduce((acc, item) => {
+        const cat = item.category.toLowerCase();
+        acc[cat] = (acc[cat] ?? 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
+    }
+    const topCategory = getMostFrequentCategory(result.items);
+    const matchedCategory = categories.find(
+      c => c.name.toLowerCase() === topCategory
+    );
+    console.log(result);
     router.push({
-      pathname: '/(tabs)/add-transaction',
+      pathname: '/(tabs)/add-transactionAI',
       params: {
-        store: result.store_name ?? '',
-        date: result.date ?? '',
-        total: result.total ?? '',
-        total_euro: result.total_euro ?? '',
-        items: JSON.stringify(result.items),
+        //items: JSON.stringify(result.items),
+        categoryId: String(matchedCategory?.id ?? ''),
+        //categoryName: String(result.items[0].category),
+        amount: String(parseFloat(result.total_euro ?? '0').toFixed(2)),
+        note: String(result.store_name ?? ''),
+        createdAt: String(result.date ?? ''),
       },
     });
 

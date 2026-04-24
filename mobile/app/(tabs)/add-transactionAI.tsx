@@ -172,6 +172,20 @@ export default function EditTransactionScreen() {
       setLoading(false);
     }
   }
+  function parseDate(dateStr: string | undefined): Date {
+    if (!dateStr) return new Date();
+    
+    if (dateStr.includes('/')) {
+        const [day, month, year] = dateStr.split('/');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else if (dateStr.includes('-')) {
+        const [day, month, year] = dateStr.split('-');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
+    
+    const parsed = new Date(dateStr);
+    return isNaN(parsed.getTime()) ? new Date() : parsed;
+    }
   useFocusEffect(
     useCallback(() => {
     const init = async () => {
@@ -194,10 +208,10 @@ export default function EditTransactionScreen() {
 
         setAmount(String(Math.abs(parseFloat(amount ?? '0'))));
         setNote(String(note ?? ''));
-        setDate(new Date(createdAt));
+        setDate(parseDate(createdAt));
 
         const foundCat = loadedCategories.find(c => c.id === parseInt(categoryId));
-        const foundAcc = loadedAccounts.find(a => String(a.id) === String(accountId));
+        const foundAcc = loadedAccounts.find(a => String(a.id) === String(accountId)) ?? loadedAccounts[0];
 
         setCategory(foundCat || null);
         setAccount(foundAcc || null);
@@ -228,7 +242,7 @@ export default function EditTransactionScreen() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
-    const normalizedAmount = amountState.replace(',', '.');
+    const normalizedAmount = amount.replace(',', '.');
     const parsedAmount = parseFloat(normalizedAmount);
 
     if (isNaN(parsedAmount)) {
@@ -240,21 +254,21 @@ export default function EditTransactionScreen() {
       const token = await requireAuth();
       if (!token) return;
 
-      await axios.put(
-        `${baseUrl}/api/transactions/${id}`,
+      await axios.post(
+        `${baseUrl}/api/transactions`,
         {
           accountId: account?.id,
           categoryId: category?.id,
           amount: parsedAmount,
           createdAt: date.toISOString(),
-          note: noteState.trim(),
+          note: note.trim(),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      Alert.alert('Успех', `Транзакцията беше актуализирана!`, [
+      Alert.alert('Успех', `Транзакцията беше създадена!`, [
         {
           text: 'OK',
           onPress: () => {
@@ -263,7 +277,7 @@ export default function EditTransactionScreen() {
       ]);
     } catch (error: any) {
       console.log('Transaction error:', JSON.stringify(error?.response?.data));
-      Alert.alert('Грешка', 'Неуспешно актуализиране на транзакция.');
+      Alert.alert('Грешка', 'Неуспешно създаване на транзакция.');
     } finally {
       setLoading(false);
     }
@@ -357,21 +371,23 @@ export default function EditTransactionScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Сметка - не може да се променя</Text>
+        <TouchableOpacity style={styles.card} onPress={() => setAccModal(true)} activeOpacity={0.75}>
+          <Text style={styles.label}>Сметка</Text>
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldValue, !account && styles.fieldPlaceholder]}>
               {account?.name || 'Избери сметка'}
             </Text>
+            <Text style={styles.chevron}>›</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Дата - не може да се променя</Text>
+        <TouchableOpacity style={styles.card} onPress={() => setShowDatePicker(true)} activeOpacity={0.75}>
+          <Text style={styles.label}>Дата</Text>
           <View style={styles.fieldRow}>
             <Text style={styles.fieldValue}><AntDesign name="calendar" size={24} color="white"></AntDesign>  {formatDate(date)}</Text>
+            <Text style={styles.chevron}>›</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {showDatePicker && (
           <DateTimePicker
@@ -398,12 +414,6 @@ export default function EditTransactionScreen() {
             numberOfLines={3}
           />
         </View>
-
-        <TouchableOpacity style={styles.cameraBtn} activeOpacity={0.75} onPress={() => router.replace("/(tabs)/camera")}>
-          <Text style={styles.cameraIcon}><AntDesign name="camera" size={24} color="white" /></Text>
-          <Text style={styles.cameraBtnText}>Снимай касова бележка</Text>
-        </TouchableOpacity>
-
       </ScrollView>
 
       <View style={styles.footer}>
@@ -420,7 +430,7 @@ export default function EditTransactionScreen() {
           disabled={!canSubmit()}
         >
           <Text style={styles.submitBtnText}>
-            {type === 'EXPENSE' ? 'Промени разход' : 'Промени приход'}
+            {type === 'EXPENSE' ? 'Добави разход' : 'Добави приход'}
           </Text>
         </TouchableOpacity>
       </View>

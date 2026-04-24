@@ -57,6 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen name="edit-account" options={{ href:null,}}/>
       <Tabs.Screen name="view-transaction" options={{ href:null,}}/>
       <Tabs.Screen name="edit-transaction" options={{ href:null,}}/>
+      <Tabs.Screen name="add-transactionAI" options={{ href:null,}}/>
       <Tabs.Screen
         name="camera"
         options={{
