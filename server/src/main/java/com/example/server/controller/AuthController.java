@@ -68,7 +68,7 @@ public class AuthController {
 
     @GetMapping("/redirect-reset")
     public ResponseEntity<Void> redirectReset(@RequestParam String token) {
-        String deepLink = expoUrl + "/--/(auth)/reset-password?token=" + token;
+        String deepLink = expoUrl + "/--/reset-password?token=" + token;
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(deepLink))
                 .build();
