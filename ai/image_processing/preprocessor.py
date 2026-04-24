@@ -8,7 +8,8 @@ def process_receipt_image(image_path, max_size_mb: float = 0.95) -> io.BytesIO:
     if isinstance(image_path, str):
         img_bgr = cv2.imread(image_path)
     else:
-        img_bgr = cv2.cvtColor(np.array(image_path), cv2.COLOR_RGB2BGR)
+        pil_img = Image.open(image_path).convert("RGB")
+        img_bgr = cv2.cvtColor(np.array(pil_img, dtype=np.uint8), cv2.COLOR_RGB2BGR)
 
     if img_bgr is None:
         raise ValueError("Could not read image")
