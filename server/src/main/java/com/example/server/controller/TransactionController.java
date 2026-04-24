@@ -1,6 +1,7 @@
 package com.example.server.controller;
 
 import com.example.server.dto.MessageResponse;
+import com.example.server.dto.statistics.CategoryStatisticsResponse;
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
 import com.example.server.dto.transaction.UpdateTransactionRequest;
@@ -41,6 +42,14 @@ public class TransactionController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(required = false) String note) {
         return ResponseEntity.ok(transactionService.getTransactions(user, accountId, categoryId, type, startDate, endDate, note));
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<List<CategoryStatisticsResponse>> getCategoryStatistics(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(transactionService.getCategoryStatistics(user, startDate, endDate));
     }
 
     @PutMapping("/{id}")

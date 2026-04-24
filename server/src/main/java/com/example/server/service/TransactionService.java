@@ -1,6 +1,7 @@
 package com.example.server.service;
 
 import com.example.server.dto.MessageResponse;
+import com.example.server.dto.statistics.CategoryStatisticsResponse;
 import com.example.server.dto.transaction.CreateTransactionRequest;
 import com.example.server.dto.transaction.TransactionResponse;
 import com.example.server.dto.transaction.UpdateTransactionRequest;
@@ -115,6 +116,10 @@ public class TransactionService {
         transactionRepository.delete(transaction);
 
         return new MessageResponse("Transaction deleted");
+    }
+
+    public List<CategoryStatisticsResponse> getCategoryStatistics(User user, LocalDate startDate, LocalDate endDate) {
+        return transactionRepository.getCategoryStatistics(user, startDate, endDate);
     }
 
     private void updateBalance(Account account, CategoryType type, double amount) {

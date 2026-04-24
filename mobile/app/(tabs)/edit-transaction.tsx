@@ -8,8 +8,8 @@ import Ionicons from '@expo/vector-icons/build/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router, Stack, useFocusEffect } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
@@ -118,13 +118,13 @@ const COLORS = [
   {id: 'blue', color: '#007aff'}, // blue
 ];
 const COLOR_MAP = Object.fromEntries(COLORS.map(c => [c.id, c.color]));
-export default function AddTransactionScreen() {
+export default function EditTransactionScreen() {
   const [type,setType] = useState<TxType>('EXPENSE');
-  const [amount,setAmount] = useState('');
+  const [amountState,setAmount] = useState('');
   const [category, setCategory] = useState<Category | null>(null);
   const [account, setAccount] = useState<Account | null>(null);
   const [date, setDate] = useState(new Date());
-  const [note, setNote] = useState('');
+  const [noteState, setNote] = useState('');
   const [accModal, setAccModal] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [activeType, setActiveType] = useState<'EXPENSE' | 'INCOME'>('EXPENSE');
@@ -132,12 +132,16 @@ export default function AddTransactionScreen() {
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState<Account[]>([]);
 
-  const resetForm = () => {
-      setAmount('');  
-      setCategory(null);
-      setAccount(null);
-      setNote('');
-  };
+  const { id, accountId, accountName, categoryId, categoryName, amount, note, createdAt } = useLocalSearchParams<{
+    id: string;
+    accountId: string;
+    accountName: string;
+    categoryId: string;
+    categoryName: string;
+    amount: string;
+    createdAt: string;
+    note: string;
+  }>();
   const fetchCategories = async () => {
     try {
       setLoading(true);
@@ -172,9 +176,45 @@ export default function AddTransactionScreen() {
   }
   useFocusEffect(
     useCallback(() => {
-      fetchCategories();
-      fetchAccounts();
-    }, [])
+    const init = async () => {
+      try {
+        setLoading(true);
+        const token = await requireAuth();
+        if (!token) return;
+        const headers = { Authorization: `Bearer ${token}` };
+
+        const [catRes, accRes] = await Promise.all([
+          axios.get(`${baseUrl}/api/categories`, { headers }),
+          axios.get(`${baseUrl}/api/accounts`, { headers }),
+        ]);
+
+        const loadedCategories: Category[] = catRes.data;
+        const loadedAccounts: Account[] = accRes.data;
+
+        setCategories(loadedCategories);
+        setAccounts(loadedAccounts);
+
+        setAmount(String(Math.abs(parseFloat(amount ?? '0'))));
+        setNote(String(note ?? ''));
+        setDate(new Date(createdAt));
+
+        const foundCat = loadedCategories.find(c => c.id === parseInt(categoryId));
+        const foundAcc = loadedAccounts.find(a => String(a.id) === String(accountId));
+
+        setCategory(foundCat || null);
+        setAccount(foundAcc || null);
+
+        if (foundCat) setType(foundCat.type);
+
+      } catch (error: any) {
+        Alert.alert('Грешка', 'Неуспешно зареждане на данните.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
+  }, [id, accountId, categoryId, amount, note, createdAt])
   );
   const accentColor = type === 'EXPENSE' ? RED : GREEN;
 
@@ -182,7 +222,7 @@ export default function AddTransactionScreen() {
     d.toLocaleDateString('bg-BG', { day: 'numeric', month: 'long', year: 'numeric' });
 
   const canSubmit = (): boolean => {
-    const hasAmount = amount.trim().length > 0 && parseFloat(amount) > 0;
+    const hasAmount = amountState.trim().length > 0 && parseFloat(amountState) > 0;
     const hasCategory = category !== null;
     const hasAccount = account !== null;
     return hasAmount && hasCategory && hasAccount;
@@ -190,7 +230,7 @@ export default function AddTransactionScreen() {
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
-    const normalizedAmount = amount.replace(',', '.');
+    const normalizedAmount = amountState.replace(',', '.');
     const parsedAmount = parseFloat(normalizedAmount);
 
     if (isNaN(parsedAmount)) {
@@ -202,31 +242,30 @@ export default function AddTransactionScreen() {
       const token = await requireAuth();
       if (!token) return;
 
-      await axios.post(
-        `${baseUrl}/api/transactions`,
+      await axios.put(
+        `${baseUrl}/api/transactions/${id}`,
         {
           accountId: account?.id,
           categoryId: category?.id,
           amount: parsedAmount,
           createdAt: date.toISOString(),
-          note: note.trim(),
+          note: noteState.trim(),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      Alert.alert('Успех', `Транзакцията беше създадена!`, [
+      Alert.alert('Успех', `Транзакцията беше актуализирана!`, [
         {
           text: 'OK',
           onPress: () => {
-            resetForm();
             router.replace('/(tabs)/main');
           }},
       ]);
     } catch (error: any) {
       console.log('Transaction error:', JSON.stringify(error?.response?.data));
-      Alert.alert('Грешка', 'Неуспешно създаване на транзакция.');
+      Alert.alert('Грешка', 'Неуспешно актуализиране на транзакция.');
     } finally {
       setLoading(false);
     }
@@ -239,7 +278,7 @@ export default function AddTransactionScreen() {
   return (
     <><SafeAreaView style={{ flex: 1, backgroundColor: '#3b6861' }} edges={['top']}>
       <Stack.Screen options={{
-        title: 'Добави транзакция',
+        title: 'Редактирай транзакция',
         headerStyle: { backgroundColor: BG },
         headerTintColor: 'white',
         headerTitleStyle: { fontWeight: 'bold' },
@@ -276,8 +315,11 @@ export default function AddTransactionScreen() {
               style={[styles.amountInput, { color: accentColor }]}
               placeholder="0.00"
               placeholderTextColor="rgba(255,255,255,0.2)"
-              value={amount}
-              onChangeText={setAmount}
+              value={amountState}
+              onChangeText={text => {
+                const clean = text.replace('-', '');
+                setAmount(clean);
+              }}
               keyboardType="decimal-pad"
             />
           </View>
@@ -317,23 +359,21 @@ export default function AddTransactionScreen() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.card} onPress={() => setAccModal(true)} activeOpacity={0.75}>
-          <Text style={styles.label}>Сметка</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Сметка - не може да се променя</Text>
           <View style={styles.fieldRow}>
             <Text style={[styles.fieldValue, !account && styles.fieldPlaceholder]}>
               {account?.name || 'Избери сметка'}
             </Text>
-            <Text style={styles.chevron}>›</Text>
           </View>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.card} onPress={() => setShowDatePicker(true)} activeOpacity={0.75}>
-          <Text style={styles.label}>Дата</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>Дата - не може да се променя</Text>
           <View style={styles.fieldRow}>
             <Text style={styles.fieldValue}><AntDesign name="calendar" size={24} color="white"></AntDesign>  {formatDate(date)}</Text>
-            <Text style={styles.chevron}>›</Text>
           </View>
-        </TouchableOpacity>
+        </View>
 
         {showDatePicker && (
           <DateTimePicker
@@ -354,7 +394,7 @@ export default function AddTransactionScreen() {
             style={styles.noteInput}
             placeholder="Добави бележка (по желание)..."
             placeholderTextColor="rgba(255,255,255,0.3)"
-            value={note}
+            value={noteState}
             onChangeText={setNote}
             multiline
             numberOfLines={3}
@@ -382,7 +422,7 @@ export default function AddTransactionScreen() {
           disabled={!canSubmit()}
         >
           <Text style={styles.submitBtnText}>
-            {type === 'EXPENSE' ? 'Добави разход' : 'Добави приход'}
+            {type === 'EXPENSE' ? 'Промени разход' : 'Промени приход'}
           </Text>
         </TouchableOpacity>
       </View>

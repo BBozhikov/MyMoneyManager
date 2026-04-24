@@ -171,7 +171,7 @@ export default function EditCategoryScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/categories')} style={styles.backBtn} activeOpacity={0.7}>
-          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backArrow}><AntDesign name="arrow-left" size={24} color="white" /></Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Редактиране на категория</Text>
         <View style={{ width: 40 }} />
