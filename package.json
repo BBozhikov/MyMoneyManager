@@ -3,7 +3,10 @@
   "scripts": {
     "mobile": "cd mobile && npx expo start",
     "server": "cd server && mvn spring-boot:run",
-    "ai": "cd ai && uvicorn api.main:app --reload --port 8000 --host 0.0.0.0",
+    "ai": "cd ai && .venv\\Scripts\\uvicorn.exe api.main:app --reload --port 8000 --host 0.0.0.0",
     "dev": "concurrently \"npm run mobile\" \"npm run server\" \"npm run ai\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
