@@ -4,6 +4,7 @@ import com.example.server.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -30,6 +31,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/verify", "/api/auth/refresh", "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/redirect-reset").permitAll()
                         .requestMatchers("/api/test/public").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpStatus.FORBIDDEN.value(), "Forbidden")))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
