@@ -76,7 +76,7 @@ interface CategoryStatisticsResponse {
 
 function mapToChartItem(item: CategoryStatisticsResponse) {
   return {
-    value: item.totalAmount,
+    value: parseFloat(item.totalAmount.toFixed(2)),
     color: COLOR_MAP[item.color.toLowerCase()] ?? '#888888',
     icon: CATEGORY_ICON_MAP[item.icon.toLowerCase()] ?? '',
     text: item.categoryName,
@@ -116,7 +116,7 @@ export default function MainScreen() {
     }, [])
   );
   const filtered = chartData.filter(item => item.type === activeType);
-  const total = filtered.reduce((sum, item) => sum + item.value, 0);
+  const total = parseFloat(filtered.reduce((sum, item) => sum + item.value, 0).toFixed(2));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#3b6861' }} edges={['top']}>

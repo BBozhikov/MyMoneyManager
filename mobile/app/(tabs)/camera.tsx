@@ -27,6 +27,7 @@ export default function App() {
   const [categorizing, setCategorizing] = useState(false);
   const [photoFacing, setPhotoFacing] = useState<CameraType>('back');
   const [loading, setLoading] = useState(false);
+  const [isCameraActive, setIsCameraActive] = useState(true);
   const cameraRef = useRef<CameraView>(null);
   const fetchCategories = async () => {
     try {
@@ -45,7 +46,12 @@ export default function App() {
   };
   useFocusEffect(
     useCallback(() => {
+    setIsCameraActive(true);
     fetchCategories();
+
+    return () => {
+      setIsCameraActive(false);
+    };
   }, []));
 
   if (!permission) {
@@ -117,9 +123,12 @@ export default function App() {
 
     const result = await response.json();
 
-    function getMostFrequentCategory(items: { category: string }[]): string {
-      const freq = items.reduce((acc, item) => {
-        const cat = item.category.toLowerCase();
+    function getMostFrequentCategory(items: { category: string | null }[]): string | null {
+      const validItems = items.filter(item => item.category != null);
+      if (validItems.length === 0) return null;
+
+      const freq = validItems.reduce((acc, item) => {
+        const cat = item.category!.toLowerCase();
         acc[cat] = (acc[cat] ?? 0) + 1;
         return acc;
       }, {} as Record<string, number>);
@@ -127,16 +136,14 @@ export default function App() {
       return Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
     }
     const topCategory = getMostFrequentCategory(result.items);
-    const matchedCategory = categories.find(
-      c => c.name.toLowerCase() === topCategory
-    );
+    const matchedCategory = topCategory
+      ? categories.find(c => c.name.toLowerCase() === topCategory): undefined;
+
     console.log(result);
     router.push({
       pathname: '/(tabs)/add-transactionAI',
       params: {
-        //items: JSON.stringify(result.items),
         categoryId: String(matchedCategory?.id ?? ''),
-        //categoryName: String(result.items[0].category),
         amount: String(parseFloat(result.total_euro ?? '0').toFixed(2)),
         note: String(result.store_name ?? ''),
         createdAt: String(result.date ?? ''),
@@ -165,7 +172,10 @@ export default function App() {
         <View style={styles.previewButtons}>
           <View style={styles.previewFabs}>
             <TouchableOpacity style={styles.fab} onPress={sendToBackend} disabled={loading}>
-              <MaterialCommunityIcons name={loading ? 'loading' : 'upload'} size={24} color="white" />
+              {loading
+                ? <ActivityIndicator size="small" color="white" />
+                : <MaterialCommunityIcons name="send" size={24} color="white" />
+              }
             </TouchableOpacity>
             <TouchableOpacity style={[styles.fab, { backgroundColor: '#555' }]} onPress={() => setCapturedPhoto(null)} disabled={loading}>
               <MaterialCommunityIcons name="close" size={24} color="white" />
@@ -191,7 +201,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef} mute={true} enableTorch={false} flash='off' />
+      {isCameraActive && (
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef} mute={true} enableTorch={false} flash='off' />)}
       <View style={[styles.corner, styles.topLeft]} />
       <View style={[styles.corner, styles.topRight]} />
       <View style={[styles.corner, styles.bottomLeft]} />
