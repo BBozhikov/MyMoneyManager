@@ -180,15 +180,6 @@ export default function MainScreen() {
             <Text style={styles.secondaryButtonText}>История на транзакциите</Text>
           </TouchableOpacity>
 
-          <View style={styles.divider} />
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={() => router.push('/(tabs)/transactions')}
-          >
-            <Text style={styles.secondaryButtonIcon}><AntDesign name="clock-circle" size={24} color="yellow" /></Text>
-            <Text style={styles.secondaryButtonText}>Чакащи транзакции</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.legendCard}>
