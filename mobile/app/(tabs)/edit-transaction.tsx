@@ -398,12 +398,6 @@ export default function EditTransactionScreen() {
             numberOfLines={3}
           />
         </View>
-
-        <TouchableOpacity style={styles.cameraBtn} activeOpacity={0.75} onPress={() => router.replace("/(tabs)/camera")}>
-          <Text style={styles.cameraIcon}><AntDesign name="camera" size={24} color="white" /></Text>
-          <Text style={styles.cameraBtnText}>Снимай касова бележка</Text>
-        </TouchableOpacity>
-
       </ScrollView>
 
       <View style={styles.footer}>
