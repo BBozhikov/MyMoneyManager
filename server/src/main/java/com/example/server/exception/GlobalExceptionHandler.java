@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleDisabledAccount(DisabledException ex) {
         Map<String, Object> body = Map.of(
                 "status", 403,
-                "message", "Account is not verified. Please check your email."
+                "message", ex.getMessage()
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
