@@ -206,12 +206,6 @@ export default function App() {
         <TouchableOpacity style={styles.fab} activeOpacity={0.8} onPress={toggleCameraFacing}>
           <Text style={styles.fabIcon}><MaterialCommunityIcons name="camera-flip" size={24} color="white" /></Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.fab} onPress={sendToBackend} disabled={loading}>
-          {loading
-            ? <ActivityIndicator color="white" size="small" />
-            : <MaterialCommunityIcons name="upload" size={24} color="white" />
-          }
-        </TouchableOpacity>
       </View>
     </View>
   );
