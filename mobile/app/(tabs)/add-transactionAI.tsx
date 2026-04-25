@@ -181,6 +181,9 @@ export default function EditTransactionScreen() {
     } else if (dateStr.includes('-')) {
         const [day, month, year] = dateStr.split('-');
         return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    } else if (dateStr.includes('.')) {
+        const [day, month, year] = dateStr.split('.');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
     
     const parsed = new Date(dateStr);
