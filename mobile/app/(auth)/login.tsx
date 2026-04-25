@@ -112,13 +112,9 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: 'bold', marginBottom: 32, textAlign: 'center', color: 'white' },
   input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 12, marginBottom: 16, fontSize: 16, color: 'white' },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  checkboxRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  checkbox: { width: 20, height: 20, borderWidth: 2, borderColor: '#ccc', borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
-  checkboxChecked: { backgroundColor: '#007AFF', borderColor: '#007AFF' },
   forgotText: { color: '#007AFF', fontSize: 14},
   button: { backgroundColor: '#007AFF', borderRadius: 8, padding: 14, alignItems: 'center', marginBottom: 16 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   link: { color: '#007AFF', textAlign: 'center', fontSize: 14 },
-  link2: { color: '#007AFF', textAlign: 'center', fontSize: 14 },
   image: { alignSelf: 'center', marginBottom: 20, height: 78, width: 102 },
 });

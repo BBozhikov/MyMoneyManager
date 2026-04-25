@@ -248,7 +248,6 @@ const ACCENT  = '#3ecf8e';
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
-
   header: {flexDirection: 'row',alignItems: 'center',backgroundColor: HEADER,paddingHorizontal: 16,paddingVertical: 14,justifyContent: 'space-between',},
   backBtn: { width: 40, alignItems: 'flex-start' },
   backArrow: { color: WHITE, fontSize: 22 },
@@ -277,24 +276,12 @@ const styles = StyleSheet.create({
   colorBtnSelected: {borderWidth: 3,borderColor: 'rgba(255,255,255,0.6)',},
   colorCheck: { color: WHITE, fontSize: 18, fontWeight: '700' },
 
-  currencyValue: {color: ACCENT,fontSize: 22,fontWeight: '600',},
-
   toggleRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 4,},
   toggleLabel: { color: WHITE, fontSize: 16, flex: 1 },
 
   footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 32,backgroundColor: BG,},
   submitBtn: {borderRadius: 999,paddingVertical: 17,alignItems: 'center',},
   submitText: { color: WHITE, fontSize: 17, fontWeight: '700' },
-
-
-  modalBackdrop: {flex: 1,backgroundColor: 'rgba(0,0,0,0.5)',justifyContent: 'flex-end',},
-  modalSheet: {backgroundColor: '#1a2e22',borderTopLeftRadius: 24,borderTopRightRadius: 24,paddingHorizontal: 24,paddingTop: 16,paddingBottom: 40,maxHeight: '60%',},
-  modalHandle: {width: 36, height: 4,backgroundColor: 'rgba(255,255,255,0.2)',borderRadius: 999,alignSelf: 'center',marginBottom: 20,},
-  modalTitle: { color: WHITE, fontSize: 18, fontWeight: '700', marginBottom: 16 },
-  currencyRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 14,},
-  currencyRowText: { color: WHITE, fontSize: 16 },
-  currencyCheck: { fontSize: 18, fontWeight: '700' },
-  modalDivider: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)' },
 
   signBtn: {paddingHorizontal: 10,paddingVertical: 6,borderRadius: 8,backgroundColor: 'rgba(255,255,255,0.1)',},
   signBtnText: {color: 'rgba(255,255,255,0.7)',fontSize: 16,fontWeight: '600',},

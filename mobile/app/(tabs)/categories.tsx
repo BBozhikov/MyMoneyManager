@@ -173,7 +173,6 @@ const COLUMN_COUNT = 4;
 
 const styles = StyleSheet.create({
   scroll: {flex: 1,backgroundColor: '#3b6861',width: '100%',marginTop: 1,marginBottom: 0,},
-  content: {padding: 12,alignItems: 'center',gap: 16,},
 
   toggleContainer: {flexDirection: 'row',backgroundColor: 'rgba(0,0,0,0.25)',borderRadius: 14,padding: 4,width: '100%',},
   toggleButton: {flex: 1,paddingVertical: 10,alignItems: 'center',borderRadius: 10,},

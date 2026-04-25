@@ -291,7 +291,6 @@ const RED = '#ff3b30';
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: BG },
 
-
   header: {flexDirection: 'row',alignItems: 'center',backgroundColor: HEADER,paddingHorizontal: 16,paddingVertical: 14,justifyContent: 'space-between',},
   backBtn: { width: 40, alignItems: 'flex-start' },
   backArrow: { color: WHITE, fontSize: 22 },
@@ -313,17 +312,11 @@ const styles = StyleSheet.create({
 
   iconsGrid: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
   iconBtn: {width: 64,height: 64,borderRadius: 32,alignItems: 'center',justifyContent: 'center',},
-  iconEmoji: { fontSize: 26 },
 
   colorsRow: {flexDirection: 'row',flexWrap: 'wrap',gap: 12,},
   colorBtn: {width: 44,height: 44,borderRadius: 22,alignItems: 'center',justifyContent: 'center',},
   colorBtnSelected: {borderWidth: 3,borderColor: 'rgba(255,255,255,0.6)',},
   colorCheck: { color: WHITE, fontSize: 18, fontWeight: '700' },
-
-  currencyValue: {color: ACCENT,fontSize: 22,fontWeight: '600',},
-
-  toggleRow: {flexDirection: 'row',alignItems: 'center',justifyContent: 'space-between',paddingVertical: 4,},
-  toggleLabel: { color: WHITE, fontSize: 16, flex: 1 },
 
   footer: {position: 'absolute',bottom: 0, left: 0, right: 0,padding: 20,paddingBottom: 32,backgroundColor: BG,},
   submitBtn: {borderRadius: 999,paddingVertical: 17,alignItems: 'center',},

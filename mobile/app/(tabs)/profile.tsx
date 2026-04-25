@@ -182,8 +182,6 @@ const styles = StyleSheet.create({
   avatarCard: {alignItems: 'center',gap: 6,paddingVertical: 8,},
   avatar: {width: 72,height: 72,borderRadius: 36,backgroundColor: 'rgba(0,0,0,0.25)',alignItems: 'center',justifyContent: 'center',marginBottom: 6,},
   avatarText: {color: WHITE,fontSize: 26,fontWeight: '700',letterSpacing: -0.5,},
-  userName: {color: WHITE,fontSize: 20,fontWeight: '700',letterSpacing: -0.3,},
-  userEmail: {color: WHITE_MUTED,fontSize: 14,},
 
   card: {backgroundColor: CARD,borderRadius: 20,width: '100%',overflow: 'hidden'},
   infoRow: {flexDirection: 'row',justifyContent: 'space-between',alignItems: 'center',paddingVertical: 16,paddingHorizontal: 20,},

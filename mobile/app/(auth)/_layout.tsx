@@ -17,12 +17,6 @@ export default function AuthLayout() {
       <Stack.Screen
         name="forgot-password"
         options={{
-          //headerShown: false,
-          //title: 'Забравена парола',
-          //headerStyle: { backgroundColor: '#2b4d47' },
-          //headerTintColor: 'white',
-          //headerTitleStyle: { fontWeight: 'bold' },
-          //contentStyle: { backgroundColor: '#2b4d47' },
         }}
       />
     </Stack>

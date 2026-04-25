@@ -235,7 +235,6 @@ const styles = StyleSheet.create({
   message: { textAlign: 'center', paddingBottom: 10 },
   camera: { flex: 1 },
   buttonContainer: { position: 'absolute', flexDirection: 'row', gap: 48, bottom: 32, alignSelf: 'center' },
-  button: { flex: 1, alignItems: 'center' },
   text: { fontSize: 24, fontWeight: 'bold', color: 'white' },
 
   fab: {
@@ -256,8 +255,6 @@ const styles = StyleSheet.create({
   previewButtons: { position: 'absolute', bottom: 48, alignSelf: 'center', flexDirection: 'column', alignItems: 'center', gap: 0 },
   previewFabs: { flexDirection: 'row', gap: 16 },
 
-  categorizeBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 24, borderWidth: 2, borderColor: ACCENT, backgroundColor: 'transparent' },
-  categorizeBtnActive: { backgroundColor: ACCENT },
   categorizeBtnText: { color: WHITE, fontSize: 15, fontWeight: '600' },
   categorizeRow: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: BG, paddingVertical: 10, paddingHorizontal: 16, borderRadius: 24, borderColor: 'black', borderWidth: 1 },
 });

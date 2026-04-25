@@ -448,10 +448,6 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   sheet: {backgroundColor: '#2a5248', borderTopLeftRadius: 20,borderTopRightRadius: 20, padding: 20, paddingBottom: 40, gap: 4,},
   sheetTitle:           { color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 },
-  sheetOption:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 12, borderRadius: 10 },
-  sheetOptionActive:    { backgroundColor: 'rgba(255,255,255,0.08)' },
-  sheetOptionText:      { color: 'rgba(255,255,255,0.7)', fontSize: 16 },
-  sheetOptionTextActive:{ color: 'white', fontWeight: '700' },
 
   footer: {padding: 16,backgroundColor: BG,},
 
@@ -466,6 +462,5 @@ const styles = StyleSheet.create({
   accountIcon: {width: 44,height: 44,borderRadius: 999,backgroundColor: 'rgba(255,255,255,0.1)',alignItems: 'center',justifyContent: 'center',},
   accountIconText: {fontSize: 22,},
   accountName: {flex: 1,color: WHITE,fontSize: 16,fontWeight: '500',},
-  accountBalance: {color: WHITE,fontSize: 16,fontWeight: '600',letterSpacing: -0.2,},
   divider: {height: 1,backgroundColor: DIVIDER,marginHorizontal: 16,},
 });
