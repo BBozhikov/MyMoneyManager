@@ -117,7 +117,7 @@ public class AuthService {
         }
 
         if (!user.isActive()) {
-            throw new DisabledException("Account is not verified. Please check your email.");
+            throw new DisabledException("Account is not active. Please register again or contact support.");
         }
 
         String accessToken = jwtService.generateToken(user);
