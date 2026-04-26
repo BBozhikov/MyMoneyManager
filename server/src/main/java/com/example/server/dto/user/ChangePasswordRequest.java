@@ -18,6 +18,6 @@ public class ChangePasswordRequest {
     @NotBlank
     @Size(min = 8, max = 120)
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).+$",
-            message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (@$!%*?&)")
+            message = "Паролата трябва да съдържа поне една главна буква, една малка буква, една цифра и един специален символ (@$!%*?&)")
     private String newPassword;
 }
