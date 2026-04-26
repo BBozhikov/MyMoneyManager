@@ -5,6 +5,10 @@ import { Alert } from 'react-native';
 
 export const BASE_URL = 'http://192.168.0.6:8080';
 
+export function redirectToLogin2() {
+  router.replace('/(auth)/login')
+}
+
 export function redirectToLogin(message: string) {
   Alert.alert(
     'Сесията изтече',
@@ -55,7 +59,7 @@ export async function validateWithRefresh(): Promise<boolean> {
     }
     if (!error?.response) {
 
-      console.log('Мрежова грешка - пропускаме logout');
+      console.log('Мрежова грешка');
       return false;
     }
 

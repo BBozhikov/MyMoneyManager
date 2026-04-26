@@ -1,6 +1,6 @@
 import { Href, router } from 'expo-router';
 import { useEffect } from 'react';
-import { redirectToLogin, validateWithRefresh } from '@/utils/auth';
+import { redirectToLogin, validateWithRefresh, redirectToLogin2 } from '@/utils/auth';
 
 export function useAuthGuard(redirectOnSuccess: Href = '/(tabs)/main') {
   useEffect(() => {
@@ -10,7 +10,7 @@ export function useAuthGuard(redirectOnSuccess: Href = '/(tabs)/main') {
       if (isValid) {
         router.replace(redirectOnSuccess);
       } else {
-        redirectToLogin('Моля влезте в профила си.');
+        redirectToLogin2();
       }
     };
 
