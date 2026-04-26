@@ -58,7 +58,8 @@ const COLORS = [
   { id: 'yellow',      color: '#ffcc00' },
   { id: 'blue',        color: '#007aff' },
 ];
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 const BG      = '#3b6861';
 const HEADER  = '#3b6861';
 const ICON_BG = 'rgba(255,255,255,0.12)';

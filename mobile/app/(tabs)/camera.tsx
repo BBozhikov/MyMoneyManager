@@ -18,7 +18,8 @@ interface Category {
   active: boolean;
   default: boolean;
 }
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
@@ -106,7 +107,7 @@ export default function App() {
     const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
     const response = await fetch(
-      `http://192.168.0.6:8000/api/v2/parse-receipt?categorize=${categorizing}`,
+      `${baseUrl}/api/v2/parse-receipt?categorize=${categorizing}`,
       {
         method: 'POST',
         body: formData,

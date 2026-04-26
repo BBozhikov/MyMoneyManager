@@ -45,7 +45,8 @@ const COLORS = [
   { id: 'yellow',      color: '#ffcc00' },
   { id: 'blue',        color: '#007aff' },
 ];
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 export default function EditAccountScreen() {
   const router = useRouter();
   const {id, currentBalance, name, color, icon, main} = useLocalSearchParams<{

@@ -63,7 +63,9 @@ const CATEGORY_ICONS: { id: string; emoji: React.ReactNode }[] = [
   { id: 'others',     emoji: <AntDesign name="question" size={iconSize} color="white" /> },
 ];
 const CATEGORY_ICON_MAP: Record<string, React.ReactNode> = Object.fromEntries(CATEGORY_ICONS.map(i => [i.id, i.emoji]));
-const baseUrl = 'http://192.168.0.6:8080';
+
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 type CategoryType = 'INCOME' | 'EXPENSE';
 
 interface CategoryStatisticsResponse {

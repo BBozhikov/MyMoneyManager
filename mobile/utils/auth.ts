@@ -3,7 +3,7 @@ import axios from 'axios';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
 
-export const BASE_URL = 'http://192.168.0.6:8080';
+export const BASE_URL = process.env.EXPO_PUBLIC_APP_BASE_URL;
 
 export function redirectToLogin2() {
   router.replace('/(auth)/login')

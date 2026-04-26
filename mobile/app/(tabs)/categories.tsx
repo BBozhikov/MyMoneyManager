@@ -16,7 +16,8 @@ import { useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { requireAuth } from '@/utils/auth';
 
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 interface Category {
   id: number;
   name: string;

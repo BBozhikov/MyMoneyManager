@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import { requireAuth } from '@/utils/auth';
 
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
 
 const BG     = '#3b6861';
 const CARD   = '#1e2d22';

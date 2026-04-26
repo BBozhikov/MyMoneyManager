@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 import Feather from '@expo/vector-icons/build/Feather';
 
-const API_BASE_URL = 'http://192.168.0.6:8080';
+const API_BASE_URL = process.env.EXPO_PUBLIC_APP_BASE_URL;
 
 type Step = 'form' | 'success';
 

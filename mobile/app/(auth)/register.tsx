@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, TextInput, View, Alert } from 'react-nativ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.0.6:8080';
+const API_BASE_URL = process.env.EXPO_PUBLIC_APP_BASE_URL;
 
 export default function RegisterScreen() {
   const [fullName, setFullName] = useState('');

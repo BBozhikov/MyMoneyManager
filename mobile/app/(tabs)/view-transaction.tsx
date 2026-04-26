@@ -13,7 +13,8 @@ import MaterialIcons from '@expo/vector-icons/build/MaterialIcons';
 import Feather from '@expo/vector-icons/build/Feather';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 const BG = '#3b6861';
 const CARD = '#1e2d22';
 const WHITE = '#ffffff';

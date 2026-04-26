@@ -7,6 +7,8 @@ import { use, useEffect, useState } from 'react';
 import axios from 'axios';
 import { requireAuth } from '@/utils/auth';
 
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 async function signOut() {
   await AsyncStorage.removeItem('accessToken');
   await AsyncStorage.removeItem('refreshToken');
@@ -58,7 +60,7 @@ export default function ProfileScreen() {
           const refreshToken = await AsyncStorage.getItem('refreshToken');
 
           await axios.post(
-            'http://192.168.0.6:8080/api/auth/logout',
+            '${baseUrl}/api/auth/logout',
             { refreshToken },
             { headers: { Authorization: `Bearer ${token}` } }
           );
@@ -88,7 +90,7 @@ export default function ProfileScreen() {
               if (!token) return;
 
               await axios.post(
-                'http://192.168.0.6:8080/api/user/deactivate', {},
+                '${baseUrl}/api/user/deactivate', {},
                 { headers: { Authorization: `Bearer ${token}` } }
               );
             } catch (error: any) {

@@ -11,7 +11,8 @@ import axios from 'axios';
 import { requireAuth } from '@/utils/auth';
 import { use, useCallback, useState } from 'react';
 
-const baseUrl = 'http://192.168.0.6:8080';
+const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+
 const iconSize = 24;
 const ICONS = [
   { id: 'cash',       emoji: <FontAwesome name="money" size={iconSize} color="white" /> },
