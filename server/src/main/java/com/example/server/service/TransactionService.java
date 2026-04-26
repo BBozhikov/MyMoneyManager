@@ -34,11 +34,11 @@ public class TransactionService {
     @Transactional
     public TransactionResponse createTransaction(User user, CreateTransactionRequest request) {
         Account account = accountRepository.findByIdAndUser(request.getAccountId(), user)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Сметката не е намерена"));
 
         Category category = categoryRepository.findByIdAndUser(request.getCategoryId(), user)
                 .filter(Category::isActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Категорията не е намерена"));
 
         Transaction transaction = Transaction.builder()
                 .user(user)
@@ -85,11 +85,11 @@ public class TransactionService {
     @Transactional
     public TransactionResponse updateTransaction(User user, Integer transactionId, UpdateTransactionRequest request) {
         Transaction transaction = transactionRepository.findByIdAndUser(transactionId, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Транзакцията не е намерена"));
 
         Category newCategory = categoryRepository.findByIdAndUser(request.getCategoryId(), user)
                 .filter(Category::isActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Категорията не е намерена"));
 
         Account account = transaction.getAccount();
         reverseBalance(account, transaction.getCategory().getType(), transaction.getAmount());
@@ -107,7 +107,7 @@ public class TransactionService {
     @Transactional
     public MessageResponse deleteTransaction(User user, Integer transactionId) {
         Transaction transaction = transactionRepository.findByIdAndUser(transactionId, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Транзакцията не е намерена"));
 
         Account account = transaction.getAccount();
         reverseBalance(account, transaction.getCategory().getType(), transaction.getAmount());
@@ -115,7 +115,7 @@ public class TransactionService {
 
         transactionRepository.delete(transaction);
 
-        return new MessageResponse("Transaction deleted");
+        return new MessageResponse("Транзакцията е изтрита");
     }
 
     public List<CategoryStatisticsResponse> getCategoryStatistics(User user, LocalDate startDate, LocalDate endDate) {

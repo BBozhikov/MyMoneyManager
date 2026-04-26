@@ -35,15 +35,15 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken verifyRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Невалиден жетон за обновяване"));
 
         if (refreshToken.isRevoked()) {
             refreshTokenRepository.revokeAllByUser(refreshToken.getUser());
-            throw new InvalidRefreshTokenException("Refresh token has been revoked");
+            throw new InvalidRefreshTokenException("Жетонът за обновяване е бил отменен");
         }
 
         if (refreshToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new InvalidRefreshTokenException("Refresh token has expired");
+            throw new InvalidRefreshTokenException("Жетонът за обновяване е изтекъл");
         }
 
         return refreshToken;
@@ -57,7 +57,7 @@ public class RefreshTokenService {
 
     public void revokeRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+                .orElseThrow(() -> new InvalidRefreshTokenException("Невалиден жетон за обновяване"));
 
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);

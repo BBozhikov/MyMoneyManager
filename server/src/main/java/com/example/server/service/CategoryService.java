@@ -55,7 +55,7 @@ public class CategoryService {
 
     public CategoryResponse createCategory(User user, CreateCategoryRequest request) {
         if (categoryRepository.existsByUserAndNameAndTypeAndIsActiveTrue(user, request.getName(), request.getType())) {
-            throw new IllegalArgumentException("Category with this name and type already exists");
+            throw new IllegalArgumentException("Категория с това име и тип вече съществува");
         }
 
         Category category = Category.builder()
@@ -80,16 +80,16 @@ public class CategoryService {
     public CategoryResponse updateCategory(User user, Integer categoryId, UpdateCategoryRequest request) {
         Category category = categoryRepository.findByIdAndUser(categoryId, user)
                 .filter(Category::isActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Категорията не е намерена"));
 
         if (category.isDefault() && request.getName() != null) {
-            throw new IllegalArgumentException("Cannot rename a default category");
+            throw new IllegalArgumentException("Не може да преименувате системна категория");
         }
 
         if (request.getName() != null) {
             if (!request.getName().equals(category.getName())
                     && categoryRepository.existsByUserAndNameAndTypeAndIsActiveTrue(user, request.getName(), category.getType())) {
-                throw new IllegalArgumentException("Category with this name and type already exists");
+                throw new IllegalArgumentException("Категория с това име и тип вече съществува");
             }
             category.setName(request.getName());
         }
@@ -103,20 +103,20 @@ public class CategoryService {
     public MessageResponse deleteCategory(User user, Integer categoryId) {
         Category category = categoryRepository.findByIdAndUser(categoryId, user)
                 .filter(Category::isActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Категорията не е намерена"));
 
         if (category.isDefault()) {
-            throw new IllegalArgumentException("Cannot delete a default category");
+            throw new IllegalArgumentException("Не може да изтриете системна категория");
         }
 
         if (transactionRepository.existsByCategoryId(categoryId)) {
             category.setActive(false);
             categoryRepository.save(category);
-            return new MessageResponse("Category deactivated");
+            return new MessageResponse("Категорията е деактивирана");
         }
 
         categoryRepository.delete(category);
-        return new MessageResponse("Category deleted");
+        return new MessageResponse("Категорията е изтрита");
     }
 
     private record DefaultCategoryDef(String name, CategoryType type, CategoryIcon icon, Color color) {}

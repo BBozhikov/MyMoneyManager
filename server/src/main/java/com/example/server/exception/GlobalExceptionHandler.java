@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
         Map<String, Object> body = Map.of(
                 "status", 400,
-                "message", "Validation failed",
+                "message", "Невалидни данни",
                 "errors", fieldErrors
         );
         return ResponseEntity.badRequest().body(body);
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleAuthErrors(Exception ex) {
         Map<String, Object> body = Map.of(
                 "status", 401,
-                "message", "Invalid email or password"
+                "message", "Невалиден имейл или парола"
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }

@@ -18,19 +18,19 @@ public class UserService {
 
     public MessageResponse changePassword(User user, ChangePasswordRequest request) {
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Current password is incorrect");
+            throw new BadCredentialsException("Текущата парола е грешна");
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 
-        return new MessageResponse("Password changed successfully.");
+        return new MessageResponse("Паролата е променена успешно.");
     }
 
     public MessageResponse deactivateAccount(User user) {
         user.setDeactivated(true);
         userRepository.save(user);
 
-        return new MessageResponse("Account deactivated successfully.");
+        return new MessageResponse("Акаунтът е деактивиран успешно.");
     }
 }

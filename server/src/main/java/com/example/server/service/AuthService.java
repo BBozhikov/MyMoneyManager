@@ -52,7 +52,7 @@ public class AuthService {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser.isPresent() && existingUser.get().isEmailVerified() && !existingUser.get().isDeactivated()) {
-            throw new IllegalArgumentException("Email already in use");
+            throw new IllegalArgumentException("Този имейл вече се използва");
         }
 
         User user;
@@ -91,15 +91,15 @@ public class AuthService {
 
         emailService.sendVerificationEmail(user.getEmail(), token);
 
-        return new MessageResponse("Registration successful. Please check your email to verify your account.");
+        return new MessageResponse("Регистрацията е успешна. Моля, проверете имейла си за потвърждение.");
     }
 
     public MessageResponse verifyEmail(String token) {
         VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid verification token"));
+                .orElseThrow(() -> new IllegalArgumentException("Невалиден жетон за потвърждение"));
 
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Verification token has expired");
+            throw new IllegalArgumentException("Жетонът за потвърждение е изтекъл");
         }
 
         User user = verificationToken.getUser();
@@ -108,23 +108,23 @@ public class AuthService {
 
         verificationTokenRepository.delete(verificationToken);
 
-        return new MessageResponse("Email verified successfully. You can now log in.");
+        return new MessageResponse("Имейлът е потвърден успешно. Вече можете да влезете.");
     }
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+                .orElseThrow(() -> new BadCredentialsException("Невалиден имейл или парола"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new BadCredentialsException("Невалиден имейл или парола");
         }
 
         if (!user.isEmailVerified()) {
-            throw new DisabledException("Please verify your email before logging in.");
+            throw new DisabledException("Моля, потвърдете имейла си преди да влезете.");
         }
 
         if (user.isDeactivated()) {
-            throw new DisabledException("Account is deactivated. Please register again to reactivate.");
+            throw new DisabledException("Акаунтът е деактивиран. Моля, регистрирайте се отново за да го активирате.");
         }
 
         String accessToken = jwtService.generateToken(user);
@@ -157,11 +157,11 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.verifyRefreshToken(refreshTokenString);
 
         if (!refreshToken.getUser().getId().equals(userId)) {
-            throw new InvalidRefreshTokenException("Refresh token does not belong to this user");
+            throw new InvalidRefreshTokenException("Жетонът не принадлежи на този потребител");
         }
 
         refreshTokenService.revokeRefreshToken(refreshTokenString);
-        return new MessageResponse("Logged out successfully.");
+        return new MessageResponse("Излязохте успешно.");
     }
 
     public MessageResponse requestPasswordReset(String email) {
@@ -177,15 +177,15 @@ public class AuthService {
             emailService.sendPasswordResetEmail(user.getEmail(), token);
         });
 
-        return new MessageResponse("If an account exists with this email, a reset link has been sent.");
+        return new MessageResponse("Ако съществува акаунт с този имейл, линк за нулиране е изпратен.");
     }
 
     public MessageResponse resetPassword(ResetPasswordRequest request) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid password reset token"));
+                .orElseThrow(() -> new IllegalArgumentException("Невалиден жетон за нулиране на паролата"));
 
         if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Password reset token has expired");
+            throw new IllegalArgumentException("Жетонът за нулиране на паролата е изтекъл");
         }
 
         User user = resetToken.getUser();
@@ -194,6 +194,6 @@ public class AuthService {
 
         passwordResetTokenRepository.delete(resetToken);
 
-        return new MessageResponse("Password has been reset successfully.");
+        return new MessageResponse("Паролата е нулирана успешно.");
     }
 }

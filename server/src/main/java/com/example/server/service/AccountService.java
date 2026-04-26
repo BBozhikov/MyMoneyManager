@@ -39,7 +39,7 @@ public class AccountService {
 
     public AccountResponse createAccount(User user, CreateAccountRequest request) {
         if (accountRepository.existsByUserAndName(user, request.getName())) {
-            throw new IllegalArgumentException("Account with this name already exists");
+            throw new IllegalArgumentException("Сметка с това име вече съществува");
         }
 
         Account account = Account.builder()
@@ -62,11 +62,11 @@ public class AccountService {
 
     public AccountResponse updateAccount(User user, Integer accountId, UpdateAccountRequest request) {
         Account account = accountRepository.findByIdAndUser(accountId, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Сметката не е намерена"));
 
         if (request.getName() != null && !request.getName().equals(account.getName())
                 && accountRepository.existsByUserAndName(user, request.getName())) {
-            throw new IllegalArgumentException("Account with this name already exists");
+            throw new IllegalArgumentException("Сметка с това име вече съществува");
         }
 
         if (request.getName() != null) {
@@ -82,15 +82,15 @@ public class AccountService {
     @Transactional
     public MessageResponse deleteAccount(User user, Integer accountId) {
         Account account = accountRepository.findByIdAndUser(accountId, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Сметката не е намерена"));
 
         if (account.isMain()) {
-            throw new IllegalArgumentException("Cannot delete the main account");
+            throw new IllegalArgumentException("Не може да изтриете основната сметка");
         }
 
         transactionRepository.deleteByAccountId(accountId);
         accountRepository.delete(account);
 
-        return new MessageResponse("Account deleted");
+        return new MessageResponse("Сметката е изтрита");
     }
 }
