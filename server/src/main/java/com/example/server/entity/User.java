@@ -49,8 +49,11 @@ public class User implements UserDetails {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive;
+    @Column(name = "is_email_verified", nullable = false)
+    private boolean isEmailVerified;
+
+    @Column(name = "is_deactivated", nullable = false)
+    private boolean isDeactivated;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -69,6 +72,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return isActive;
+        return isEmailVerified && !isDeactivated;
     }
 }

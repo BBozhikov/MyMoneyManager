@@ -28,7 +28,7 @@ public class UserService {
     }
 
     public MessageResponse deactivateAccount(User user) {
-        user.setActive(false);
+        user.setDeactivated(true);
         userRepository.save(user);
 
         return new MessageResponse("Account deactivated successfully.");

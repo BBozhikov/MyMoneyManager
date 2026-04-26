@@ -51,7 +51,7 @@ public class AuthService {
     public MessageResponse register(RegisterRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
 
-        if (existingUser.isPresent() && existingUser.get().isActive()) {
+        if (existingUser.isPresent() && existingUser.get().isEmailVerified() && !existingUser.get().isDeactivated()) {
             throw new IllegalArgumentException("Email already in use");
         }
 
@@ -60,6 +60,8 @@ public class AuthService {
             user = existingUser.get();
             user.setFullName(request.getFullName());
             user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
+            user.setDeactivated(false);
+            user.setEmailVerified(false);
             userRepository.save(user);
             verificationTokenRepository.deleteByUser(user);
         } else {
@@ -68,7 +70,8 @@ public class AuthService {
                     .email(request.getEmail())
                     .passwordHash(passwordEncoder.encode(request.getPassword()))
                     .currency(Currency.EUR)
-                    .isActive(false)
+                    .isEmailVerified(false)
+                    .isDeactivated(false)
                     .build();
 
             userRepository.save(user);
@@ -100,7 +103,7 @@ public class AuthService {
         }
 
         User user = verificationToken.getUser();
-        user.setActive(true);
+        user.setEmailVerified(true);
         userRepository.save(user);
 
         verificationTokenRepository.delete(verificationToken);
@@ -116,8 +119,12 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        if (!user.isActive()) {
-            throw new DisabledException("Account is not active. Please register again or contact support.");
+        if (!user.isEmailVerified()) {
+            throw new DisabledException("Please verify your email before logging in.");
+        }
+
+        if (user.isDeactivated()) {
+            throw new DisabledException("Account is deactivated. Please register again to reactivate.");
         }
 
         String accessToken = jwtService.generateToken(user);
