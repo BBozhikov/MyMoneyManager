@@ -210,16 +210,6 @@ export default function NewAccountScreen() {
           </View>
         </View>
 
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Не включвай в общия баланс</Text>
-          <Switch
-            value={excludeBalance}
-            onValueChange={setExcludeBalance}
-            trackColor={{ false: 'rgba(255,255,255,0.15)', true: ACCENT }}
-            thumbColor={excludeBalance ? '#fff' : 'rgba(255,255,255,0.6)'}
-          />
-        </View>
-
       </ScrollView>
 
       <View style={styles.footer}>

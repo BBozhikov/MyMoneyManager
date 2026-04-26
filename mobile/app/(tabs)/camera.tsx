@@ -19,6 +19,7 @@ interface Category {
   default: boolean;
 }
 const baseUrl = process.env.EXPO_PUBLIC_APP_BASE_URL;
+const baseUrl2 = process.env.EXPO_PUBLIC_APP_BASE_URL2;
 
 export default function App() {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -107,7 +108,7 @@ export default function App() {
     const timeout = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
     const response = await fetch(
-      `${baseUrl}/api/v2/parse-receipt?categorize=${categorizing}`,
+      `${baseUrl2}/api/v2/parse-receipt?categorize=${categorizing}`,
       {
         method: 'POST',
         body: formData,
